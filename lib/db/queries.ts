@@ -13,6 +13,7 @@ import {
   type User,
   type Vote,
 } from "@/lib/supabase/models";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database, Json } from "@/lib/supabase/types";
 import { ChatSDKError } from "../errors";
@@ -22,9 +23,12 @@ import { generateHashedPassword } from "./utils";
 
 type Supabase = SupabaseClient<Database>;
 
-function getSupabase(): Supabase {
-  return createSupabaseServerClient();
+async function getSupabase(): Promise<Supabase> {
+  return await createSupabaseServerClient();
 }
+
+const STORAGE_BUCKET_ID = "uploads";
+const SIGNED_URL_TTL_SECONDS = 60 * 60;
 
 function toIsoString(value: Date | string) {
   return value instanceof Date ? value.toISOString() : value;
@@ -83,8 +87,100 @@ type SuggestionInsertInput = Omit<
   documentCreatedAt: Date | string;
 };
 
+async function withSignedAttachmentUrls(
+  messages: DBMessage[]
+): Promise<DBMessage[]> {
+  if (messages.length === 0) {
+    return messages;
+  }
+
+  const adminClient = createSupabaseAdminClient();
+
+  const clonedMessages = messages.map((message) => {
+    if (Array.isArray(message.parts)) {
+      const partsClone = JSON.parse(
+        JSON.stringify(message.parts)
+      ) as Array<Record<string, unknown>>;
+
+      return {
+        ...message,
+        parts: partsClone as unknown as Json,
+      };
+    }
+
+    return { ...message };
+  });
+
+  const fileReferences: Array<{
+    messageIndex: number;
+    partIndex: number;
+    path: string;
+  }> = [];
+
+  clonedMessages.forEach((message, messageIndex) => {
+    if (!Array.isArray(message.parts)) {
+      return;
+    }
+
+    (message.parts as unknown as Array<Record<string, unknown>>).forEach(
+      (part, partIndex) => {
+        if (
+          part &&
+          typeof part === "object" &&
+          part.type === "file" &&
+          typeof part.storagePath === "string"
+        ) {
+          fileReferences.push({
+            messageIndex,
+            partIndex,
+            path: part.storagePath,
+          });
+        }
+      }
+    );
+  });
+
+  if (fileReferences.length === 0) {
+    return clonedMessages;
+  }
+
+  const { data, error } = await adminClient.storage
+    .from(STORAGE_BUCKET_ID)
+    .createSignedUrls(
+      fileReferences.map((reference) => reference.path),
+      SIGNED_URL_TTL_SECONDS
+    );
+
+  if (error || !data) {
+    console.error(
+      "Failed to create signed URLs for message attachments",
+      error
+    );
+    return clonedMessages;
+  }
+
+  data.forEach((item, index) => {
+    const signedUrl = item.signedUrl;
+    if (!signedUrl) {
+      return;
+    }
+
+    const { messageIndex, partIndex } = fileReferences[index];
+    const parts = clonedMessages[messageIndex].parts;
+
+    if (Array.isArray(parts)) {
+      const part = (parts as unknown as Array<Record<string, unknown>>)[
+        partIndex
+      ];
+      part.url = signedUrl;
+    }
+  });
+
+  return clonedMessages;
+}
+
 export async function getUser(email: string): Promise<User[]> {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("User")
@@ -102,7 +198,7 @@ export async function getUser(email: string): Promise<User[]> {
 }
 
 export async function createUser(email: string, password: string) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   const hashedPassword = generateHashedPassword(password);
 
   const { error } = await supabase
@@ -115,7 +211,7 @@ export async function createUser(email: string, password: string) {
 }
 
 export async function createGuestUser() {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   const email = `guest-${Date.now()}`;
   const password = generateHashedPassword(generateUUID());
 
@@ -145,7 +241,7 @@ export async function saveChat({
   title: string;
   visibility: VisibilityType;
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { error } = await supabase.from("Chat").insert({
     id,
@@ -161,7 +257,7 @@ export async function saveChat({
 }
 
 export async function deleteChatById({ id }: { id: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { error: voteError } = await supabase
     .from("Vote_v2")
@@ -217,7 +313,7 @@ export async function deleteChatById({ id }: { id: string }) {
 }
 
 export async function deleteAllChatsByUserId({ userId }: { userId: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data: userChats, error: chatsError } = await supabase
     .from("Chat")
@@ -300,7 +396,7 @@ export async function getChatsByUserId({
   startingAfter: string | null;
   endingBefore: string | null;
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   const extendedLimit = limit + 1;
 
   const buildQuery = () =>
@@ -378,7 +474,7 @@ export async function getChatsByUserId({
 }
 
 export async function getChatById({ id }: { id: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Chat")
@@ -398,7 +494,7 @@ export async function saveMessages({
 }: {
   messages: MessageInsertInput[];
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   const payload: DBMessageInsert[] = messages.map((message) => ({
     id: message.id,
     chatId: message.chatId,
@@ -418,7 +514,7 @@ export async function saveMessages({
 }
 
 export async function getMessagesByChatId({ id }: { id: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Message_v2")
@@ -433,7 +529,8 @@ export async function getMessagesByChatId({ id }: { id: string }) {
     );
   }
 
-  return data ?? [];
+  const messages = (data ?? []) as DBMessage[];
+  return withSignedAttachmentUrls(messages);
 }
 
 export async function voteMessage({
@@ -445,7 +542,7 @@ export async function voteMessage({
   messageId: string;
   type: "up" | "down";
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data: existingVote, error: existingVoteError } = await supabase
     .from("Vote_v2")
@@ -485,7 +582,7 @@ export async function voteMessage({
 }
 
 export async function getVotesByChatId({ id }: { id: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Vote_v2")
@@ -515,7 +612,7 @@ export async function saveDocument({
   content: string;
   userId: string;
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Document")
@@ -537,7 +634,7 @@ export async function saveDocument({
 }
 
 export async function getDocumentsById({ id }: { id: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Document")
@@ -556,7 +653,7 @@ export async function getDocumentsById({ id }: { id: string }) {
 }
 
 export async function getDocumentById({ id }: { id: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Document")
@@ -582,7 +679,7 @@ export async function deleteDocumentsByIdAfterTimestamp({
   id: string;
   timestamp: Date | string;
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   const timestampIso = toIsoString(timestamp);
 
   const { error: suggestionError } = await supabase
@@ -620,7 +717,7 @@ export async function saveSuggestions({
 }: {
   suggestions: SuggestionInsertInput[];
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   const payload = suggestions.map((suggestion) => ({
     ...suggestion,
     createdAt: toIsoString(suggestion.createdAt),
@@ -642,7 +739,7 @@ export async function getSuggestionsByDocumentId({
 }: {
   documentId: string;
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Suggestion")
@@ -660,7 +757,7 @@ export async function getSuggestionsByDocumentId({
 }
 
 export async function getMessageById({ id }: { id: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Message_v2")
@@ -684,7 +781,7 @@ export async function deleteMessagesByChatIdAfterTimestamp({
   chatId: string;
   timestamp: Date | string;
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   const timestampIso = toIsoString(timestamp);
 
   const { data: messagesToDelete, error } = await supabase
@@ -740,7 +837,7 @@ export async function updateChatVisibilityById({
   chatId: string;
   visibility: "private" | "public";
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { error } = await supabase
     .from("Chat")
@@ -764,7 +861,7 @@ export async function updateChatLastContextById({
   context: AppUsage;
 }) {
   try {
-    const supabase = getSupabase();
+    const supabase = await getSupabase();
 
     const { error } = await supabase
       .from("Chat")
@@ -786,7 +883,7 @@ export async function getMessageCountByUserId({
   id: string;
   differenceInHours: number;
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
   const startTime = new Date(
     Date.now() - differenceInHours * 60 * 60 * 1000
   ).toISOString();
@@ -813,7 +910,7 @@ export async function createStreamId({
   streamId: string;
   chatId: string;
 }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { error } = await supabase
     .from("Stream")
@@ -828,7 +925,7 @@ export async function createStreamId({
 }
 
 export async function getStreamIdsByChatId({ chatId }: { chatId: string }) {
-  const supabase = getSupabase();
+  const supabase = await getSupabase();
 
   const { data, error } = await supabase
     .from("Stream")
