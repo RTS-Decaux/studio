@@ -15,13 +15,14 @@ test.describe
         throw new Error("Failed to load page");
       }
 
-      let request = response.request();
+      let current: ReturnType<typeof response.request> | null =
+        response.request();
 
       const chain: string[] = [];
 
-      while (request) {
-        chain.unshift(request.url());
-        request = request.redirectedFrom();
+      while (current) {
+        chain.unshift(current.url());
+        current = current.redirectedFrom();
       }
 
       expect(chain).toEqual([
@@ -57,13 +58,14 @@ test.describe
         throw new Error("Failed to load page");
       }
 
-      let request = response.request();
+      let current: ReturnType<typeof response.request> | null =
+        response.request();
 
       const chain: string[] = [];
 
-      while (request) {
-        chain.unshift(request.url());
-        request = request.redirectedFrom();
+      while (current) {
+        chain.unshift(current.url());
+        current = current.redirectedFrom();
       }
 
       expect(chain).toEqual(["http://localhost:3000/"]);

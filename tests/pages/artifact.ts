@@ -1,4 +1,18 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
+
+type AssistantMessage = {
+  element: Locator;
+  content: string;
+  reasoning: string | null;
+  toggleReasoningVisibility(): Promise<void>;
+};
+
+type UserMessage = {
+  element: Locator;
+  content: string;
+  attachments: Locator[];
+  edit(newMessage: string): Promise<void>;
+};
 
 export class ArtifactPage {
   private readonly page: Page;
@@ -37,32 +51,28 @@ export class ArtifactPage {
     await this.artifact.getByTestId("send-button").click();
   }
 
-  async getRecentAssistantMessage() {
+  async getRecentAssistantMessage(): Promise<AssistantMessage> {
     const messageElements = await this.artifact
       .getByTestId("message-assistant")
       .all();
     const lastMessageElement = messageElements.at(-1);
 
     if (!lastMessageElement) {
-      return null;
+      throw new Error("No artifact assistant message found");
     }
 
     const content = await lastMessageElement
       .getByTestId("message-content")
-      .innerText()
-      .catch(() => null);
+      .innerText();
 
-    const reasoningElement = await lastMessageElement
-      .getByTestId("message-reasoning")
+    const reasoningLocator = lastMessageElement.getByTestId(
+      "message-reasoning"
+    );
+    const reasoningElement = (await reasoningLocator
       .isVisible()
-      .then(async (visible) =>
-        visible
-          ? await lastMessageElement
-              .getByTestId("message-reasoning")
-              .innerText()
-          : null
-      )
-      .catch(() => null);
+      .catch(() => false))
+      ? await reasoningLocator.innerText()
+      : null;
 
     return {
       element: lastMessageElement,
@@ -76,14 +86,14 @@ export class ArtifactPage {
     };
   }
 
-  async getRecentUserMessage() {
+  async getRecentUserMessage(): Promise<UserMessage> {
     const messageElements = await this.artifact
       .getByTestId("message-user")
       .all();
     const lastMessageElement = messageElements.at(-1);
 
     if (!lastMessageElement) {
-      return null;
+      throw new Error("No artifact user message found");
     }
 
     const content = await lastMessageElement.innerText();
