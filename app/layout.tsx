@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { SupabaseSessionProvider } from "@/lib/supabase/provider";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://chat.vercel.ai"),
@@ -48,11 +49,16 @@ const THEME_COLOR_SCRIPT = `\
   updateThemeColor();
 })();`;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = getSupabaseServerClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   return (
     <html
       className={`${geist.variable} ${geistMono.variable}`}
@@ -64,23 +70,15 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: "Required"
-          dangerouslySetInnerHTML={{
-            __html: THEME_COLOR_SCRIPT,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: THEME_COLOR_SCRIPT }} />
       </head>
-      <body className="antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          disableTransitionOnChange
-          enableSystem
-        >
-          <Toaster position="top-center" />
-          <SessionProvider>{children}</SessionProvider>
-        </ThemeProvider>
+      <body className="bg-background text-foreground">
+        <SupabaseSessionProvider initialSession={session}>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            {children}
+            <Toaster position="bottom-center" richColors closeButton />
+          </ThemeProvider>
+        </SupabaseSessionProvider>
       </body>
     </html>
   );
