@@ -9,10 +9,10 @@ export async function GET(request: Request) {
   // Create Supabase client using the existing helper
   const supabase = await createSupabaseServerClient();
 
-  // Check if user is already signed in
-  const { data: { session } } = await supabase.auth.getSession();
+  // Check if user is already signed in (use getUser() for security)
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-  if (session) {
+  if (user && !userError) {
     return NextResponse.redirect(new URL(redirectUrl, requestUrl.origin));
   }
 
