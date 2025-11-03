@@ -2,7 +2,7 @@ import { streamObject, tool, type UIMessageStreamWriter } from "ai";
 import type { Session } from "next-auth";
 import { z } from "zod";
 import { getDocumentById, saveSuggestions } from "@/lib/db/queries";
-import type { Suggestion } from "@/lib/db/schema";
+import type { Suggestion } from "@/lib/supabase/models";
 import type { ChatMessage } from "@/lib/types";
 import { generateUUID } from "@/lib/utils";
 import { myProvider } from "../providers";
@@ -10,6 +10,15 @@ import { myProvider } from "../providers";
 type RequestSuggestionsProps = {
   session: Session;
   dataStream: UIMessageStreamWriter<ChatMessage>;
+};
+
+type SuggestionDraft = Omit<
+  Suggestion,
+  "userId" | "createdAt" | "documentCreatedAt"
+> & {
+  userId?: string;
+  createdAt?: string | Date;
+  documentCreatedAt?: string | Date;
 };
 
 export const requestSuggestions = ({
@@ -32,10 +41,7 @@ export const requestSuggestions = ({
         };
       }
 
-      const suggestions: Omit<
-        Suggestion,
-        "userId" | "createdAt" | "documentCreatedAt"
-      >[] = [];
+      const suggestions: SuggestionDraft[] = [];
 
       const { elementStream } = streamObject({
         model: myProvider.languageModel("artifact-model"),
@@ -51,8 +57,7 @@ export const requestSuggestions = ({
       });
 
       for await (const element of elementStream) {
-        // @ts-expect-error todo: fix type
-        const suggestion: Suggestion = {
+        const suggestion: SuggestionDraft = {
           originalText: element.originalSentence,
           suggestedText: element.suggestedSentence,
           description: element.description,
@@ -63,7 +68,17 @@ export const requestSuggestions = ({
 
         dataStream.write({
           type: "data-suggestion",
-          data: suggestion,
+          data: {
+            id: suggestion.id,
+            documentId,
+            originalText: suggestion.originalText,
+            suggestedText: suggestion.suggestedText,
+            description: suggestion.description ?? null,
+            isResolved: suggestion.isResolved ?? false,
+            userId: suggestion.userId ?? "",
+            createdAt: new Date().toISOString(),
+            documentCreatedAt: document.createdAt,
+          } satisfies Suggestion,
           transient: true,
         });
 
@@ -75,7 +90,12 @@ export const requestSuggestions = ({
 
         await saveSuggestions({
           suggestions: suggestions.map((suggestion) => ({
-            ...suggestion,
+            id: suggestion.id,
+            documentId: suggestion.documentId,
+            originalText: suggestion.originalText,
+            suggestedText: suggestion.suggestedText,
+            description: suggestion.description ?? null,
+            isResolved: suggestion.isResolved ?? false,
             userId,
             createdAt: new Date(),
             documentCreatedAt: document.createdAt,

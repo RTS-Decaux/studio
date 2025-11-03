@@ -7,7 +7,7 @@ import type {
 import { type ClassValue, clsx } from 'clsx';
 import { formatISO } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
-import type { DBMessage, Document } from '@/lib/db/schema';
+import type { DBMessage, Document } from '@/lib/supabase/models';
 import { ChatSDKError, type ErrorCode } from './errors';
 import type { ChatMessage, ChatTools, CustomUIDataTypes } from './types';
 
@@ -73,10 +73,14 @@ export function getMostRecentUserMessage(messages: UIMessage[]) {
 
 export function getDocumentTimestampByIndex(
   documents: Document[],
-  index: number,
+  index: number
 ) {
-  if (!documents) { return new Date(); }
-  if (index > documents.length) { return new Date(); }
+  if (!documents) {
+    return new Date().toISOString();
+  }
+  if (index > documents.length) {
+    return new Date().toISOString();
+  }
 
   return documents[index].createdAt;
 }
@@ -103,7 +107,7 @@ export function convertToUIMessages(messages: DBMessage[]): ChatMessage[] {
     role: message.role as 'user' | 'assistant' | 'system',
     parts: message.parts as UIMessagePart<CustomUIDataTypes, ChatTools>[],
     metadata: {
-      createdAt: formatISO(message.createdAt),
+      createdAt: formatISO(new Date(message.createdAt)),
     },
   }));
 }
