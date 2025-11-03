@@ -4,6 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import { ArrowDownIcon } from "lucide-react";
 import { memo, useEffect } from "react";
 import { useMessages } from "@/hooks/use-messages";
+import type { ChatModelId } from "@/lib/ai/models";
 import type { Vote } from "@/lib/supabase/models";
 import type { ChatMessage } from "@/lib/types";
 import { useDataStream } from "./data-stream-provider";
@@ -20,7 +21,7 @@ type MessagesProps = {
   regenerate: UseChatHelpers<ChatMessage>["regenerate"];
   isReadonly: boolean;
   isArtifactVisible: boolean;
-  selectedModelId: string;
+  selectedModelId: ChatModelId;
 };
 
 function PureMessages({

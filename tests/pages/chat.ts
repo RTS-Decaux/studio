@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { expect, type Locator, type Page } from "@playwright/test";
-import { chatModels } from "@/lib/ai/models";
+import { chatModels, type ChatModelId } from "@/lib/ai/models";
 
 type AssistantMessage = {
   element: Locator;
@@ -122,7 +122,7 @@ export class ChatPage {
     return modelId;
   }
 
-  async chooseModelFromSelector(chatModelId: string) {
+  async chooseModelFromSelector(chatModelId: ChatModelId) {
     const chatModel = chatModels.find(
       (currentChatModel) => currentChatModel.id === chatModelId
     );

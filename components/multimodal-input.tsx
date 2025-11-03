@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
 import { saveChatModelAsCookie } from "@/app/(chat)/actions";
 import { SelectItem } from "@/components/ui/select";
-import { chatModels } from "@/lib/ai/models";
+import { chatModels, type ChatModelId } from "@/lib/ai/models";
 import { myProvider } from "@/lib/ai/providers";
 import type { Attachment, ChatMessage } from "@/lib/types";
 import type { AppUsage } from "@/lib/usage";
@@ -76,8 +76,8 @@ function PureMultimodalInput({
   sendMessage: UseChatHelpers<ChatMessage>["sendMessage"];
   className?: string;
   selectedVisibilityType: VisibilityType;
-  selectedModelId: string;
-  onModelChange?: (modelId: string) => void;
+  selectedModelId: ChatModelId;
+  onModelChange?: (modelId: ChatModelId) => void;
   usage?: AppUsage;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -140,6 +140,7 @@ function PureMultimodalInput({
           url: attachment.url,
           name: attachment.name,
           mediaType: attachment.contentType,
+          storagePath: attachment.storagePath,
         })),
         {
           type: "text",
@@ -178,18 +179,35 @@ function PureMultimodalInput({
         body: formData,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const { url, pathname, contentType } = data;
+      const data = await response.json();
 
-        return {
-          url,
-          name: pathname,
-          contentType,
-        };
+      if (!response.ok) {
+        const errorMessage =
+          typeof data?.error === "string"
+            ? data.error
+            : "Failed to upload file, please try again!";
+        toast.error(errorMessage);
+        return;
       }
-      const { error } = await response.json();
-      toast.error(error);
+
+      const { url, storagePath, contentType, name } = data as {
+        url?: string;
+        storagePath?: string;
+        contentType?: string;
+        name?: string;
+      };
+
+      if (!url || !storagePath || !contentType) {
+        toast.error("Failed to upload file, please try again!");
+        return;
+      }
+
+      return {
+        url,
+        storagePath,
+        name: name ?? storagePath,
+        contentType,
+      };
     } catch (_error) {
       toast.error("Failed to upload file, please try again!");
     }
@@ -428,7 +446,7 @@ function PureAttachmentsButton({
 }: {
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
   status: UseChatHelpers<ChatMessage>["status"];
-  selectedModelId: string;
+  selectedModelId: ChatModelId;
 }) {
   const isReasoningModel = selectedModelId === "chat-model-reasoning";
 
@@ -454,10 +472,11 @@ function PureModelSelectorCompact({
   selectedModelId,
   onModelChange,
 }: {
-  selectedModelId: string;
-  onModelChange?: (modelId: string) => void;
+  selectedModelId: ChatModelId;
+  onModelChange?: (modelId: ChatModelId) => void;
 }) {
-  const [optimisticModelId, setOptimisticModelId] = useState(selectedModelId);
+  const [optimisticModelId, setOptimisticModelId] =
+    useState<ChatModelId>(selectedModelId);
 
   useEffect(() => {
     setOptimisticModelId(selectedModelId);

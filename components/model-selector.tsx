@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
-import { chatModels } from "@/lib/ai/models";
+import { chatModels, type ChatModelId } from "@/lib/ai/models";
 import { cn } from "@/lib/utils";
 import { CheckCircleFillIcon, ChevronDownIcon } from "./icons";
 
@@ -21,11 +21,11 @@ export function ModelSelector({
   className,
 }: {
   session: Session;
-  selectedModelId: string;
+  selectedModelId: ChatModelId;
 } & React.ComponentProps<typeof Button>) {
   const [open, setOpen] = useState(false);
   const [optimisticModelId, setOptimisticModelId] =
-    useOptimistic(selectedModelId);
+    useOptimistic<ChatModelId>(selectedModelId);
 
   const userType = session.user.type;
   const { availableChatModelIds } = entitlementsByUserType[userType];
