@@ -20,6 +20,7 @@ import {
 import { useArtifactSelector } from "@/hooks/use-artifact";
 import { useAutoResume } from "@/hooks/use-auto-resume";
 import { useChatVisibility } from "@/hooks/use-chat-visibility";
+import type { ChatModelId } from "@/lib/ai/models";
 import type { Vote } from "@/lib/supabase/models";
 import { ChatSDKError } from "@/lib/errors";
 import type { Attachment, ChatMessage } from "@/lib/types";
@@ -44,7 +45,7 @@ export function Chat({
 }: {
   id: string;
   initialMessages: ChatMessage[];
-  initialChatModel: string;
+  initialChatModel: ChatModelId;
   initialVisibilityType: VisibilityType;
   isReadonly: boolean;
   autoResume: boolean;
@@ -61,8 +62,10 @@ export function Chat({
   const [input, setInput] = useState<string>("");
   const [usage, setUsage] = useState<AppUsage | undefined>(initialLastContext);
   const [showCreditCardAlert, setShowCreditCardAlert] = useState(false);
-  const [currentModelId, setCurrentModelId] = useState(initialChatModel);
-  const currentModelIdRef = useRef(currentModelId);
+  const [currentModelId, setCurrentModelId] = useState<ChatModelId>(
+    initialChatModel
+  );
+  const currentModelIdRef = useRef<ChatModelId>(currentModelId);
 
   useEffect(() => {
     currentModelIdRef.current = currentModelId;
@@ -109,7 +112,8 @@ export function Chat({
       if (error instanceof ChatSDKError) {
         // Check if it's a credit card error
         if (
-          error.message?.includes("AI Gateway requires a valid credit card")
+          error.message?.includes("requires a valid credit card") ||
+          error.message?.includes("billing")
         ) {
           setShowCreditCardAlert(true);
         } else {
@@ -169,7 +173,7 @@ export function Chat({
           isReadonly={isReadonly}
           messages={messages}
           regenerate={regenerate}
-          selectedModelId={initialChatModel}
+          selectedModelId={currentModelId}
           setMessages={setMessages}
           status={status}
           votes={votes}
@@ -182,7 +186,9 @@ export function Chat({
               chatId={id}
               input={input}
               messages={messages}
-              onModelChange={setCurrentModelId}
+              onModelChange={(modelId) => {
+                setCurrentModelId(modelId);
+              }}
               selectedModelId={currentModelId}
               selectedVisibilityType={visibilityType}
               sendMessage={sendMessage}
@@ -221,26 +227,16 @@ export function Chat({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Activate AI Gateway</AlertDialogTitle>
+            <AlertDialogTitle>Enable AI provider billing</AlertDialogTitle>
             <AlertDialogDescription>
               This application requires{" "}
               {process.env.NODE_ENV === "production" ? "the owner" : "you"} to
-              activate Vercel AI Gateway.
+              enable billing for the configured AI provider.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                window.open(
-                  "https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dadd-credit-card",
-                  "_blank"
-                );
-                window.location.href = "/";
-              }}
-            >
-              Activate
-            </AlertDialogAction>
+            <AlertDialogCancel>Dismiss</AlertDialogCancel>
+            <AlertDialogAction>Close</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
