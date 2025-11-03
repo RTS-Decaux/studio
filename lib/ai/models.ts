@@ -1,21 +1,23 @@
-export const DEFAULT_CHAT_MODEL: string = "chat-model";
-
-export type ChatModel = {
-  id: string;
-  name: string;
-  description: string;
-};
-
-export const chatModels: ChatModel[] = [
+export const chatModels = [
   {
     id: "chat-model",
-    name: "Grok Vision",
-    description: "Advanced multimodal model with vision and text capabilities",
+    name: "Chat — Balanced",
+    description: "Multimodal, high-quality responses suitable for most tasks",
   },
   {
     id: "chat-model-reasoning",
-    name: "Grok Reasoning",
-    description:
-      "Uses advanced chain-of-thought reasoning for complex problems",
+    name: "Chat — Reasoning",
+    description: "Enhanced chain-of-thought for complex or analytical prompts",
   },
-];
+  {
+    id: "chat-model-fast",
+    name: "Chat — Fast",
+    description:
+      "Lower-latency model tuned for quick replies and iterative workflows",
+  },
+] as const;
+
+export type ChatModel = (typeof chatModels)[number];
+export type ChatModelId = ChatModel["id"];
+
+export const DEFAULT_CHAT_MODEL: ChatModelId = "chat-model";
