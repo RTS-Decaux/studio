@@ -1,17 +1,17 @@
 "use server";
 
-import { generateText, type UIMessage } from "ai";
-import { cookies } from "next/headers";
 import type { VisibilityType } from "@/components/visibility-selector";
-import { myProvider } from "@/lib/ai/providers";
 import type { ChatModelId } from "@/lib/ai/models";
 import { titlePrompt } from "@/lib/ai/prompts";
+import { myProvider } from "@/lib/ai/providers";
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
   updateChatVisibilityById,
 } from "@/lib/db/queries";
 import { getTextFromMessage } from "@/lib/utils";
+import { generateText, type LanguageModel, type UIMessage } from "ai";
+import { cookies } from "next/headers";
 
 export async function saveChatModelAsCookie(model: ChatModelId) {
   const cookieStore = await cookies();
@@ -23,8 +23,10 @@ export async function generateTitleFromUserMessage({
 }: {
   message: UIMessage;
 }) {
+  const model = myProvider.languageModel("title-model") as LanguageModel;
+
   const { text: title } = await generateText({
-    model: myProvider.languageModel("title-model"),
+    model,
     system: titlePrompt,
     prompt: getTextFromMessage(message),
   });

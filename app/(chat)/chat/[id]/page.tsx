@@ -1,12 +1,16 @@
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
-import { auth } from "@/app/(auth)/auth";
 import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
 import type { VisibilityType } from "@/components/visibility-selector";
-import { chatModels, DEFAULT_CHAT_MODEL, type ChatModelId } from "@/lib/ai/models";
+import {
+  chatModels,
+  DEFAULT_CHAT_MODEL,
+  type ChatModelId,
+} from "@/lib/ai/models";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
+import { getSession, getUser } from "@/lib/supabase/server";
 import type { AppUsage } from "@/lib/usage";
 import { convertToUIMessages } from "@/lib/utils";
 
@@ -19,18 +23,19 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     notFound();
   }
 
-  const session = await auth();
+  const session = await getSession();
+  const user = await getUser();
 
   if (!session) {
     redirect("/api/auth/guest");
   }
 
   if (chat.visibility === "private") {
-    if (!session.user) {
+    if (!user) {
       return notFound();
     }
 
-    if (session.user.id !== chat.userId) {
+    if (user.id !== chat.userId) {
       return notFound();
     }
   }
@@ -63,7 +68,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           }
           initialMessages={uiMessages}
           initialVisibilityType={chat.visibility as VisibilityType}
-          isReadonly={session?.user?.id !== chat.userId}
+          isReadonly={user?.id !== chat.userId}
         />
         <DataStreamHandler />
       </>
@@ -81,7 +86,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         }
         initialMessages={uiMessages}
         initialVisibilityType={chat.visibility as VisibilityType}
-        isReadonly={session?.user?.id !== chat.userId}
+        isReadonly={user?.id !== chat.userId}
       />
       <DataStreamHandler />
     </>

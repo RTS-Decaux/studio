@@ -1,6 +1,6 @@
-import { auth } from "@/app/(auth)/auth";
 import { getSuggestionsByDocumentId } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
+import { getSession } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,11 +9,11 @@ export async function GET(request: Request) {
   if (!documentId) {
     return new ChatSDKError(
       "bad_request:api",
-      "Parameter documentId is required."
+      "Parameter documentId is required.",
     ).toResponse();
   }
 
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user) {
     return new ChatSDKError("unauthorized:suggestions").toResponse();

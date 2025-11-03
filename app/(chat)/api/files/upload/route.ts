@@ -1,13 +1,12 @@
 import "server-only";
 
+import { NextResponse } from "next/server";
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
-import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { auth } from "@/app/(auth)/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, getSession } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -36,7 +35,7 @@ function buildStoragePath(userId: string, originalName: string) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -90,7 +89,7 @@ export async function POST(request: Request) {
       console.error("Failed to create signed URL", signedError);
       return NextResponse.json(
         { error: "Failed to generate access URL" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -104,7 +103,7 @@ export async function POST(request: Request) {
     console.error("Failed to process upload", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

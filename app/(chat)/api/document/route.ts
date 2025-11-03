@@ -1,4 +1,3 @@
-import { auth } from "@/app/(auth)/auth";
 import type { ArtifactKind } from "@/components/artifact";
 import {
   deleteDocumentsByIdAfterTimestamp,
@@ -6,6 +5,7 @@ import {
   saveDocument,
 } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
+import { getSession } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -14,11 +14,11 @@ export async function GET(request: Request) {
   if (!id) {
     return new ChatSDKError(
       "bad_request:api",
-      "Parameter id is missing"
+      "Parameter id is missing",
     ).toResponse();
   }
 
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user) {
     return new ChatSDKError("unauthorized:document").toResponse();
@@ -46,11 +46,11 @@ export async function POST(request: Request) {
   if (!id) {
     return new ChatSDKError(
       "bad_request:api",
-      "Parameter id is required."
+      "Parameter id is required.",
     ).toResponse();
   }
 
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user) {
     return new ChatSDKError("not_found:document").toResponse();
@@ -60,8 +60,8 @@ export async function POST(request: Request) {
     content,
     title,
     kind,
-  }: { content: string; title: string; kind: ArtifactKind } =
-    await request.json();
+  }: { content: string; title: string; kind: ArtifactKind } = await request
+    .json();
 
   const documents = await getDocumentsById({ id });
 
@@ -92,18 +92,18 @@ export async function DELETE(request: Request) {
   if (!id) {
     return new ChatSDKError(
       "bad_request:api",
-      "Parameter id is required."
+      "Parameter id is required.",
     ).toResponse();
   }
 
   if (!timestamp) {
     return new ChatSDKError(
       "bad_request:api",
-      "Parameter timestamp is required."
+      "Parameter timestamp is required.",
     ).toResponse();
   }
 
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user) {
     return new ChatSDKError("unauthorized:document").toResponse();

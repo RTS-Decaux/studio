@@ -1,6 +1,6 @@
-import { auth } from "@/app/(auth)/auth";
 import { getChatById, getVotesByChatId, voteMessage } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
+import { getSession } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,11 +9,11 @@ export async function GET(request: Request) {
   if (!chatId) {
     return new ChatSDKError(
       "bad_request:api",
-      "Parameter chatId is required."
+      "Parameter chatId is required.",
     ).toResponse();
   }
 
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user) {
     return new ChatSDKError("unauthorized:vote").toResponse();
@@ -39,17 +39,17 @@ export async function PATCH(request: Request) {
     chatId,
     messageId,
     type,
-  }: { chatId: string; messageId: string; type: "up" | "down" } =
-    await request.json();
+  }: { chatId: string; messageId: string; type: "up" | "down" } = await request
+    .json();
 
   if (!chatId || !messageId || !type) {
     return new ChatSDKError(
       "bad_request:api",
-      "Parameters chatId, messageId, and type are required."
+      "Parameters chatId, messageId, and type are required.",
     ).toResponse();
   }
 
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user) {
     return new ChatSDKError("unauthorized:vote").toResponse();

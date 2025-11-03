@@ -1,7 +1,7 @@
-import type { NextRequest } from "next/server";
-import { auth } from "@/app/(auth)/auth";
-import { getChatsByUserId, deleteAllChatsByUserId } from "@/lib/db/queries";
+import { deleteAllChatsByUserId, getChatsByUserId } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
+import { getSession } from "@/lib/supabase/server";
+import type { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
   if (startingAfter && endingBefore) {
     return new ChatSDKError(
       "bad_request:api",
-      "Only one of starting_after or ending_before can be provided."
+      "Only one of starting_after or ending_before can be provided.",
     ).toResponse();
   }
 
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user) {
     return new ChatSDKError("unauthorized:chat").toResponse();
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE() {
-  const session = await auth();
+  const session = await getSession();
 
   if (!session?.user) {
     return new ChatSDKError("unauthorized:chat").toResponse();
