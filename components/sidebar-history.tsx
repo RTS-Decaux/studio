@@ -1,30 +1,30 @@
 "use client";
 
-import { isToday, isYesterday, subMonths, subWeeks } from "date-fns";
-import { motion } from "framer-motion";
-import { useParams, useRouter } from "next/navigation";
-import type { User } from "next-auth";
-import { useState } from "react";
-import { toast } from "sonner";
-import useSWRInfinite from "swr/infinite";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarMenu,
-  useSidebar,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarMenu,
+    useSidebar,
 } from "@/components/ui/sidebar";
 import type { Chat } from "@/lib/supabase/models";
 import { fetcher } from "@/lib/utils";
+import type { User } from "@supabase/supabase-js";
+import { isToday, isYesterday, subMonths, subWeeks } from "date-fns";
+import { motion } from "framer-motion";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import useSWRInfinite from "swr/infinite";
 import { LoaderIcon } from "./icons";
 import { ChatItem } from "./sidebar-history-item";
 
