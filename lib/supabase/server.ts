@@ -1,14 +1,14 @@
 import "server-only";
 
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import type { Database } from "./types";
 
 function requireEnv(
-  name: "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  name: "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_ANON_KEY",
 ) {
   const value = process.env[name];
   if (!value) {
@@ -17,15 +17,20 @@ function requireEnv(
   return value;
 }
 
-export function createSupabaseServerClient(): SupabaseClient<Database> {
-  const cookieStoreAny = cookies() as any;
-  const mutableCookies = cookieStoreAny as {
-    set: (cookie: {
-      name: string;
-      value: string;
-      options?: CookieOptions;
-    }) => void;
-  };
+type MutableCookies = {
+  getAll: () => { name: string; value: string }[];
+  set: (cookie: {
+    name: string;
+    value: string;
+    options?: CookieOptions;
+  }) => void;
+};
+
+export async function createSupabaseServerClient(): Promise<
+  SupabaseClient<Database>
+> {
+  const cookieStore = await cookies();
+  const mutableCookies = cookieStore as unknown as MutableCookies;
 
   return createServerClient<Database>(
     requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
@@ -33,7 +38,7 @@ export function createSupabaseServerClient(): SupabaseClient<Database> {
     {
       cookies: {
         getAll() {
-          return cookieStoreAny.getAll();
+          return mutableCookies.getAll();
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach((cookie) => {
@@ -41,7 +46,7 @@ export function createSupabaseServerClient(): SupabaseClient<Database> {
           });
         },
       },
-    }
+    },
   );
 }
 
@@ -61,7 +66,7 @@ export function createSupabaseMiddlewareResponse(request: NextRequest) {
           });
         },
       },
-    }
+    },
   );
 
   return { supabase, response };

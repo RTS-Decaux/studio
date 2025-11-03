@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
-import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { chatModels, DEFAULT_CHAT_MODEL, type ChatModelId } from "@/lib/ai/models";
 import { generateUUID } from "@/lib/utils";
 import { auth } from "../(auth)/auth";
 
@@ -17,8 +17,14 @@ export default async function Page() {
 
   const cookieStore = await cookies();
   const modelIdFromCookie = cookieStore.get("chat-model");
+  const cookieModelValue = modelIdFromCookie?.value;
+  const isValidChatModel = (value: string | undefined): value is ChatModelId =>
+    Boolean(value && chatModels.some((model) => model.id === value));
+  const resolvedChatModel: ChatModelId = isValidChatModel(cookieModelValue)
+    ? cookieModelValue
+    : DEFAULT_CHAT_MODEL;
 
-  if (!modelIdFromCookie) {
+  if (!modelIdFromCookie || !isValidChatModel(cookieModelValue)) {
     return (
       <>
         <Chat
@@ -40,7 +46,7 @@ export default async function Page() {
       <Chat
         autoResume={false}
         id={id}
-        initialChatModel={modelIdFromCookie.value}
+        initialChatModel={resolvedChatModel}
         initialMessages={[]}
         initialVisibilityType="private"
         isReadonly={false}
