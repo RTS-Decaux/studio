@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import type { ReactNode } from "react";
 import type { Database } from "./types";
-import { getSupabaseBrowserClient } from "./browser";
+import { createSupabaseBrowserClient } from "./browser";
 
 interface SupabaseContextValue {
   supabase: SupabaseClient<Database>;
@@ -22,7 +22,7 @@ export function SupabaseSessionProvider({
   children: ReactNode;
   initialSession: Session | null;
 }) {
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [session, setSession] = useState<Session | null>(initialSession);
 
   useEffect(() => {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { SupabaseSessionProvider } from "@/lib/supabase/provider";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
@@ -54,7 +54,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = getSupabaseServerClient();
+  const supabase = createSupabaseServerClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
