@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useActionState, useEffect, useState } from "react";
 import { AuthForm } from "@/components/auth-form";
 import { SubmitButton } from "@/components/submit-button";
 import { toast } from "@/components/toast";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
 import { type RegisterActionState, register } from "../actions";
 
 export default function Page() {
@@ -22,8 +21,6 @@ export default function Page() {
     }
   );
 
-  const { update: updateSession } = useSession();
-
   useEffect(() => {
     if (state.status === "user_exists") {
       toast({ type: "error", description: "Account already exists!" });
@@ -38,7 +35,6 @@ export default function Page() {
       toast({ type: "success", description: "Account created successfully!" });
 
       setIsSuccessful(true);
-      updateSession();
       router.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

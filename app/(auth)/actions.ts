@@ -1,10 +1,8 @@
 "use server";
 
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { z } from "zod";
-
-import { createUser, getUser } from "@/lib/db/queries";
-
-import { signIn } from "./auth";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -17,7 +15,7 @@ export type LoginActionState = {
 
 export const login = async (
   _: LoginActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<LoginActionState> => {
   try {
     const validatedData = authFormSchema.parse({
@@ -25,11 +23,17 @@ export const login = async (
       password: formData.get("password"),
     });
 
-    await signIn("credentials", {
+    const supabase = await createSupabaseServerClient();
+
+    const { error } = await supabase.auth.signInWithPassword({
       email: validatedData.email,
       password: validatedData.password,
-      redirect: false,
     });
+
+    if (error) {
+      console.error("Login error:", error);
+      return { status: "failed" };
+    }
 
     return { status: "success" };
   } catch (error) {
@@ -53,7 +57,7 @@ export type RegisterActionState = {
 
 export const register = async (
   _: RegisterActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<RegisterActionState> => {
   try {
     const validatedData = authFormSchema.parse({
@@ -61,17 +65,29 @@ export const register = async (
       password: formData.get("password"),
     });
 
-    const [user] = await getUser(validatedData.email);
+    const supabase = await createSupabaseServerClient();
 
-    if (user) {
-      return { status: "user_exists" } as RegisterActionState;
-    }
-    await createUser(validatedData.email, validatedData.password);
-    await signIn("credentials", {
+    // Sign up with Supabase Auth
+    const { error } = await supabase.auth.signUp({
       email: validatedData.email,
       password: validatedData.password,
-      redirect: false,
+      options: {
+        emailRedirectTo: `${
+          process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+        }/`,
+      },
     });
+
+    if (error) {
+      console.error("Register error:", error);
+
+      // Check if user already exists
+      if (error.message.includes("already registered")) {
+        return { status: "user_exists" };
+      }
+
+      return { status: "failed" };
+    }
 
     return { status: "success" };
   } catch (error) {
@@ -82,3 +98,9 @@ export const register = async (
     return { status: "failed" };
   }
 };
+
+export async function signOut() {
+  const supabase = await createSupabaseServerClient();
+  await supabase.auth.signOut();
+  redirect("/");
+}
