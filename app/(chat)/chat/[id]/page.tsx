@@ -4,10 +4,11 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/app/(auth)/auth";
 import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
-import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { VisibilityType } from "@/components/visibility-selector";
+import { chatModels, DEFAULT_CHAT_MODEL, type ChatModelId } from "@/lib/ai/models";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
-import { convertToUIMessages } from "@/lib/utils";
 import type { AppUsage } from "@/lib/usage";
+import { convertToUIMessages } from "@/lib/utils";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -43,7 +44,14 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies();
   const chatModelFromCookie = cookieStore.get("chat-model");
 
-  if (!chatModelFromCookie) {
+  const cookieModelValue = chatModelFromCookie?.value;
+  const isValidChatModel = (value: string | undefined): value is ChatModelId =>
+    Boolean(value && chatModels.some((model) => model.id === value));
+  const resolvedChatModel: ChatModelId = isValidChatModel(cookieModelValue)
+    ? cookieModelValue
+    : DEFAULT_CHAT_MODEL;
+
+  if (!chatModelFromCookie || !isValidChatModel(cookieModelValue)) {
     return (
       <>
         <Chat
@@ -67,12 +75,12 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
       <Chat
         autoResume={true}
         id={chat.id}
-        initialChatModel={chatModelFromCookie.value}
+        initialChatModel={resolvedChatModel}
         initialLastContext={
           chat.lastContext ? (chat.lastContext as AppUsage) : undefined
         }
         initialMessages={uiMessages}
-        initialVisibilityType={chat.visibility}
+        initialVisibilityType={chat.visibility as VisibilityType}
         isReadonly={session?.user?.id !== chat.userId}
       />
       <DataStreamHandler />
