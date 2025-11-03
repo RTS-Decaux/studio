@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/app/(auth)/auth";
 import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
-import { VisibilityType } from "@/components/visibility-selector";
+import type { VisibilityType } from "@/components/visibility-selector";
 import { chatModels, DEFAULT_CHAT_MODEL, type ChatModelId } from "@/lib/ai/models";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
 import type { AppUsage } from "@/lib/usage";
