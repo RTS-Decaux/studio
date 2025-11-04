@@ -10,7 +10,7 @@ import {
   type ChatModelId,
 } from "@/lib/ai/models";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
-import { getSession, getUser } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import type { AppUsage } from "@/lib/usage";
 import { convertToUIMessages } from "@/lib/utils";
 
@@ -23,10 +23,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     notFound();
   }
 
-  const session = await getSession();
   const user = await getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/api/auth/guest");
   }
 

@@ -5,15 +5,15 @@ import {
   DEFAULT_CHAT_MODEL,
   type ChatModelId,
 } from "@/lib/ai/models";
-import { getSession } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import { generateUUID } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/api/auth/guest");
   }
 

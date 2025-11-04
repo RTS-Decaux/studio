@@ -2,7 +2,7 @@ import { getDocumentById, saveSuggestions } from "@/lib/db/queries";
 import type { Suggestion } from "@/lib/supabase/models";
 import type { ChatMessage } from "@/lib/types";
 import { generateUUID } from "@/lib/utils";
-import type { Session } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 import {
   type LanguageModel,
   streamObject,
@@ -13,7 +13,7 @@ import { z } from "zod";
 import { myProvider } from "../providers";
 
 type RequestSuggestionsProps = {
-  session: Session;
+  user: User;
   dataStream: UIMessageStreamWriter<ChatMessage>;
 };
 
@@ -29,7 +29,7 @@ type SuggestionDraft =
   };
 
 export const requestSuggestions = ({
-  session,
+  user,
   dataStream,
 }: RequestSuggestionsProps) =>
   tool({
@@ -93,8 +93,8 @@ export const requestSuggestions = ({
         suggestions.push(suggestion);
       }
 
-      if (session.user?.id) {
-        const userId = session.user.id;
+      if (user?.id) {
+        const userId = user.id;
 
         await saveSuggestions({
           suggestions: suggestions.map((suggestion) => ({
