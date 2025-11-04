@@ -20,7 +20,7 @@ import {
 } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
 import type { DBMessage } from "@/lib/supabase/models";
-import { getSession } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import type { ChatMessage } from "@/lib/types";
 import type { AppUsage } from "@/lib/usage";
 import { convertToUIMessages, generateUUID } from "@/lib/utils";
@@ -111,16 +111,16 @@ export async function POST(request: Request) {
       selectedVisibilityType: VisibilityType;
     } = requestBody;
 
-    const session = await getSession();
+    const user = await getUser();
 
-    if (!session?.user) {
+    if (!user) {
       return new ChatSDKError("unauthorized:chat").toResponse();
     }
 
-    const userType: UserType = session.user.is_anonymous ? "guest" : "regular";
+    const userType: UserType = user.is_anonymous ? "guest" : "regular";
 
     const messageCount = await getMessageCountByUserId({
-      id: session.user.id,
+      id: user.id,
       differenceInHours: 24,
     });
 
@@ -132,7 +132,7 @@ export async function POST(request: Request) {
     let messagesFromDb: DBMessage[] = [];
 
     if (chat) {
-      if (chat.userId !== session.user.id) {
+      if (chat.userId !== user.id) {
         return new ChatSDKError("forbidden:chat").toResponse();
       }
       // Only fetch messages if chat already exists
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
 
       await saveChat({
         id,
-        userId: session.user.id,
+        userId: user.id,
         title,
         visibility: selectedVisibilityType,
       });
@@ -202,10 +202,10 @@ export async function POST(request: Request) {
           experimental_transform: smoothStream({ chunking: "word" }),
           tools: {
             getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
+            createDocument: createDocument({ user, dataStream }),
+            updateDocument: updateDocument({ user, dataStream }),
             requestSuggestions: requestSuggestions({
-              session,
+              user,
               dataStream,
             }),
           },
@@ -325,15 +325,15 @@ export async function DELETE(request: Request) {
     return new ChatSDKError("bad_request:api").toResponse();
   }
 
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session?.user) {
+  if (!user) {
     return new ChatSDKError("unauthorized:chat").toResponse();
   }
 
   const chat = await getChatById({ id });
 
-  if (chat?.userId !== session.user.id) {
+  if (chat?.userId !== user.id) {
     return new ChatSDKError("forbidden:chat").toResponse();
   }
 

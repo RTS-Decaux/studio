@@ -1,6 +1,6 @@
 import { deleteAllChatsByUserId, getChatsByUserId } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
-import { getSession } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import type { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -17,14 +17,14 @@ export async function GET(request: NextRequest) {
     ).toResponse();
   }
 
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session?.user) {
+  if (!user) {
     return new ChatSDKError("unauthorized:chat").toResponse();
   }
 
   const chats = await getChatsByUserId({
-    id: session.user.id,
+    id: user.id,
     limit,
     startingAfter,
     endingBefore,
@@ -34,13 +34,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE() {
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session?.user) {
+  if (!user) {
     return new ChatSDKError("unauthorized:chat").toResponse();
   }
 
-  const result = await deleteAllChatsByUserId({ userId: session.user.id });
+  const result = await deleteAllChatsByUserId({ userId: user.id });
 
   return Response.json(result, { status: 200 });
 }

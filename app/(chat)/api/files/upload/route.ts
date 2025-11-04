@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { createSupabaseServerClient, getSession } from "@/lib/supabase/server";
+import { createSupabaseServerClient, getUser } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -35,9 +35,9 @@ function buildStoragePath(userId: string, originalName: string) {
 }
 
 export async function POST(request: Request) {
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session?.user?.id) {
+  if (!user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     const filename = (formData.get("file") as File)?.name ?? "file";
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const storagePath = buildStoragePath(session.user.id, filename);
+    const storagePath = buildStoragePath(user.id, filename);
 
     const supabase = await createSupabaseServerClient();
     const { data: uploadData, error: uploadError } = await supabase.storage

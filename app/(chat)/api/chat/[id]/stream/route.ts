@@ -5,7 +5,7 @@ import {
 } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
 import type { Chat } from "@/lib/supabase/models";
-import { getSession } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import type { ChatMessage } from "@/lib/types";
 import { createUIMessageStream, JsonToSseTransformStream } from "ai";
 import { differenceInSeconds } from "date-fns";
@@ -28,9 +28,9 @@ export async function GET(
     return new ChatSDKError("bad_request:api").toResponse();
   }
 
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session?.user) {
+  if (!user) {
     return new ChatSDKError("unauthorized:chat").toResponse();
   }
 
@@ -46,7 +46,7 @@ export async function GET(
     return new ChatSDKError("not_found:chat").toResponse();
   }
 
-  if (chat.visibility === "private" && chat.userId !== session.user.id) {
+  if (chat.visibility === "private" && chat.userId !== user.id) {
     return new ChatSDKError("forbidden:chat").toResponse();
   }
 

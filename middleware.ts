@@ -16,11 +16,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Create Supabase client and get session
+  // Create Supabase client and get user (secure method)
   const { supabase, response } = createSupabaseMiddlewareResponse(request);
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user || error) {
     const redirectUrl = encodeURIComponent(request.url);
 
     return NextResponse.redirect(
@@ -29,9 +29,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check if user is anonymous (guest)
-  const isGuest = session.user.is_anonymous;
+  const isGuest = user.is_anonymous;
 
-  if (session && !isGuest && ["/login", "/register"].includes(pathname)) {
+  if (user && !isGuest && ["/login", "/register"].includes(pathname)) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

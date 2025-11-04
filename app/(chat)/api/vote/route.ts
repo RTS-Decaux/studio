@@ -1,6 +1,6 @@
 import { getChatById, getVotesByChatId, voteMessage } from "@/lib/db/queries";
 import { ChatSDKError } from "@/lib/errors";
-import { getSession } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -13,9 +13,9 @@ export async function GET(request: Request) {
     ).toResponse();
   }
 
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session?.user) {
+  if (!user) {
     return new ChatSDKError("unauthorized:vote").toResponse();
   }
 
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     return new ChatSDKError("not_found:chat").toResponse();
   }
 
-  if (chat.userId !== session.user.id) {
+  if (chat.userId !== user.id) {
     return new ChatSDKError("forbidden:vote").toResponse();
   }
 
@@ -49,9 +49,9 @@ export async function PATCH(request: Request) {
     ).toResponse();
   }
 
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session?.user) {
+  if (!user) {
     return new ChatSDKError("unauthorized:vote").toResponse();
   }
 
@@ -61,7 +61,7 @@ export async function PATCH(request: Request) {
     return new ChatSDKError("not_found:vote").toResponse();
   }
 
-  if (chat.userId !== session.user.id) {
+  if (chat.userId !== user.id) {
     return new ChatSDKError("forbidden:vote").toResponse();
   }
 
