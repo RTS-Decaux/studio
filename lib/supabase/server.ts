@@ -81,6 +81,9 @@ export function createSupabaseMiddlewareResponse(request: NextRequest) {
 /**
  * Get the current user session from Supabase Auth
  * Returns null if no session exists
+ * 
+ * @deprecated Use getUser() instead for better security
+ * This method reads directly from cookies without server verification
  */
 export async function getSession() {
   const supabase = await createSupabaseServerClient();

@@ -4,486 +4,521 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[];
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "13.0.5"
+  }
   graphql_public: {
     Tables: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Views: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     Functions: {
       graphql: {
         Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
     Enums: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
+      AuditLog: {
+        Row: {
+          action: string
+          createdAt: string
+          id: string
+          ipAddress: unknown
+          metadata: Json | null
+          resource: string
+          resourceId: string | null
+          userAgent: string | null
+          userId: string
+        }
+        Insert: {
+          action: string
+          createdAt?: string
+          id?: string
+          ipAddress?: unknown
+          metadata?: Json | null
+          resource: string
+          resourceId?: string | null
+          userAgent?: string | null
+          userId: string
+        }
+        Update: {
+          action?: string
+          createdAt?: string
+          id?: string
+          ipAddress?: unknown
+          metadata?: Json | null
+          resource?: string
+          resourceId?: string | null
+          userAgent?: string | null
+          userId?: string
+        }
+        Relationships: []
+      }
       Chat: {
         Row: {
-          createdAt: string;
-          id: string;
-          lastContext: Json | null;
-          title: string;
-          userId: string;
-          visibility: string;
-        };
+          createdAt: string
+          id: string
+          lastContext: Json | null
+          title: string
+          userId: string
+          visibility: string
+        }
         Insert: {
-          createdAt: string;
-          id?: string;
-          lastContext?: Json | null;
-          title: string;
-          userId: string;
-          visibility?: string;
-        };
+          createdAt: string
+          id?: string
+          lastContext?: Json | null
+          title: string
+          userId: string
+          visibility?: string
+        }
         Update: {
-          createdAt?: string;
-          id?: string;
-          lastContext?: Json | null;
-          title?: string;
-          userId?: string;
-          visibility?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "Chat_userId_fkey";
-            columns: ["userId"];
-            isOneToOne: false;
-            referencedRelation: "User";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
+          createdAt?: string
+          id?: string
+          lastContext?: Json | null
+          title?: string
+          userId?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       Document: {
         Row: {
-          content: string | null;
-          createdAt: string;
-          id: string;
-          kind: "text" | "code" | "image" | "sheet";
-          title: string;
-          userId: string;
-        };
+          content: string | null
+          createdAt: string
+          id: string
+          kind: string
+          title: string
+          userId: string
+        }
         Insert: {
-          content?: string | null;
-          createdAt: string;
-          id?: string;
-          kind?: "text" | "code" | "image" | "sheet";
-          title: string;
-          userId: string;
-        };
+          content?: string | null
+          createdAt: string
+          id?: string
+          kind?: string
+          title: string
+          userId: string
+        }
         Update: {
-          content?: string | null;
-          createdAt?: string;
-          id?: string;
-          kind?: "text" | "code" | "image" | "sheet";
-          title?: string;
-          userId?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "Document_userId_fkey";
-            columns: ["userId"];
-            isOneToOne: false;
-            referencedRelation: "User";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
+          content?: string | null
+          createdAt?: string
+          id?: string
+          kind?: string
+          title?: string
+          userId?: string
+        }
+        Relationships: []
+      }
       Message: {
         Row: {
-          chatId: string;
-          content: Json;
-          createdAt: string;
-          id: string;
-          role: string;
-        };
+          chatId: string
+          content: Json
+          createdAt: string
+          id: string
+          role: string
+        }
         Insert: {
-          chatId: string;
-          content: Json;
-          createdAt: string;
-          id?: string;
-          role: string;
-        };
+          chatId: string
+          content: Json
+          createdAt: string
+          id?: string
+          role: string
+        }
         Update: {
-          chatId?: string;
-          content?: Json;
-          createdAt?: string;
-          id?: string;
-          role?: string;
-        };
+          chatId?: string
+          content?: Json
+          createdAt?: string
+          id?: string
+          role?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "Message_chatId_fkey";
-            columns: ["chatId"];
-            isOneToOne: false;
-            referencedRelation: "Chat";
-            referencedColumns: ["id"];
+            foreignKeyName: "Message_chatId_fkey"
+            columns: ["chatId"]
+            isOneToOne: false
+            referencedRelation: "Chat"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       Message_v2: {
         Row: {
-          attachments: Json;
-          chatId: string;
-          createdAt: string;
-          id: string;
-          parts: Json;
-          role: string;
-        };
+          attachments: Json
+          chatId: string
+          createdAt: string
+          id: string
+          parts: Json
+          role: string
+        }
         Insert: {
-          attachments: Json;
-          chatId: string;
-          createdAt: string;
-          id?: string;
-          parts: Json;
-          role: string;
-        };
+          attachments: Json
+          chatId: string
+          createdAt: string
+          id?: string
+          parts: Json
+          role: string
+        }
         Update: {
-          attachments?: Json;
-          chatId?: string;
-          createdAt?: string;
-          id?: string;
-          parts?: Json;
-          role?: string;
-        };
+          attachments?: Json
+          chatId?: string
+          createdAt?: string
+          id?: string
+          parts?: Json
+          role?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "Message_v2_chatId_fkey";
-            columns: ["chatId"];
-            isOneToOne: false;
-            referencedRelation: "Chat";
-            referencedColumns: ["id"];
+            foreignKeyName: "Message_v2_chatId_fkey"
+            columns: ["chatId"]
+            isOneToOne: false
+            referencedRelation: "Chat"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
+      RateLimit: {
+        Row: {
+          count: number
+          key: string
+          resetAt: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          resetAt: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          resetAt?: string
+        }
+        Relationships: []
+      }
       Stream: {
         Row: {
-          chatId: string;
-          createdAt: string;
-          id: string;
-        };
+          chatId: string
+          createdAt: string
+          id: string
+        }
         Insert: {
-          chatId: string;
-          createdAt: string;
-          id?: string;
-        };
+          chatId: string
+          createdAt: string
+          id?: string
+        }
         Update: {
-          chatId?: string;
-          createdAt?: string;
-          id?: string;
-        };
+          chatId?: string
+          createdAt?: string
+          id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "Stream_chatId_fkey";
-            columns: ["chatId"];
-            isOneToOne: false;
-            referencedRelation: "Chat";
-            referencedColumns: ["id"];
+            foreignKeyName: "Stream_chatId_fkey"
+            columns: ["chatId"]
+            isOneToOne: false
+            referencedRelation: "Chat"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       Suggestion: {
         Row: {
-          createdAt: string;
-          description: string | null;
-          documentCreatedAt: string;
-          documentId: string;
-          id: string;
-          isResolved: boolean;
-          originalText: string;
-          suggestedText: string;
-          userId: string;
-        };
+          createdAt: string
+          description: string | null
+          documentCreatedAt: string
+          documentId: string
+          id: string
+          isResolved: boolean
+          originalText: string
+          suggestedText: string
+          userId: string
+        }
         Insert: {
-          createdAt: string;
-          description?: string | null;
-          documentCreatedAt: string;
-          documentId: string;
-          id?: string;
-          isResolved?: boolean;
-          originalText: string;
-          suggestedText: string;
-          userId: string;
-        };
+          createdAt: string
+          description?: string | null
+          documentCreatedAt: string
+          documentId: string
+          id?: string
+          isResolved?: boolean
+          originalText: string
+          suggestedText: string
+          userId: string
+        }
         Update: {
-          createdAt?: string;
-          description?: string | null;
-          documentCreatedAt?: string;
-          documentId?: string;
-          id?: string;
-          isResolved?: boolean;
-          originalText?: string;
-          suggestedText?: string;
-          userId?: string;
-        };
+          createdAt?: string
+          description?: string | null
+          documentCreatedAt?: string
+          documentId?: string
+          id?: string
+          isResolved?: boolean
+          originalText?: string
+          suggestedText?: string
+          userId?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "Suggestion_document_ref_fkey";
-            columns: ["documentId", "documentCreatedAt"];
-            isOneToOne: false;
-            referencedRelation: "Document";
-            referencedColumns: ["id", "createdAt"];
+            foreignKeyName: "Suggestion_document_ref_fkey"
+            columns: ["documentId", "documentCreatedAt"]
+            isOneToOne: false
+            referencedRelation: "Document"
+            referencedColumns: ["id", "createdAt"]
           },
-          {
-            foreignKeyName: "Suggestion_userId_fkey";
-            columns: ["userId"];
-            isOneToOne: false;
-            referencedRelation: "User";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      User: {
-        Row: {
-          email: string;
-          id: string;
-          password: string | null;
-        };
-        Insert: {
-          email: string;
-          id?: string;
-          password?: string | null;
-        };
-        Update: {
-          email?: string;
-          id?: string;
-          password?: string | null;
-        };
-        Relationships: [];
-      };
+        ]
+      }
       Vote: {
         Row: {
-          chatId: string;
-          isUpvoted: boolean;
-          messageId: string;
-        };
+          chatId: string
+          isUpvoted: boolean
+          messageId: string
+        }
         Insert: {
-          chatId: string;
-          isUpvoted: boolean;
-          messageId: string;
-        };
+          chatId: string
+          isUpvoted: boolean
+          messageId: string
+        }
         Update: {
-          chatId?: string;
-          isUpvoted?: boolean;
-          messageId?: string;
-        };
+          chatId?: string
+          isUpvoted?: boolean
+          messageId?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "Vote_chatId_fkey";
-            columns: ["chatId"];
-            isOneToOne: false;
-            referencedRelation: "Chat";
-            referencedColumns: ["id"];
+            foreignKeyName: "Vote_chatId_fkey"
+            columns: ["chatId"]
+            isOneToOne: false
+            referencedRelation: "Chat"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "Vote_messageId_fkey";
-            columns: ["messageId"];
-            isOneToOne: false;
-            referencedRelation: "Message";
-            referencedColumns: ["id"];
+            foreignKeyName: "Vote_messageId_fkey"
+            columns: ["messageId"]
+            isOneToOne: false
+            referencedRelation: "Message"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       Vote_v2: {
         Row: {
-          chatId: string;
-          isUpvoted: boolean;
-          messageId: string;
-        };
+          chatId: string
+          isUpvoted: boolean
+          messageId: string
+        }
         Insert: {
-          chatId: string;
-          isUpvoted: boolean;
-          messageId: string;
-        };
+          chatId: string
+          isUpvoted: boolean
+          messageId: string
+        }
         Update: {
-          chatId?: string;
-          isUpvoted?: boolean;
-          messageId?: string;
-        };
+          chatId?: string
+          isUpvoted?: boolean
+          messageId?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "Vote_v2_chatId_fkey";
-            columns: ["chatId"];
-            isOneToOne: false;
-            referencedRelation: "Chat";
-            referencedColumns: ["id"];
+            foreignKeyName: "Vote_v2_chatId_fkey"
+            columns: ["chatId"]
+            isOneToOne: false
+            referencedRelation: "Chat"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "Vote_v2_messageId_fkey";
-            columns: ["messageId"];
-            isOneToOne: false;
-            referencedRelation: "Message_v2";
-            referencedColumns: ["id"];
+            foreignKeyName: "Vote_v2_messageId_fkey"
+            columns: ["messageId"]
+            isOneToOne: false
+            referencedRelation: "Message_v2"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-    };
+        ]
+      }
+    }
     Views: {
-      [_ in never]: never;
-    };
+      User: {
+        Row: {
+          email: string | null
+          id: string | null
+          password: string | null
+        }
+        Insert: {
+          email?: string | null
+          id?: string | null
+          password?: never
+        }
+        Update: {
+          email?: string | null
+          id?: string | null
+          password?: never
+        }
+        Relationships: []
+      }
+    }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          p_key: string
+          p_max_requests: number
+          p_window_seconds: number
+        }
+        Returns: boolean
+      }
       get_message_stats: {
-        Args: { start_time: string; user_id: string };
-        Returns: number;
-      };
-    };
+        Args: { start_time: string; user_id: string }
+        Returns: number
+      }
+      log_audit_event: {
+        Args: {
+          p_action: string
+          p_metadata?: Json
+          p_resource: string
+          p_resource_id?: string
+        }
+        Returns: undefined
+      }
+    }
     Enums: {
-      [_ in never]: never;
-    };
+      [_ in never]: never
+    }
     CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-};
+      [_ in never]: never
+    }
+  }
+}
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-type DefaultSchema =
-  DatabaseWithoutInternals[Extract<keyof Database, "public">];
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  } ? keyof (
-      & DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]][
-        "Tables"
-      ]
-      & DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]][
-        "Views"
-      ]
-    )
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-} ? (
-    & DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]][
-      "Tables"
-    ]
-    & DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]][
-      "Views"
-    ]
-  )[TableName] extends {
-    Row: infer R;
-  } ? R
-  : never
-  : DefaultSchemaTableNameOrOptions extends keyof (
-    & DefaultSchema["Tables"]
-    & DefaultSchema["Views"]
-  ) ? (
-      & DefaultSchema["Tables"]
-      & DefaultSchema["Views"]
-    )[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R;
-    } ? R
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
     : never
-  : never;
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  } ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]][
-      "Tables"
-    ]
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-} ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]][
-    "Tables"
-  ][TableName] extends {
-    Insert: infer I;
-  } ? I
-  : never
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Insert: infer I;
-    } ? I
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  } ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]][
-      "Tables"
-    ]
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-} ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]][
-    "Tables"
-  ][TableName] extends {
-    Update: infer U;
-  } ? U
-  : never
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-      Update: infer U;
-    } ? U
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  } ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]][
-      "Enums"
-    ]
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-} ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][
-    EnumName
-  ]
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never;
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals;
-  } ? keyof DatabaseWithoutInternals[
-      PublicCompositeTypeNameOrOptions["schema"]
-    ]["CompositeTypes"]
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals;
-} ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]][
-    "CompositeTypes"
-  ][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends
-    keyof DefaultSchema["CompositeTypes"]
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never;
+    : never
 
 export const Constants = {
   graphql_public: {
@@ -492,4 +527,4 @@ export const Constants = {
   public: {
     Enums: {},
   },
-} as const;
+} as const

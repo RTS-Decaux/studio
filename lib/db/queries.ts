@@ -461,6 +461,8 @@ export async function getChatsByUserId({
   const { data, error } = await query;
 
   if (error) {
+    console.error("Failed to get chats by user id:", error);
+    console.error("User ID:", id);
     throw new ChatSDKError(
       "bad_request:database",
       "Failed to get chats by user id",
