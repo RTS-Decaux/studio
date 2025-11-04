@@ -1,8 +1,10 @@
-import type { FalStudioModel, ReferenceInputKind } from "@/lib/ai/studio-models";
+
 
 // ============================================================================
 // Database Types
 // ============================================================================
+
+import { FalStudioModel } from "../ai/studio-models";
 
 export type StudioProject = {
   id: string;
