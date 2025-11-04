@@ -20,10 +20,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import type { User } from "@supabase/supabase-js";
-import { ChevronDown, MessageSquare, Search, Video } from "lucide-react";
+import { ChevronRight, MessageSquare, Search, Video } from "lucide-react";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { toast } from "sonner";
@@ -82,6 +83,10 @@ export function AppSidebar({
     <>
       <Sidebar {...props}>
         <SidebarHeader>
+          <div className="flex items-center gap-2 px-2 py-1.5">
+            <SidebarTrigger />
+            <span className="font-semibold">Menu</span>
+          </div>
           <SidebarMenu>
             <SidebarMenuItem>
               <DropdownMenu>
@@ -101,7 +106,7 @@ export function AppSidebar({
                       <span className="truncate font-semibold">{activeWorkspace.name}</span>
                       <span className="truncate text-xs">Workspace</span>
                     </div>
-                    <ChevronDown className="ml-auto" />
+                    <ChevronRight className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
