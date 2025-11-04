@@ -1,7 +1,12 @@
 "use client";
 
 import { SidebarUserNav } from "@/components/sidebar-user-nav";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -16,14 +21,29 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import type { User } from "@supabase/supabase-js";
-import { Film, FolderOpen, Layout, Plus, Sparkles } from "lucide-react";
+import { ChevronDown, Film, FolderOpen, Layout, MessageSquare, Plus, Sparkles, Video } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import * as React from "react";
 
-export function StudioSidebar({ user }: { user: User }) {
+export function StudioSidebar({ 
+  user,
+  ...props 
+}: { 
+  user: User;
+} & React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
+  const [activeWorkspace, setActiveWorkspace] = React.useState({
+    name: "Studio",
+    type: "studio" as "chat" | "studio",
+  });
+
+  const workspaces = [
+    { name: "Chat", type: "chat" as const, icon: MessageSquare },
+    { name: "Studio", type: "studio" as const, icon: Video },
+  ];
 
   const navigation = [
     {
@@ -49,6 +69,25 @@ export function StudioSidebar({ user }: { user: User }) {
     },
   ];
 
+  const quickActions = [
+    {
+      name: "Generate Image",
+      onClick: () => {
+        setOpenMobile(false);
+        router.push("/studio/new?type=text-to-image");
+      },
+      icon: Sparkles,
+    },
+    {
+      name: "Generate Video",
+      onClick: () => {
+        setOpenMobile(false);
+        router.push("/studio/new?type=text-to-video");
+      },
+      icon: Film,
+    },
+  ];
+
   const isActive = (href: string, exact?: boolean) => {
     if (exact) {
       return pathname === href;
@@ -57,35 +96,87 @@ export function StudioSidebar({ user }: { user: User }) {
   };
 
   return (
-    <Sidebar className="group-data-[side=left]:border-r-0">
-      <SidebarHeader className="border-b border-sidebar-border">
+    <Sidebar {...props}>
+      <SidebarHeader>
         <SidebarMenu>
-          <div className="flex flex-col gap-2 px-2 py-2">
-            <Button
-              className="w-full justify-start gap-2 h-9 text-sm font-medium"
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                    {activeWorkspace.type === "chat" ? (
+                      <MessageSquare className="size-4" />
+                    ) : (
+                      <Video className="size-4" />
+                    )}
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">{activeWorkspace.name}</span>
+                    <span className="truncate text-xs">Workspace</span>
+                  </div>
+                  <ChevronDown className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                align="start"
+                side="bottom"
+                sideOffset={4}
+              >
+                {workspaces.map((workspace) => (
+                  <DropdownMenuItem
+                    key={workspace.type}
+                    onClick={() => {
+                      setActiveWorkspace(workspace);
+                      setOpenMobile(false);
+                      if (workspace.type === "studio") {
+                        router.push("/studio");
+                      } else {
+                        router.push("/");
+                      }
+                    }}
+                    className="gap-2 p-2"
+                  >
+                    <div className="flex size-6 items-center justify-center rounded-sm border">
+                      <workspace.icon className="size-4" />
+                    </div>
+                    {workspace.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
               onClick={() => {
                 setOpenMobile(false);
                 router.push("/studio/new");
               }}
-              variant="outline"
+              tooltip="New Project"
             >
               <Plus className="h-4 w-4" />
               <span>New project</span>
-            </Button>
-          </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-2">
-        <SidebarGroup className="py-0">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-0.5">
+            <SidebarMenu>
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.href, item.exact)}
-                    className="h-8 text-sm"
+                    tooltip={item.name}
                   >
                     <Link
                       href={item.href}
@@ -101,43 +192,32 @@ export function StudioSidebar({ user }: { user: User }) {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="py-2">
-          <SidebarGroupLabel className="px-2 text-xs text-muted-foreground font-normal tracking-tight mb-1">
-            Quick Actions
-          </SidebarGroupLabel>
+        <SidebarGroup>
+          <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="gap-0.5">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  className="h-8 text-sm"
-                  onClick={() => {
-                    setOpenMobile(false);
-                    router.push("/studio/new?type=text-to-image");
-                  }}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  <span>Generate Image</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  className="h-8 text-sm"
-                  onClick={() => {
-                    setOpenMobile(false);
-                    router.push("/studio/new?type=text-to-video");
-                  }}
-                >
-                  <Film className="h-4 w-4" />
-                  <span>Generate Video</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+            <SidebarMenu>
+              {quickActions.map((action) => (
+                <SidebarMenuItem key={action.name}>
+                  <SidebarMenuButton
+                    onClick={action.onClick}
+                    tooltip={action.name}
+                  >
+                    <action.icon className="h-4 w-4" />
+                    <span>{action.name}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-2">
-        <SidebarUserNav user={user} />
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarUserNav user={user} />
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

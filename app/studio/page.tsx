@@ -1,9 +1,9 @@
-import { getProjectsAction } from "@/lib/studio/actions";
-import { StudioHeader } from "@/components/studio/studio-header";
-import { ProjectGrid } from "@/components/studio/project/project-grid";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { PlusIcon } from "@/components/icons";
+import { ProjectGrid } from "@/components/studio/project/project-grid";
+import { StudioHeader } from "@/components/studio/studio-header";
+import { Button } from "@/components/ui/button";
+import { getProjectsAction } from "@/lib/studio/actions";
+import Link from "next/link";
 
 export default async function StudioPage() {
   const projects = await getProjectsAction();
