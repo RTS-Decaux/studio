@@ -240,6 +240,265 @@ export type Database = {
           },
         ]
       }
+      StudioAsset: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json | null
+          name: string
+          project_id: string | null
+          source_generation_id: string | null
+          source_type: string | null
+          thumbnail_url: string | null
+          type: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          name: string
+          project_id?: string | null
+          source_generation_id?: string | null
+          source_type?: string | null
+          thumbnail_url?: string | null
+          type: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          name?: string
+          project_id?: string | null
+          source_generation_id?: string | null
+          source_type?: string | null
+          thumbnail_url?: string | null
+          type?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_asset_source_generation"
+            columns: ["source_generation_id"]
+            isOneToOne: false
+            referencedRelation: "StudioGeneration"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "StudioAsset_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "StudioProject"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "StudioAsset_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      StudioGeneration: {
+        Row: {
+          completed_at: string | null
+          cost: number | null
+          created_at: string
+          error: string | null
+          fal_request_id: string | null
+          fal_response: Json | null
+          first_frame_url: string | null
+          generation_type: string
+          id: string
+          input_asset_id: string | null
+          last_frame_url: string | null
+          model_id: string
+          negative_prompt: string | null
+          output_asset_id: string | null
+          parameters: Json
+          processing_time: number | null
+          project_id: string | null
+          prompt: string | null
+          reference_image_url: string | null
+          reference_video_url: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          cost?: number | null
+          created_at?: string
+          error?: string | null
+          fal_request_id?: string | null
+          fal_response?: Json | null
+          first_frame_url?: string | null
+          generation_type: string
+          id?: string
+          input_asset_id?: string | null
+          last_frame_url?: string | null
+          model_id: string
+          negative_prompt?: string | null
+          output_asset_id?: string | null
+          parameters?: Json
+          processing_time?: number | null
+          project_id?: string | null
+          prompt?: string | null
+          reference_image_url?: string | null
+          reference_video_url?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          cost?: number | null
+          created_at?: string
+          error?: string | null
+          fal_request_id?: string | null
+          fal_response?: Json | null
+          first_frame_url?: string | null
+          generation_type?: string
+          id?: string
+          input_asset_id?: string | null
+          last_frame_url?: string | null
+          model_id?: string
+          negative_prompt?: string | null
+          output_asset_id?: string | null
+          parameters?: Json
+          processing_time?: number | null
+          project_id?: string | null
+          prompt?: string | null
+          reference_image_url?: string | null
+          reference_video_url?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "StudioGeneration_input_asset_id_fkey"
+            columns: ["input_asset_id"]
+            isOneToOne: false
+            referencedRelation: "StudioAsset"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "StudioGeneration_output_asset_id_fkey"
+            columns: ["output_asset_id"]
+            isOneToOne: false
+            referencedRelation: "StudioAsset"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "StudioGeneration_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "StudioProject"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "StudioGeneration_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      StudioProject: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          settings: Json | null
+          thumbnail: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          settings?: Json | null
+          thumbnail?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          settings?: Json | null
+          thumbnail?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "StudioProject_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      StudioTemplate: {
+        Row: {
+          config: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          model_id: string | null
+          name: string
+          thumbnail: string | null
+          type: string
+          usage_count: number | null
+          user_id: string | null
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          model_id?: string | null
+          name: string
+          thumbnail?: string | null
+          type: string
+          usage_count?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          model_id?: string | null
+          name?: string
+          thumbnail?: string | null
+          type?: string
+          usage_count?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "StudioTemplate_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       Suggestion: {
         Row: {
           createdAt: string
