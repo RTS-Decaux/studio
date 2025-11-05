@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { SupabaseSessionProvider } from "@/lib/supabase/provider";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
@@ -54,10 +54,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  // Use getUser() to verify the user's session with Supabase Auth server.
+  // Avoid reading the raw session from cookies on the server which triggers
+  // a security warning in the Supabase client. We intentionally pass
+  // `initialSession={null}` to the client provider so the client can rehydrate
+  // its own session securely.
+  const user = await getUser();
+  const session = null;
 
   return (
     <html

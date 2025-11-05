@@ -27,16 +27,17 @@ import {
 
 // Helper to get current authenticated user
 async function getCurrentUser() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  // Use secure server helper which calls `supabase.auth.getUser()` under the hood
+  // (this verifies the session with the Supabase Auth server) instead of
+  // directly reading the session from cookies which can be insecure.
+  const { getUser } = await import("@/lib/supabase/server");
+  const user = await getUser();
 
-  if (!session?.user) {
+  if (!user) {
     redirect("/login");
   }
 
-  return session.user;
+  return user;
 }
 
 // ============================================================================
