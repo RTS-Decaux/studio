@@ -18,45 +18,45 @@
   /* Base colors - Pure monochrome */
   --background: hsl(0 0% 100%);
   --foreground: hsl(0 0% 9%);
-  
+
   /* Surface colors - Solid layers */
   --card: hsl(0 0% 98%);
   --card-foreground: hsl(0 0% 9%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(0 0% 9%);
-  
+
   /* Primary - Deep monochrome */
   --primary: hsl(0 0% 9%);
   --primary-foreground: hsl(0 0% 98%);
-  
+
   /* Secondary - Light subtle tone */
   --secondary: hsl(0 0% 96%);
   --secondary-foreground: hsl(0 0% 9%);
-  
+
   /* Muted - Minimal contrast */
   --muted: hsl(0 0% 96%);
   --muted-foreground: hsl(0 0% 45%);
-  
+
   /* Accent - Subtle highlight */
   --accent: hsl(0 0% 96%);
   --accent-foreground: hsl(0 0% 9%);
-  
+
   /* Destructive - Minimal color */
   --destructive: hsl(0 70% 50%);
   --destructive-foreground: hsl(0 0% 98%);
-  
+
   /* Borders - Thin and crisp */
   --border: hsl(0 0% 85% / 0.8);
   --input: hsl(0 0% 85% / 0.8);
   --ring: hsl(0 0% 9% / 0.3);
-  
+
   /* Charts - Monochrome spectrum */
   --chart-1: hsl(0 0% 20%);
   --chart-2: hsl(0 0% 35%);
   --chart-3: hsl(0 0% 50%);
   --chart-4: hsl(0 0% 65%);
   --chart-5: hsl(0 0% 80%);
-  
+
   /* Sidebar - Solid background */
   --sidebar-background: hsl(0 0% 99%);
   --sidebar-foreground: hsl(0 0% 25%);
@@ -67,10 +67,10 @@
   --sidebar-border: hsl(0 0% 90%);
   --sidebar-ring: hsl(0 0% 9% / 0.3);
   --sidebar: hsl(0 0% 99%);
-  
+
   /* Border radius - Smooth but defined */
   --radius: 0.75rem;
-  
+
   /* Shadow colors for glass effect */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.03);
@@ -83,45 +83,45 @@
   /* Base colors - Deep monochrome */
   --background: hsl(0 0% 7%);
   --foreground: hsl(0 0% 98%);
-  
+
   /* Surface colors - Solid dark */
   --card: hsl(0 0% 10%);
   --card-foreground: hsl(0 0% 98%);
   --popover: hsl(0 0% 9%);
   --popover-foreground: hsl(0 0% 98%);
-  
+
   /* Primary - Light on dark */
   --primary: hsl(0 0% 98%);
   --primary-foreground: hsl(0 0% 9%);
-  
+
   /* Secondary - Dark subtle tone */
   --secondary: hsl(0 0% 14%);
   --secondary-foreground: hsl(0 0% 98%);
-  
+
   /* Muted - Minimal contrast */
   --muted: hsl(0 0% 14%);
   --muted-foreground: hsl(0 0% 60%);
-  
+
   /* Accent - Subtle highlight */
   --accent: hsl(0 0% 14%);
   --accent-foreground: hsl(0 0% 98%);
-  
+
   /* Destructive - Minimal color */
   --destructive: hsl(0 60% 45%);
   --destructive-foreground: hsl(0 0% 98%);
-  
+
   /* Borders - Thin and crisp */
   --border: hsl(0 0% 25% / 0.8);
   --input: hsl(0 0% 25% / 0.8);
   --ring: hsl(0 0% 98% / 0.3);
-  
+
   /* Charts - Monochrome spectrum */
   --chart-1: hsl(0 0% 80%);
   --chart-2: hsl(0 0% 65%);
   --chart-3: hsl(0 0% 50%);
   --chart-4: hsl(0 0% 35%);
   --chart-5: hsl(0 0% 20%);
-  
+
   /* Sidebar - Solid dark background */
   --sidebar-background: hsl(0 0% 8%);
   --sidebar-foreground: hsl(0 0% 80%);
@@ -132,7 +132,7 @@
   --sidebar-border: hsl(0 0% 20%);
   --sidebar-ring: hsl(0 0% 98% / 0.3);
   --sidebar: hsl(0 0% 8%);
-  
+
   /* Shadow colors for dark glass effect */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
@@ -396,25 +396,25 @@
   .border-thin {
     border-width: 0.5px;
   }
-  
+
   /* Elegant shadows for depth */
   .shadow-xs {
     box-shadow: var(--shadow-sm);
   }
-  
+
   .shadow-md {
     box-shadow: var(--shadow-md);
   }
-  
+
   .shadow-lg {
     box-shadow: var(--shadow-lg);
   }
-  
+
   /* Smooth transitions */
   .transition-smooth {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   /* Smooth borders */
   .border-smooth {
     border-color: var(--border);
