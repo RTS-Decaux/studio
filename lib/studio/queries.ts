@@ -37,6 +37,16 @@ function projectRowToModel(row: StudioProjectRow): StudioProject {
 }
 
 function assetRowToModel(row: StudioAssetRow): StudioAsset {
+  // If thumbnailUrl is null but we have an image, use the main URL
+  // The getAssetPreviewUrl function will handle the transformation
+  let thumbnailUrl = row.thumbnail_url;
+  
+  // For images without explicit thumbnails, use the main URL
+  // (transformations will be applied on the client side)
+  if (!thumbnailUrl && row.type === "image") {
+    thumbnailUrl = row.url;
+  }
+
   return {
     id: row.id,
     projectId: row.project_id,
@@ -44,7 +54,7 @@ function assetRowToModel(row: StudioAssetRow): StudioAsset {
     type: row.type as StudioAsset["type"],
     name: row.name,
     url: row.url,
-    thumbnailUrl: row.thumbnail_url,
+    thumbnailUrl,
     metadata: row.metadata as StudioAsset["metadata"],
     sourceType: row.source_type as StudioAsset["sourceType"],
     sourceGenerationId: row.source_generation_id,
@@ -283,6 +293,37 @@ export async function createAsset(
   if (error) {
     console.error("Error creating asset:", error);
     throw new Error("Failed to create asset");
+  }
+
+  return assetRowToModel(data);
+}
+
+export async function updateAsset(
+  id: string,
+  updates: Partial<Pick<StudioAsset, "name" | "metadata">>
+): Promise<StudioAsset> {
+  const supabase = await createSupabaseServerClient();
+
+  const dbUpdates: any = {};
+
+  if (updates.name !== undefined) {
+    dbUpdates.name = updates.name;
+  }
+
+  if (updates.metadata !== undefined) {
+    dbUpdates.metadata = updates.metadata;
+  }
+
+  const { data, error } = await supabase
+    .from("StudioAsset")
+    .update(dbUpdates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error updating asset:", error);
+    throw new Error("Failed to update asset");
   }
 
   return assetRowToModel(data);

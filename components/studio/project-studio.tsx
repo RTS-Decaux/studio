@@ -10,7 +10,7 @@ import { FolderOpen, Sparkles } from "lucide-react";
 import { useCallback, useState } from "react";
 import { AssetGallery } from "./asset-gallery";
 import { GenerationHistory } from "./generation-history";
-import { GenerationPanel } from "./generation-panel";
+import { GenerationPanelV2 as GenerationPanel } from "./generation-panel-v2";
 
 interface ProjectStudioProps {
   project: StudioProject;
@@ -43,56 +43,56 @@ export function ProjectStudio({
   }, []);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-background">
       {/* Project Description */}
       {project.description && (
-        <div className="px-4 md:px-6 py-3 border-b">
-          <p className="text-sm text-muted-foreground">{project.description}</p>
+        <div className="px-6 py-4 border-b bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {project.description}
+          </p>
         </div>
       )}
 
       {/* Main Content - Grid Layout */}
       <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
         {/* Left Panel - Generation Form */}
-        <div className="lg:col-span-5 xl:col-span-4 border-r overflow-auto">
-          <div className="p-4 md:p-6">
-            <GenerationPanel
-              projectId={project.id}
-              onGenerationStart={handleGenerationStart}
-              onGenerationComplete={handleGenerationComplete}
-            />
-          </div>
+        <div className="lg:col-span-5 xl:col-span-4 border-r bg-card/50 overflow-hidden">
+          <GenerationPanel
+            projectId={project.id}
+            onGenerationStart={handleGenerationStart}
+            onGenerationComplete={handleGenerationComplete}
+          />
         </div>
 
         {/* Right Panel - Results & History */}
-        <div className="lg:col-span-7 xl:col-span-8 flex flex-col">
+        <div className="lg:col-span-7 xl:col-span-8 flex flex-col bg-background">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className="h-full flex flex-col"
           >
-            <div className="border-b px-4 md:px-6">
-              <TabsList className="h-12">
-                <TabsTrigger value="generate" className="gap-2">
+            <div className="border-b bg-card/30 backdrop-blur-sm px-6 py-2">
+              <TabsList className="h-11 bg-background/50">
+                <TabsTrigger value="generate" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/10 data-[state=active]:to-pink-500/10 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-400">
                   <Sparkles className="h-4 w-4" />
-                  <span>History</span>
+                  <span className="font-medium">Generation History</span>
                 </TabsTrigger>
-                <TabsTrigger value="assets" className="gap-2">
+                <TabsTrigger value="assets" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/10 data-[state=active]:to-purple-500/10 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400">
                   <FolderOpen className="h-4 w-4" />
-                  <span>Assets</span>
+                  <span className="font-medium">Assets Library</span>
                 </TabsTrigger>
               </TabsList>
             </div>
 
             <div className="flex-1 overflow-auto">
-              <TabsContent value="generate" className="mt-0 p-4 md:p-6 h-full">
+              <TabsContent value="generate" className="mt-0 p-6 h-full">
                 <GenerationHistory
                   generations={generations}
                   onRefresh={refreshGenerations}
                 />
               </TabsContent>
 
-              <TabsContent value="assets" className="mt-0 p-4 md:p-6 h-full">
+              <TabsContent value="assets" className="mt-0 p-6 h-full">
                 <AssetGallery assets={assets} />
               </TabsContent>
             </div>
