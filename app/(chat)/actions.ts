@@ -3,7 +3,7 @@
 import type { VisibilityType } from "@/components/visibility-selector";
 import type { ChatModelId } from "@/lib/ai/models";
 import { titlePrompt } from "@/lib/ai/prompts";
-import { myProvider } from "@/lib/ai/providers";
+import { myProvider, type ModelProviderId } from "@/lib/ai/providers";
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
@@ -16,6 +16,11 @@ import { cookies } from "next/headers";
 export async function saveChatModelAsCookie(model: ChatModelId) {
   const cookieStore = await cookies();
   cookieStore.set("chat-model", model);
+}
+
+export async function saveProviderAsCookie(provider: ModelProviderId) {
+  const cookieStore = await cookies();
+  cookieStore.set("ai-provider", provider);
 }
 
 export async function generateTitleFromUserMessage({

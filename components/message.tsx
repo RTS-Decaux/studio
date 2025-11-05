@@ -5,25 +5,18 @@ import { cn, sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import equal from "fast-deep-equal";
 import { motion } from "framer-motion";
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { useDataStream } from "./data-stream-provider";
 import { DocumentToolResult } from "./document";
 import { DocumentPreview } from "./document-preview";
 import { MessageContent } from "./elements/message";
 import { Response } from "./elements/response";
-import {
-  Tool,
-  ToolContent,
-  ToolHeader,
-  ToolInput,
-  ToolOutput,
-} from "./elements/tool";
 import { SparklesIcon } from "./icons";
 import { MessageActions } from "./message-actions";
 import { MessageEditor } from "./message-editor";
-import { MessageReasoning } from "./message-reasoning";
 import { PreviewAttachment } from "./preview-attachment";
-import { Weather } from "./weather";
+import { ReasoningTrace } from "./reasoning-trace";
+import { WeatherAccordion } from "./weather-accordion";
 import { WebSearchResult } from "./web-search-result";
 
 const PurePreviewMessage = ({
@@ -52,6 +45,51 @@ const PurePreviewMessage = ({
   );
 
   useDataStream();
+
+  // Collect reasoning and tool calls into a trace
+  const reasoningSteps = useMemo(() => {
+    if (message.role !== "assistant") return [];
+    
+    const steps: Array<{
+      type: "reasoning" | "tool";
+      title: string;
+      content?: string;
+      toolType?: string;
+      state?: string;
+      isStreaming?: boolean;
+    }> = [];
+
+    message.parts.forEach((part) => {
+      if (part.type === "reasoning" && part.text?.trim()) {
+        steps.push({
+          type: "reasoning",
+          title: "Analyzing your request",
+          content: part.text,
+          isStreaming: isLoading,
+        });
+      } else if (part.type.startsWith("tool-")) {
+        const toolLabels: Record<string, string> = {
+          "tool-webSearch": "Searching the web",
+          "tool-getWeather": "Getting weather data",
+          "tool-createDocument": "Creating document",
+          "tool-updateDocument": "Updating document",
+          "tool-requestSuggestions": "Getting suggestions",
+        };
+        
+        const state = "state" in part ? part.state : undefined;
+        
+        steps.push({
+          type: "tool",
+          title: toolLabels[part.type] || part.type,
+          toolType: part.type,
+          state,
+          isStreaming: isLoading && state !== "output-available",
+        });
+      }
+    });
+
+    return steps;
+  }, [message.parts, message.role, isLoading]);
 
   return (
     <motion.div
@@ -89,6 +127,14 @@ const PurePreviewMessage = ({
               message.role === "user" && mode !== "edit",
           })}
         >
+          {/* Show reasoning trace for assistant messages */}
+          {message.role === "assistant" && reasoningSteps.length > 0 && (
+            <ReasoningTrace
+              isStreaming={isLoading}
+              steps={reasoningSteps}
+            />
+          )}
+
           {attachmentsFromMessage.length > 0 && (
             <div
               className="flex flex-row justify-end gap-2"
@@ -111,14 +157,9 @@ const PurePreviewMessage = ({
             const { type } = part;
             const key = `message-${message.id}-part-${index}`;
 
-            if (type === "reasoning" && part.text?.trim().length > 0) {
-              return (
-                <MessageReasoning
-                  isLoading={isLoading}
-                  key={key}
-                  reasoning={part.text}
-                />
-              );
+            // Skip reasoning - it's shown in ReasoningTrace
+            if (type === "reasoning") {
+              return null;
             }
 
             if (type === "text") {
@@ -169,49 +210,33 @@ const PurePreviewMessage = ({
             if (type === "tool-getWeather") {
               const { toolCallId, state } = part;
 
-              return (
-                <Tool defaultOpen={true} key={toolCallId}>
-                  <ToolHeader state={state} type="tool-getWeather" />
-                  <ToolContent>
-                    {state === "input-available" && (
-                      <ToolInput input={part.input} />
-                    )}
-                    {state === "output-available" && (
-                      <ToolOutput
-                        errorText={undefined}
-                        output={<Weather weatherAtLocation={part.output} />}
-                      />
-                    )}
-                  </ToolContent>
-                </Tool>
-              );
+              // Only show output in accordion, process is shown in ReasoningTrace
+              if (state === "output-available") {
+                return (
+                  <WeatherAccordion
+                    key={toolCallId}
+                    weatherAtLocation={part.output}
+                  />
+                );
+              }
+              return null;
             }
 
             if (type === "tool-webSearch") {
               const { toolCallId, state } = part;
               
               // Extract the actual data from wrapped format if needed
-              // Sometimes the output comes wrapped in {type: "json", value: {...}}
               const outputData = (part.output as any)?.type === "json" && (part.output as any)?.value 
                 ? (part.output as any).value 
                 : part.output;
 
-              return (
-                <Tool defaultOpen={true} key={toolCallId}>
-                  <ToolHeader state={state} type="tool-webSearch" />
-                  <ToolContent>
-                    {state === "input-available" && (
-                      <ToolInput input={part.input} />
-                    )}
-                    {state === "output-available" && (
-                      <ToolOutput
-                        errorText={outputData?.error}
-                        output={<WebSearchResult output={outputData} />}
-                      />
-                    )}
-                  </ToolContent>
-                </Tool>
-              );
+              // Only show output in accordion, process is shown in ReasoningTrace
+              if (state === "output-available") {
+                return (
+                  <WebSearchResult key={toolCallId} output={outputData} />
+                );
+              }
+              return null;
             }
 
             if (type === "tool-createDocument") {
@@ -265,37 +290,28 @@ const PurePreviewMessage = ({
             if (type === "tool-requestSuggestions") {
               const { toolCallId, state } = part;
 
-              return (
-                <Tool defaultOpen={true} key={toolCallId}>
-                  <ToolHeader state={state} type="tool-requestSuggestions" />
-                  <ToolContent>
-                    {state === "input-available" && (
-                      <ToolInput input={part.input} />
-                    )}
-                    {state === "output-available" && (
-                      <ToolOutput
-                        errorText={undefined}
-                        output={
-                          "error" in part.output ? (
-                            <div className="rounded border p-2 text-red-500">
-                              Error: {String(part.output.error)}
-                            </div>
-                          ) : (
-                            <DocumentToolResult
-                              isReadonly={isReadonly}
-                              result={{
-                                ...part.output,
-                                kind: part.output.kind as "text" | "code" | "image" | "sheet"
-                              }}
-                              type="request-suggestions"
-                            />
-                          )
-                        }
+              // Only show output, process is shown in ReasoningTrace
+              if (state === "output-available") {
+                return (
+                  <div className="my-2" key={toolCallId}>
+                    {"error" in part.output ? (
+                      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-500 dark:bg-red-950/50">
+                        Error: {String(part.output.error)}
+                      </div>
+                    ) : (
+                      <DocumentToolResult
+                        isReadonly={isReadonly}
+                        result={{
+                          ...part.output,
+                          kind: part.output.kind as "text" | "code" | "image" | "sheet"
+                        }}
+                        type="request-suggestions"
                       />
                     )}
-                  </ToolContent>
-                </Tool>
-              );
+                  </div>
+                );
+              }
+              return null;
             }
 
             return null;

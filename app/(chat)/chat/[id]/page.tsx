@@ -9,6 +9,11 @@ import {
   DEFAULT_CHAT_MODEL,
   type ChatModelId,
 } from "@/lib/ai/models";
+import {
+  getDefaultProvider,
+  isValidProvider,
+  type ModelProviderId,
+} from "@/lib/ai/providers";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
 import { getUser } from "@/lib/supabase/server";
 import type { AppUsage } from "@/lib/usage";
@@ -47,35 +52,23 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 
   const cookieStore = await cookies();
   const chatModelFromCookie = cookieStore.get("chat-model");
+  const providerIdFromCookie = cookieStore.get("ai-provider");
 
   const cookieModelValue = chatModelFromCookie?.value;
+  const cookieProviderValue = providerIdFromCookie?.value;
+  
   const isValidChatModel = (value: string | undefined): value is ChatModelId =>
     Boolean(value && chatModels.some((model) => model.id === value));
+  
   const resolvedChatModel: ChatModelId = isValidChatModel(cookieModelValue)
     ? cookieModelValue
     : DEFAULT_CHAT_MODEL;
+  
+  const resolvedProvider: ModelProviderId = isValidProvider(cookieProviderValue)
+    ? cookieProviderValue
+    : getDefaultProvider();
 
   const userName = user.user_metadata?.full_name || user.email?.split("@")[0] || "Guest";
-
-  if (!chatModelFromCookie || !isValidChatModel(cookieModelValue)) {
-    return (
-      <>
-        <Chat
-          autoResume={true}
-          id={chat.id}
-          initialChatModel={DEFAULT_CHAT_MODEL}
-          initialLastContext={
-            chat.lastContext ? (chat.lastContext as AppUsage) : undefined
-          }
-          initialMessages={uiMessages}
-          initialVisibilityType={chat.visibility as VisibilityType}
-          isReadonly={user?.id !== chat.userId}
-          userName={userName}
-        />
-        <DataStreamHandler />
-      </>
-    );
-  }
 
   return (
     <>
@@ -83,6 +76,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         autoResume={true}
         id={chat.id}
         initialChatModel={resolvedChatModel}
+        initialProvider={resolvedProvider}
         initialLastContext={
           chat.lastContext ? (chat.lastContext as AppUsage) : undefined
         }

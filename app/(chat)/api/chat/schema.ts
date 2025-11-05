@@ -26,6 +26,7 @@ export const postRequestBodySchema = z.object({
     "chat-model-reasoning",
     "chat-model-fast",
   ]),
+  selectedProvider: z.enum(["openai", "gemini"]).optional().default("openai"),
   selectedVisibilityType: z.enum(["public", "private"]),
 });
 

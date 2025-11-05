@@ -15,6 +15,7 @@ import { useArtifactSelector } from "@/hooks/use-artifact";
 import { useAutoResume } from "@/hooks/use-auto-resume";
 import { useChatVisibility } from "@/hooks/use-chat-visibility";
 import type { ChatModelId } from "@/lib/ai/models";
+import type { ModelProviderId } from "@/lib/ai/providers";
 import { ChatSDKError } from "@/lib/errors";
 import type { Vote } from "@/lib/supabase/models";
 import type { Attachment, ChatMessage } from "@/lib/types";
@@ -38,6 +39,7 @@ export function Chat({
   id,
   initialMessages,
   initialChatModel,
+  initialProvider = "openai",
   initialVisibilityType,
   isReadonly,
   autoResume,
@@ -47,6 +49,7 @@ export function Chat({
   id: string;
   initialMessages: ChatMessage[];
   initialChatModel: ChatModelId;
+  initialProvider?: ModelProviderId;
   initialVisibilityType: VisibilityType;
   isReadonly: boolean;
   autoResume: boolean;
@@ -67,11 +70,19 @@ export function Chat({
   const [currentModelId, setCurrentModelId] = useState<ChatModelId>(
     initialChatModel
   );
+  const [currentProviderId, setCurrentProviderId] = useState<ModelProviderId>(
+    initialProvider
+  );
   const currentModelIdRef = useRef<ChatModelId>(currentModelId);
+  const currentProviderIdRef = useRef<ModelProviderId>(currentProviderId);
 
   useEffect(() => {
     currentModelIdRef.current = currentModelId;
   }, [currentModelId]);
+
+  useEffect(() => {
+    currentProviderIdRef.current = currentProviderId;
+  }, [currentProviderId]);
 
   const {
     messages,
@@ -95,6 +106,7 @@ export function Chat({
             id: request.id,
             message: request.messages.at(-1),
             selectedChatModel: currentModelIdRef.current,
+            selectedProvider: currentProviderIdRef.current,
             selectedVisibilityType: visibilityType,
             ...request.body,
           },
@@ -167,6 +179,10 @@ export function Chat({
           chatId={id}
           isReadonly={isReadonly}
           selectedVisibilityType={initialVisibilityType}
+          selectedModelId={currentModelId}
+          selectedProviderId={currentProviderId}
+          onModelChange={setCurrentModelId}
+          onProviderChange={setCurrentProviderId}
         />
 
         <Messages
@@ -192,7 +208,11 @@ export function Chat({
               onModelChange={(modelId) => {
                 setCurrentModelId(modelId);
               }}
+              onProviderChange={(providerId) => {
+                setCurrentProviderId(providerId);
+              }}
               selectedModelId={currentModelId}
+              selectedProviderId={currentProviderId}
               selectedVisibilityType={visibilityType}
               sendMessage={sendMessage}
               setAttachments={setAttachments}

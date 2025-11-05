@@ -108,11 +108,13 @@ export async function POST(request: Request) {
       id,
       message,
       selectedChatModel,
+      selectedProvider = "openai",
       selectedVisibilityType,
     }: {
       id: string;
       message: ChatMessage;
       selectedChatModel: ChatModelId;
+      selectedProvider?: "openai" | "gemini";
       selectedVisibilityType: VisibilityType;
     } = requestBody;
 
@@ -196,6 +198,7 @@ export async function POST(request: Request) {
       execute: ({ writer: dataStream }) => {
         const model = myProvider.languageModel(
           selectedChatModel,
+          selectedProvider,
         ) as LanguageModel;
 
         const result = streamText({
@@ -235,7 +238,7 @@ export async function POST(request: Request) {
             try {
               const providers = await getTokenlensCatalog();
               const modelId =
-                myProvider.languageModel(selectedChatModel).modelId;
+                myProvider.languageModel(selectedChatModel, selectedProvider).modelId;
               if (!modelId) {
                 finalMergedUsage = usage;
                 dataStream.write({

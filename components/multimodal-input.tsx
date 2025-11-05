@@ -1,8 +1,13 @@
 "use client";
 
-import { saveChatModelAsCookie } from "@/app/(chat)/actions";
+import { saveChatModelAsCookie, saveProviderAsCookie } from "@/app/(chat)/actions";
 import { SelectItem } from "@/components/ui/select";
 import { type ChatModelId, chatModels } from "@/lib/ai/models";
+import {
+    getConfiguredProviders,
+    getProviderDisplayName,
+    type ModelProviderId,
+} from "@/lib/ai/providers";
 import type { Attachment, ChatMessage } from "@/lib/types";
 import type { AppUsage } from "@/lib/usage";
 import { cn } from "@/lib/utils";
@@ -60,7 +65,9 @@ function PureMultimodalInput({
   className,
   selectedVisibilityType,
   selectedModelId,
+  selectedProviderId = "openai",
   onModelChange,
+  onProviderChange,
   usage,
 }: {
   chatId: string;
@@ -76,7 +83,9 @@ function PureMultimodalInput({
   className?: string;
   selectedVisibilityType: VisibilityType;
   selectedModelId: ChatModelId;
+  selectedProviderId?: ModelProviderId;
   onModelChange?: (modelId: ChatModelId) => void;
+  onProviderChange?: (providerId: ModelProviderId) => void;
   usage?: AppUsage;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -389,10 +398,17 @@ function PureMultimodalInput({
               selectedModelId={selectedModelId}
               status={status}
             />
-            <ModelSelectorCompact
+            {/* 
+              @deprecated ModelSelectorCompact is now deprecated in favor of ModelSelectorHeader in chat-header.tsx
+              Kept here for backwards compatibility and potential mobile-specific use cases.
+              Consider removing in future versions if no longer needed.
+            */}
+            {/* <ModelSelectorCompact
               onModelChange={onModelChange}
+              onProviderChange={onProviderChange}
               selectedModelId={selectedModelId}
-            />
+              selectedProviderId={selectedProviderId}
+            /> */}
           </PromptInputTools>
 
           {status === "submitted" ? (
@@ -431,6 +447,9 @@ export const MultimodalInput = memo(
     if (prevProps.selectedModelId !== nextProps.selectedModelId) {
       return false;
     }
+    if (prevProps.selectedProviderId !== nextProps.selectedProviderId) {
+      return false;
+    }
 
     return true;
   }
@@ -465,28 +484,84 @@ function PureAttachmentsButton({
 
 const AttachmentsButton = memo(PureAttachmentsButton);
 
+/**
+ * @deprecated This component is deprecated in favor of ModelSelectorHeader in chat-header.tsx
+ * 
+ * ModelSelectorCompact was previously used in the input toolbar but has been replaced
+ * by ModelSelectorHeader which is now displayed in the chat header (similar to ChatGPT).
+ * 
+ * This component is kept for:
+ * - Backwards compatibility
+ * - Potential mobile-specific use cases
+ * - Reference implementation
+ * 
+ * Consider removing in future versions if no longer needed.
+ * 
+ * @see components/model-selector-header.tsx for the new implementation
+ */
 function PureModelSelectorCompact({
   selectedModelId,
+  selectedProviderId = "openai",
   onModelChange,
+  onProviderChange,
 }: {
   selectedModelId: ChatModelId;
+  selectedProviderId?: ModelProviderId;
   onModelChange?: (modelId: ChatModelId) => void;
+  onProviderChange?: (providerId: ModelProviderId) => void;
 }) {
   const [optimisticModelId, setOptimisticModelId] =
     useState<ChatModelId>(selectedModelId);
+  const [optimisticProviderId, setOptimisticProviderId] =
+    useState<ModelProviderId>(selectedProviderId);
 
   useEffect(() => {
     setOptimisticModelId(selectedModelId);
   }, [selectedModelId]);
 
+  useEffect(() => {
+    setOptimisticProviderId(selectedProviderId);
+  }, [selectedProviderId]);
+
   const selectedModel = chatModels.find(
     (model) => model.id === optimisticModelId
   );
 
+  const configuredProviders = useMemo(() => getConfiguredProviders(), []);
+  const showProviderSelector = configuredProviders.length > 1;
+
+  // Маппинг моделей на красивые названия
+  const modelLabels: Record<ChatModelId, { label: string; description: string }> = {
+    "chat-model": {
+      label: "Auto",
+      description: "Решает, как долго думать",
+    },
+    "chat-model-fast": {
+      label: "Instant",
+      description: "Отвечает сразу",
+    },
+    "chat-model-reasoning": {
+      label: "Thinking",
+      description: "Думает дольше, чтобы получить лучшие ответы",
+    },
+  };
+
   return (
     <PromptInputModelSelect
-      onValueChange={(modelName) => {
-        const model = chatModels.find((m) => m.name === modelName);
+      onValueChange={(value) => {
+        // Check if it's a provider selection
+        if (value.startsWith("provider:")) {
+          const providerId = value.replace("provider:", "") as ModelProviderId;
+          setOptimisticProviderId(providerId);
+          onProviderChange?.(providerId);
+          startTransition(() => {
+            saveProviderAsCookie(providerId);
+          });
+          return;
+        }
+
+        // Otherwise it's a model selection
+        const model = chatModels.find((m) => m.id === value);
         if (model) {
           setOptimisticModelId(model.id);
           onModelChange?.(model.id);
@@ -495,33 +570,98 @@ function PureModelSelectorCompact({
           });
         }
       }}
-      value={selectedModel?.name}
+      value={optimisticModelId}
     >
       <Trigger asChild>
         <Button variant="ghost" className="h-8 px-2">
           <CpuIcon size={16} />
           <span className="hidden font-medium text-xs sm:block">
-            {selectedModel?.name}
+            <span className="text-foreground">
+              {getProviderDisplayName(optimisticProviderId).split(" ")[0]}
+            </span>
+            {showProviderSelector && (
+              <span className="text-muted-foreground">
+                {" "}• {modelLabels[optimisticModelId]?.label || selectedModel?.name}
+              </span>
+            )}
+            {!showProviderSelector && (
+              <span className="text-muted-foreground ml-1">
+                {modelLabels[optimisticModelId]?.label || selectedModel?.name}
+              </span>
+            )}
           </span>
           <ChevronDownIcon size={16} />
         </Button>
       </Trigger>
-      <PromptInputModelSelectContent className="min-w-[260px] p-0">
-        <div className="flex flex-col gap-px">
-          {chatModels.map((model) => (
-            <SelectItem key={model.id} value={model.name}>
-              <div className="truncate font-medium text-xs">{model.name}</div>
-              <div className="mt-px truncate text-[10px] text-muted-foreground leading-tight">
-                {model.description}
+      <PromptInputModelSelectContent className="min-w-[280px] p-0">
+        <div className="flex flex-col">
+          {showProviderSelector && (
+            <>
+              <div className="px-3 pt-2 pb-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+                Провайдер
               </div>
-            </SelectItem>
-          ))}
+              <div className="px-1 pb-1">
+                {configuredProviders.map((providerId) => (
+                  <SelectItem
+                    key={`provider-${providerId}`}
+                    value={`provider:${providerId}`}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between gap-3 w-full py-0.5">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="font-medium text-xs">
+                          {providerId === "openai" ? "ChatGPT" : "Google"}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {providerId === "openai" ? "GPT модели" : "Gemini модели"}
+                        </div>
+                      </div>
+                      {providerId === optimisticProviderId && (
+                        <span className="text-xs text-primary font-bold">✓</span>
+                      )}
+                    </div>
+                  </SelectItem>
+                ))}
+              </div>
+              <div className="h-px bg-border mx-2" />
+            </>
+          )}
+          <div className="px-3 pt-2 pb-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+            Модель
+          </div>
+          <div className="px-1 pb-1">
+            {chatModels.map((model) => {
+              const info = modelLabels[model.id];
+              const isActive = model.id === optimisticModelId;
+              
+              return (
+                <SelectItem key={model.id} value={model.id} className="cursor-pointer">
+                  <div className="flex items-start justify-between gap-3 w-full py-0.5">
+                    <div className="flex flex-col gap-0.5 flex-1">
+                      <div className="font-medium text-xs">
+                        {info?.label || model.name}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground leading-snug">
+                        {info?.description || model.description}
+                      </div>
+                    </div>
+                    {isActive && (
+                      <span className="text-xs text-primary font-bold pt-0.5">✓</span>
+                    )}
+                  </div>
+                </SelectItem>
+              );
+            })}
+          </div>
         </div>
       </PromptInputModelSelectContent>
     </PromptInputModelSelect>
   );
 }
 
+/**
+ * @deprecated Use ModelSelectorHeader from components/model-selector-header.tsx instead
+ */
 const ModelSelectorCompact = memo(PureModelSelectorCompact);
 
 function PureStopButton({

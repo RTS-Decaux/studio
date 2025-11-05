@@ -2,8 +2,10 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { customProvider } from "ai";
 import { isTestEnvironment } from "../constants";
-
-type ProviderId = "openai" | "gemini";
+import {
+  type ProviderId,
+  getDefaultProvider, validateProviderConfig
+} from "./provider-selector";
 
 const MODEL_REGISTRY = {
   "chat-model": {
@@ -29,23 +31,16 @@ const MODEL_REGISTRY = {
 } as const;
 
 type ModelId = keyof typeof MODEL_REGISTRY;
-const DEFAULT_PROVIDER: ProviderId =
-  process.env.AI_DEFAULT_PROVIDER === "gemini" ? "gemini" : "openai";
+const DEFAULT_PROVIDER: ProviderId = getDefaultProvider();
 
 function getOpenAIApiKey() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is not defined");
-  }
-  return apiKey;
+  validateProviderConfig("openai");
+  return process.env.OPENAI_API_KEY!;
 }
 
 function getGeminiApiKey() {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not defined");
-  }
-  return apiKey;
+  validateProviderConfig("gemini");
+  return process.env.GEMINI_API_KEY!;
 }
 
 type OpenAIProviderInstance = ReturnType<typeof createOpenAI>;
@@ -142,4 +137,11 @@ export const myProvider = isTestEnvironment
   };
 
 export { MODEL_REGISTRY as MODEL_PROVIDER_REGISTRY };
-export type { ModelId as RegisteredModelId, ProviderId as ModelProviderId };
+export type { ProviderId as ModelProviderId, ModelId as RegisteredModelId };
+
+// Re-export provider selector utilities for use in components
+  export {
+    AVAILABLE_PROVIDERS, getConfiguredProviders, getDefaultProvider, getProviderDisplayName,
+    isProviderConfigured, isValidProvider, selectProvider
+  } from "./provider-selector";
+
