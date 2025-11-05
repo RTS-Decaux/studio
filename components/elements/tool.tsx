@@ -1,22 +1,22 @@
 "use client";
 
-import type { ToolUIPart } from "ai";
-import {
-  CheckCircleIcon,
-  ChevronDownIcon,
-  CircleIcon,
-  ClockIcon,
-  WrenchIcon,
-  XCircleIcon,
-} from "lucide-react";
-import type { ComponentProps, ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import type { ToolUIPart } from "ai";
+import {
+    CheckCircleIcon,
+    ChevronDownIcon,
+    CircleIcon,
+    ClockIcon,
+    WrenchIcon,
+    XCircleIcon,
+} from "lucide-react";
+import type { ComponentProps, ReactNode } from "react";
 import { CodeBlock } from "./code-block";
 
 export type ToolProps = ComponentProps<typeof Collapsible>;
@@ -32,6 +32,18 @@ export type ToolHeaderProps = {
   type: ToolUIPart["type"];
   state: ToolUIPart["state"];
   className?: string;
+};
+
+const getToolLabel = (type: ToolUIPart["type"]): string => {
+  const labels: Record<string, string> = {
+    "tool-getWeather": "Get Weather",
+    "tool-webSearch": "Web Search",
+    "tool-createDocument": "Create Document",
+    "tool-updateDocument": "Update Document",
+    "tool-requestSuggestions": "Request Suggestions",
+  };
+  
+  return labels[type] || type.replace("tool-", "").replace(/([A-Z])/g, " $1").trim();
 };
 
 const getStatusBadge = (status: ToolUIPart["state"]) => {
@@ -81,7 +93,7 @@ export const ToolHeader = ({
   >
     <div className="flex min-w-0 flex-1 items-center gap-2">
       <WrenchIcon className="size-4 shrink-0 text-muted-foreground" />
-      <span className="truncate font-medium text-sm">{type}</span>
+      <span className="truncate font-medium text-sm">{getToolLabel(type)}</span>
     </div>
     <div className="flex shrink-0 items-center gap-2">
       {getStatusBadge(state)}

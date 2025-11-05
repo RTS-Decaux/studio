@@ -1,5 +1,9 @@
 import type { VisibilityType } from "@/components/visibility-selector";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
+import {
+  debugToolMessages,
+  filterToolMessages,
+} from "@/lib/ai/message-utils";
 import type { ChatModelId } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { myProvider } from "@/lib/ai/providers";
@@ -136,8 +140,15 @@ export async function POST(request: Request) {
       if (chat.userId !== user.id) {
         return new ChatSDKError("forbidden:chat").toResponse();
       }
-      // Only fetch messages if chat already exists
-      messagesFromDb = await getMessagesByChatId({ id });
+      // Load messages and filter out tool messages
+      // Tool messages are AI SDK artifacts with results already in assistant parts
+      const allMessages = await getMessagesByChatId({ id });
+      messagesFromDb = filterToolMessages(allMessages);
+      
+      // Debug: show how many tool messages were filtered
+      if (process.env.NODE_ENV === 'development') {
+        debugToolMessages(allMessages);
+      }
     } else {
       const title = await generateTitleFromUserMessage({
         message,
@@ -190,7 +201,11 @@ export async function POST(request: Request) {
         const result = streamText({
           model,
           system: systemPrompt({ selectedChatModel, requestHints }),
-          messages: convertToModelMessages(uiMessages),
+          // Filter tool messages - they break convertToModelMessages validation
+          // Tool results are already included in assistant message parts
+          messages: convertToModelMessages(
+            filterToolMessages(uiMessages)
+          ),
           stopWhen: stepCountIs(5),
           experimental_activeTools: selectedChatModel === "chat-model-reasoning"
             ? []
@@ -260,8 +275,12 @@ export async function POST(request: Request) {
       },
       generateId: generateUUID,
       onFinish: async ({ messages }) => {
+        // Filter out tool messages before saving
+        // Tool results are already in assistant message parts
+        const messagesToSave = filterToolMessages(messages);
+        
         await saveMessages({
-          messages: messages.map((currentMessage) => ({
+          messages: messagesToSave.map((currentMessage) => ({
             id: currentMessage.id,
             role: currentMessage.role,
             parts: currentMessage.parts,

@@ -1,11 +1,11 @@
 "use client";
+import type { Vote } from "@/lib/supabase/models";
+import type { ChatMessage } from "@/lib/types";
+import { cn, sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import equal from "fast-deep-equal";
 import { motion } from "framer-motion";
 import { memo, useState } from "react";
-import type { Vote } from "@/lib/supabase/models";
-import type { ChatMessage } from "@/lib/types";
-import { cn, sanitizeText } from "@/lib/utils";
 import { useDataStream } from "./data-stream-provider";
 import { DocumentToolResult } from "./document";
 import { DocumentPreview } from "./document-preview";
@@ -24,6 +24,7 @@ import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
 import { PreviewAttachment } from "./preview-attachment";
 import { Weather } from "./weather";
+import { WebSearchResult } from "./web-search-result";
 
 const PurePreviewMessage = ({
   chatId,
@@ -179,6 +180,33 @@ const PurePreviewMessage = ({
                       <ToolOutput
                         errorText={undefined}
                         output={<Weather weatherAtLocation={part.output} />}
+                      />
+                    )}
+                  </ToolContent>
+                </Tool>
+              );
+            }
+
+            if (type === "tool-webSearch") {
+              const { toolCallId, state } = part;
+              
+              // Extract the actual data from wrapped format if needed
+              // Sometimes the output comes wrapped in {type: "json", value: {...}}
+              const outputData = (part.output as any)?.type === "json" && (part.output as any)?.value 
+                ? (part.output as any).value 
+                : part.output;
+
+              return (
+                <Tool defaultOpen={true} key={toolCallId}>
+                  <ToolHeader state={state} type="tool-webSearch" />
+                  <ToolContent>
+                    {state === "input-available" && (
+                      <ToolInput input={part.input} />
+                    )}
+                    {state === "output-available" && (
+                      <ToolOutput
+                        errorText={outputData?.error}
+                        output={<WebSearchResult output={outputData} />}
                       />
                     )}
                   </ToolContent>
