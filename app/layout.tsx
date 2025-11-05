@@ -1,9 +1,9 @@
+import { ThemeProvider } from "@/components/theme-provider";
+import { SupabaseSessionProvider } from "@/lib/supabase/provider";
+import { getUser } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
-import { SupabaseSessionProvider } from "@/lib/supabase/provider";
-import { getUser } from "@/lib/supabase/server";
-import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
 

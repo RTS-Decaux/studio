@@ -1,4 +1,4 @@
-import { StudioSidebar } from "@/components/studio/studio-sidebar";
+import { StudioSidebar } from "@/components/studio-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getUser } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
