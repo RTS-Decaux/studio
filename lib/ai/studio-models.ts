@@ -1,21 +1,28 @@
-export type ReferenceInputKind = "reference-image" | "first-frame" | "last-frame" | "reference-video"
+export type ReferenceInputKind =
+  | "reference-image"
+  | "first-frame"
+  | "last-frame"
+  | "reference-video";
 
 export type FalStudioModel = {
-  id: string
-  name: string
-  description: string
-  type: "image" | "video"
-  provider: "fal"
-  creator: string
-  quality?: string
-  supportsImageInput?: boolean
-  supportsVideoInput?: boolean
-  requiresReferenceImage?: boolean
-  requiredInputs?: ReferenceInputKind[]
-  optionalInputs?: ReferenceInputKind[]
-}
+  id: string;
+  name: string;
+  description: string;
+  type: "image" | "video";
+  provider: "fal";
+  creator: string;
+  quality?: string;
+  supportsImageInput?: boolean;
+  supportsVideoInput?: boolean;
+  requiresReferenceImage?: boolean;
+  requiredInputs?: ReferenceInputKind[];
+  optionalInputs?: ReferenceInputKind[];
+};
 
-export const FAL_MODEL_GROUPS: Array<{ creator: string; models: FalStudioModel[] }> = [
+export const FAL_MODEL_GROUPS: Array<{
+  creator: string;
+  models: FalStudioModel[];
+}> = [
   {
     creator: "Black Forest Labs (FLUX)",
     models: [
@@ -544,6 +551,8 @@ export const FAL_MODEL_GROUPS: Array<{ creator: string; models: FalStudioModel[]
       },
     ],
   },
-]
+];
 
-export const ALL_FAL_MODELS: FalStudioModel[] = FAL_MODEL_GROUPS.flatMap((group) => group.models)
+export const ALL_FAL_MODELS: FalStudioModel[] = FAL_MODEL_GROUPS.flatMap(
+  (group) => group.models
+);

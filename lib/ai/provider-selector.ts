@@ -39,7 +39,7 @@ export function getDefaultProvider(): ProviderId {
  */
 export function resolveProvider(
   provider: unknown,
-  fallback?: ProviderId,
+  fallback?: ProviderId
 ): ProviderId {
   if (isValidProvider(provider)) {
     return provider;
@@ -89,7 +89,7 @@ export function validateProviderConfig(provider: ProviderId): void {
     throw new Error(
       `Provider "${provider}" is not configured. Missing API key: ${
         provider === "openai" ? "OPENAI_API_KEY" : "GEMINI_API_KEY"
-      }`,
+      }`
     );
   }
 }
@@ -98,9 +98,7 @@ export function validateProviderConfig(provider: ProviderId): void {
  * Selects best available provider
  * Prefers the requested provider, falls back to configured ones
  */
-export function selectBestProvider(
-  preferredProvider?: ProviderId,
-): ProviderId {
+export function selectBestProvider(preferredProvider?: ProviderId): ProviderId {
   // If preferred provider is configured, use it
   if (preferredProvider && isProviderConfigured(preferredProvider)) {
     return preferredProvider;
@@ -111,7 +109,7 @@ export function selectBestProvider(
 
   if (configured.length === 0) {
     throw new Error(
-      "No AI providers configured. Please set OPENAI_API_KEY or GEMINI_API_KEY",
+      "No AI providers configured. Please set OPENAI_API_KEY or GEMINI_API_KEY"
     );
   }
 

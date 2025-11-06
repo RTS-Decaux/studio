@@ -4,12 +4,12 @@
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-    AVAILABLE_PROVIDERS,
-    getConfiguredProviders,
-    getProviderDisplayName,
-    isProviderConfigured,
-    myProvider,
-    selectProvider,
+  AVAILABLE_PROVIDERS,
+  getConfiguredProviders,
+  getProviderDisplayName,
+  isProviderConfigured,
+  myProvider,
+  selectProvider,
 } from "./providers";
 
 describe("Provider Integration Tests", () => {
@@ -162,9 +162,9 @@ describe("Provider Integration Tests", () => {
     it("should integrate with myProvider object", () => {
       expect(myProvider).toBeDefined();
       expect(myProvider.languageModel).toBeDefined();
-      
+
       // Check for custom properties in non-test environment
-      if ('defaultProvider' in myProvider) {
+      if ("defaultProvider" in myProvider) {
         expect(myProvider.defaultProvider).toBeDefined();
         expect(myProvider.resolveProvider).toBeDefined();
       }
@@ -175,7 +175,7 @@ describe("Provider Integration Tests", () => {
       process.env.GEMINI_API_KEY = "test-key";
 
       const fromSelector = selectProvider();
-      
+
       // In non-test environment, should match
       expect(fromSelector).toBe("gemini");
     });
@@ -195,9 +195,7 @@ describe("Provider Integration Tests", () => {
       delete process.env.OPENAI_API_KEY;
       delete process.env.GEMINI_API_KEY;
 
-      expect(() => selectProvider()).toThrow(
-        "No AI providers configured"
-      );
+      expect(() => selectProvider()).toThrow("No AI providers configured");
     });
 
     it("should provide clear error when requested provider not configured", () => {

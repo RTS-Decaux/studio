@@ -1,9 +1,9 @@
-import { documentHandlersByArtifactKind } from "@/lib/artifacts/server";
-import { getDocumentById } from "@/lib/db/queries";
-import type { ChatMessage } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 import { tool, type UIMessageStreamWriter } from "ai";
 import { z } from "zod";
+import { documentHandlersByArtifactKind } from "@/lib/artifacts/server";
+import { getDocumentById } from "@/lib/db/queries";
+import type { ChatMessage } from "@/lib/types";
 
 type UpdateDocumentProps = {
   user: User;
@@ -19,7 +19,13 @@ export const updateDocument = ({ user, dataStream }: UpdateDocumentProps) =>
         .string()
         .describe("The description of changes that need to be made"),
     }),
-    execute: async ({ id, description }: { id: string; description: string }) => {
+    execute: async ({
+      id,
+      description,
+    }: {
+      id: string;
+      description: string;
+    }) => {
       const document = await getDocumentById({ id });
 
       if (!document) {
@@ -36,7 +42,7 @@ export const updateDocument = ({ user, dataStream }: UpdateDocumentProps) =>
 
       const documentHandler = documentHandlersByArtifactKind.find(
         (documentHandlerByArtifactKind) =>
-          documentHandlerByArtifactKind.kind === document.kind,
+          documentHandlerByArtifactKind.kind === document.kind
       );
 
       if (!documentHandler) {

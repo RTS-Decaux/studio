@@ -82,7 +82,7 @@ function resolveModelId(modelId: ModelId, providerId: ProviderId) {
   const providerModelId = mapping[providerId];
   if (!providerModelId) {
     throw new Error(
-      `Model ${modelId} is not available for provider ${providerId}`,
+      `Model ${modelId} is not available for provider ${providerId}`
     );
   }
   return providerModelId;
@@ -130,12 +130,12 @@ export const geminiProvider = () =>
 export const myProvider = isTestEnvironment
   ? (testProviderSingleton as ReturnType<typeof customProvider>)
   : {
-    languageModel: createLanguageModelResolver(),
-    defaultProvider: DEFAULT_PROVIDER,
-    resolveProvider(providerId: ProviderId = DEFAULT_PROVIDER) {
-      return getProvider(providerId);
-    },
-  };
+      languageModel: createLanguageModelResolver(),
+      defaultProvider: DEFAULT_PROVIDER,
+      resolveProvider(providerId: ProviderId = DEFAULT_PROVIDER) {
+        return getProvider(providerId);
+      },
+    };
 
 export { MODEL_REGISTRY as MODEL_PROVIDER_REGISTRY };
 export type { ModelId as RegisteredModelId, ProviderId as ModelProviderId };

@@ -1,12 +1,12 @@
+import type { User } from "@supabase/supabase-js";
+import { tool, type UIMessageStreamWriter } from "ai";
+import { z } from "zod";
 import {
   artifactKinds,
   documentHandlersByArtifactKind,
 } from "@/lib/artifacts/server";
 import type { ChatMessage } from "@/lib/types";
 import { generateUUID } from "@/lib/utils";
-import type { User } from "@supabase/supabase-js";
-import { tool, type UIMessageStreamWriter } from "ai";
-import { z } from "zod";
 
 type CreateDocumentProps = {
   user: User;
@@ -21,7 +21,13 @@ export const createDocument = ({ user, dataStream }: CreateDocumentProps) =>
       title: z.string(),
       kind: z.enum(artifactKinds),
     }),
-    execute: async ({ title, kind }: { title: string; kind: typeof artifactKinds[number] }) => {
+    execute: async ({
+      title,
+      kind,
+    }: {
+      title: string;
+      kind: (typeof artifactKinds)[number];
+    }) => {
       const id = generateUUID();
 
       dataStream.write({
@@ -50,7 +56,7 @@ export const createDocument = ({ user, dataStream }: CreateDocumentProps) =>
 
       const documentHandler = documentHandlersByArtifactKind.find(
         (documentHandlerByArtifactKind) =>
-          documentHandlerByArtifactKind.kind === kind,
+          documentHandlerByArtifactKind.kind === kind
       );
 
       if (!documentHandler) {

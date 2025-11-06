@@ -1,7 +1,3 @@
-import { getDocumentById, saveSuggestions } from "@/lib/db/queries";
-import type { Suggestion } from "@/lib/supabase/models";
-import type { ChatMessage } from "@/lib/types";
-import { generateUUID } from "@/lib/utils";
 import type { User } from "@supabase/supabase-js";
 import {
   type LanguageModel,
@@ -10,6 +6,10 @@ import {
   type UIMessageStreamWriter,
 } from "ai";
 import { z } from "zod";
+import { getDocumentById, saveSuggestions } from "@/lib/db/queries";
+import type { Suggestion } from "@/lib/supabase/models";
+import type { ChatMessage } from "@/lib/types";
+import { generateUUID } from "@/lib/utils";
 import { myProvider } from "../providers";
 
 type RequestSuggestionsProps = {
@@ -17,16 +17,14 @@ type RequestSuggestionsProps = {
   dataStream: UIMessageStreamWriter<ChatMessage>;
 };
 
-type SuggestionDraft =
-  & Omit<
-    Suggestion,
-    "userId" | "createdAt" | "documentCreatedAt"
-  >
-  & {
-    userId?: string;
-    createdAt?: string | Date;
-    documentCreatedAt?: string | Date;
-  };
+type SuggestionDraft = Omit<
+  Suggestion,
+  "userId" | "createdAt" | "documentCreatedAt"
+> & {
+  userId?: string;
+  createdAt?: string | Date;
+  documentCreatedAt?: string | Date;
+};
 
 export const requestSuggestions = ({
   user,

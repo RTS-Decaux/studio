@@ -1,16 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-    type ProviderId,
-    AVAILABLE_PROVIDERS,
-    getConfiguredProviders,
-    getDefaultProvider,
-    getProviderDisplayName,
-    isProviderConfigured,
-    isValidProvider,
-    resolveProvider,
-    selectBestProvider,
-    selectProvider,
-    validateProviderConfig,
+  AVAILABLE_PROVIDERS,
+  getConfiguredProviders,
+  getDefaultProvider,
+  getProviderDisplayName,
+  isProviderConfigured,
+  isValidProvider,
+  type ProviderId,
+  resolveProvider,
+  selectBestProvider,
+  selectProvider,
+  validateProviderConfig,
 } from "./provider-selector";
 
 describe("Provider Selector", () => {
@@ -210,9 +210,7 @@ describe("Provider Selector", () => {
     it("should throw when no providers configured", () => {
       delete process.env.OPENAI_API_KEY;
       delete process.env.GEMINI_API_KEY;
-      expect(() => selectBestProvider()).toThrow(
-        "No AI providers configured"
-      );
+      expect(() => selectBestProvider()).toThrow("No AI providers configured");
     });
   });
 
@@ -236,9 +234,9 @@ describe("Provider Selector", () => {
 
     it("should skip validation when disabled", () => {
       delete process.env.GEMINI_API_KEY;
-      expect(
-        selectProvider({ provider: "gemini", validate: false })
-      ).toBe("gemini");
+      expect(selectProvider({ provider: "gemini", validate: false })).toBe(
+        "gemini"
+      );
     });
 
     it("should fallback on invalid provider with fallback=true", () => {
@@ -269,9 +267,9 @@ describe("Provider Selector", () => {
 
     it("should respect validate:false with invalid config", () => {
       delete process.env.OPENAI_API_KEY;
-      expect(
-        selectProvider({ provider: "openai", validate: false })
-      ).toBe("openai");
+      expect(selectProvider({ provider: "openai", validate: false })).toBe(
+        "openai"
+      );
     });
   });
 
