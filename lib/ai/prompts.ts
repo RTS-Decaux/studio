@@ -30,6 +30,12 @@ This is a guide for using artifacts tools: \`createDocument\` and \`updateDocume
 - Immediately after creating a document
 
 Do not update document right after creating it. Wait for user feedback or request to update it.
+
+**IMPORTANT TOOL CALL POLICY:**
+- Call each tool EXACTLY ONCE per assistant turn.
+- Do NOT call the same tool multiple times in a single response.
+- For example, when asked to create a document, call \`createDocument\` once only.
+- Do not repeat tool calls unless the user explicitly requests multiple actions.
 `;
 
 export const regularPrompt =
