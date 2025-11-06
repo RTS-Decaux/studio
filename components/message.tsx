@@ -15,7 +15,7 @@ import { SparklesIcon } from "./icons";
 import { Loader2, Search } from "lucide-react";
 import { MessageActions } from "./message-actions";
 import { MessageEditor } from "./message-editor";
-import { MessageReasoning } from "./message-reasoning";
+// Message reasoning UI removed: keep only the concise "Thinking..." indicator
 import { PreviewAttachment } from "./preview-attachment";
 import { Weather } from "./weather";
 import { WebSearchResult } from "./web-search-result";
@@ -105,15 +105,10 @@ const PurePreviewMessage = ({
             const { type } = part;
             const key = `message-${message.id}-part-${index}`;
 
-            // Handle reasoning parts
-            if (type === "reasoning" && part.text?.trim().length > 0) {
-              return (
-                <MessageReasoning
-                  isLoading={isLoading}
-                  key={key}
-                  reasoning={part.text}
-                />
-              );
+            // Detailed reasoning steps removed. The UI now uses a single
+            // concise "Thinking..." indicator rendered elsewhere.
+            if (type === "reasoning") {
+              return null;
             }
 
             if (type === "text") {
