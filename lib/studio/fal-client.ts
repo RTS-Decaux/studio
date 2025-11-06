@@ -31,7 +31,10 @@ class FalClient {
   /**
    * Отправляет запрос на генерацию в очередь
    */
-  async submit(modelId: string, input: FalGenerationInput): Promise<FalQueuedResponse> {
+  async submit(
+    modelId: string,
+    input: FalGenerationInput
+  ): Promise<FalQueuedResponse> {
     const response = await fetch(`${this.baseUrl}/${modelId}`, {
       method: "POST",
       headers: {
@@ -43,7 +46,9 @@ class FalClient {
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Failed to submit generation: ${response.status} ${error}`);
+      throw new Error(
+        `Failed to submit generation: ${response.status} ${error}`
+      );
     }
 
     return response.json();
@@ -53,11 +58,14 @@ class FalClient {
    * Проверяет статус генерации
    */
   async getStatus(requestId: string): Promise<FalStatusResponse> {
-    const response = await fetch(`${this.baseUrl}/requests/${requestId}/status`, {
-      headers: {
-        Authorization: `Key ${this.apiKey}`,
-      },
-    });
+    const response = await fetch(
+      `${this.baseUrl}/requests/${requestId}/status`,
+      {
+        headers: {
+          Authorization: `Key ${this.apiKey}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.text();
@@ -89,16 +97,21 @@ class FalClient {
    * Отменяет генерацию
    */
   async cancel(requestId: string): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/requests/${requestId}/cancel`, {
-      method: "POST",
-      headers: {
-        Authorization: `Key ${this.apiKey}`,
-      },
-    });
+    const response = await fetch(
+      `${this.baseUrl}/requests/${requestId}/cancel`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Key ${this.apiKey}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Failed to cancel generation: ${response.status} ${error}`);
+      throw new Error(
+        `Failed to cancel generation: ${response.status} ${error}`
+      );
     }
   }
 
@@ -114,7 +127,11 @@ class FalClient {
       timeout?: number;
     }
   ): Promise<FalGenerationOutput> {
-    const { onProgress, pollInterval = 2000, timeout = 600000 } = options || {};
+    const {
+      onProgress,
+      pollInterval = 2000,
+      timeout = 600_000,
+    } = options || {};
 
     // Отправляем в очередь
     const queued = await this.submit(modelId, input);
@@ -141,7 +158,9 @@ class FalClient {
       }
 
       if (status.status === "FAILED") {
-        throw new Error(`Generation failed: ${status.error || "Unknown error"}`);
+        throw new Error(
+          `Generation failed: ${status.error || "Unknown error"}`
+        );
       }
 
       // Ждём перед следующей проверкой

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -15,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createProjectAction } from "@/lib/studio/actions";
-import { toast } from "sonner";
 
 interface CreateProjectDialogProps {
   open: boolean;
@@ -39,7 +39,10 @@ export function CreateProjectDialog({
 
     setIsCreating(true);
     try {
-      const project = await createProjectAction(title.trim(), description.trim() || undefined);
+      const project = await createProjectAction(
+        title.trim(),
+        description.trim() || undefined
+      );
       toast.success("Project created successfully");
       onOpenChange(false);
       router.push(`/studio/${project.id}`);
@@ -61,52 +64,49 @@ export function CreateProjectDialog({
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={handleClose}>
+    <AlertDialog onOpenChange={handleClose} open={open}>
       <AlertDialogContent className="sm:max-w-[425px]">
         <AlertDialogHeader>
           <AlertDialogTitle>Create new project</AlertDialogTitle>
           <AlertDialogDescription>
-            Start a new AI Studio project. You can add generations and assets later.
+            Start a new AI Studio project. You can add generations and assets
+            later.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="title">Project title</Label>
             <Input
-              id="title"
-              placeholder="My awesome project"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
               disabled={isCreating}
+              id="title"
+              onChange={(e) => setTitle(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
                   handleCreate();
                 }
               }}
+              placeholder="My awesome project"
+              value={title}
             />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description">Description (optional)</Label>
             <Textarea
-              id="description"
-              placeholder="Describe your project..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               disabled={isCreating}
+              id="description"
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe your project..."
               rows={3}
+              value={description}
             />
           </div>
         </div>
         <AlertDialogFooter>
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            disabled={isCreating}
-          >
+          <Button disabled={isCreating} onClick={handleClose} variant="outline">
             Cancel
           </Button>
-          <Button onClick={handleCreate} disabled={isCreating}>
+          <Button disabled={isCreating} onClick={handleCreate}>
             {isCreating ? "Creating..." : "Create project"}
           </Button>
         </AlertDialogFooter>

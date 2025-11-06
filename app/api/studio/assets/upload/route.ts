@@ -1,6 +1,6 @@
+import { NextResponse } from "next/server";
 import { createAsset } from "@/lib/studio/queries";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   try {
     const { getUser } = await import("@/lib/supabase/server");
     const user = await getUser();
-    
+
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -28,13 +28,16 @@ export async function POST(request: Request) {
     }
 
     if (!type || !["image", "video", "audio"].includes(type)) {
-      return NextResponse.json({ error: "Invalid asset type" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid asset type" },
+        { status: 400 }
+      );
     }
 
     // Upload to Supabase Storage
     const supabase = await createSupabaseServerClient();
     const bucket = "studio-assets"; // Make sure this bucket exists in Supabase
-    
+
     // Generate unique filename
     const timestamp = Date.now();
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
@@ -63,7 +66,7 @@ export async function POST(request: Request) {
     // Store the storage path (we'll generate signed URLs on-demand)
     // Note: For private buckets, we store the path and generate signed URLs when needed
     const storagePath = filePath;
-    
+
     // We'll store the path in metadata and generate signed URLs dynamically
     // This is more secure than storing public URLs for sensitive content
     const fileUrl = `supabase://storage/${bucket}/${filePath}`;
@@ -75,7 +78,7 @@ export async function POST(request: Request) {
       format: file.type.split("/")[1] || file.name.split(".").pop(),
       originalName: file.name,
       storagePath: filePath,
-      bucket: bucket,
+      bucket,
     };
 
     // Try to extract image dimensions if it's an image

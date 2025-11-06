@@ -1,5 +1,10 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 import { StudioHeader } from "@/components/studio/studio-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,11 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createProjectAction } from "@/lib/studio/actions";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -27,7 +27,10 @@ export default function NewProjectPage() {
 
     setIsCreating(true);
     try {
-      const project = await createProjectAction(title.trim(), description.trim() || undefined);
+      const project = await createProjectAction(
+        title.trim(),
+        description.trim() || undefined
+      );
       toast.success("Проект успешно создан");
       router.push(`/studio/${project.id}`);
     } catch (error) {
@@ -39,18 +42,13 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <StudioHeader title="Новый проект" showNewButton={false} />
-      
+    <div className="flex h-full flex-col">
+      <StudioHeader showNewButton={false} title="Новый проект" />
+
       <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="mx-auto max-w-2xl space-y-6">
           {/* Back button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="mb-2"
-            asChild
-          >
+          <Button asChild className="mb-2" size="sm" variant="ghost">
             <Link href="/studio">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Назад к проектам
@@ -59,69 +57,78 @@ export default function NewProjectPage() {
 
           {/* Header */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Создать новый проект</h1>
+            <h1 className="font-bold text-3xl tracking-tight">
+              Создать новый проект
+            </h1>
             <p className="text-muted-foreground">
-              Начните новый проект RTS Studio. Вы можете добавить генерации и ресурсы позже.
+              Начните новый проект RTS Studio. Вы можете добавить генерации и
+              ресурсы позже.
             </p>
           </div>
 
           {/* Form Card */}
           <Card className="border-2 shadow-lg">
-            <CardContent className="p-6 md:p-8 space-y-6">
+            <CardContent className="space-y-6 p-6 md:p-8">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-base font-semibold">
+                <Label className="font-semibold text-base" htmlFor="title">
                   Название проекта <span className="text-destructive">*</span>
                 </Label>
                 <Input
-                  id="title"
-                  placeholder="Введите описательное имя для вашего проекта"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  disabled={isCreating}
                   className="h-12 text-base"
+                  disabled={isCreating}
+                  id="title"
+                  onChange={(e) => setTitle(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
                       handleCreate();
                     }
                   }}
+                  placeholder="Введите описательное имя для вашего проекта"
+                  value={title}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Выберите запоминающееся имя, которое описывает ваш проект
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-base font-semibold">
-                  Описание <span className="text-xs font-normal text-muted-foreground">(необязательно)</span>
+                <Label
+                  className="font-semibold text-base"
+                  htmlFor="description"
+                >
+                  Описание{" "}
+                  <span className="font-normal text-muted-foreground text-xs">
+                    (необязательно)
+                  </span>
                 </Label>
                 <Textarea
-                  id="description"
-                  placeholder="Опишите, что вы планируете создать в этом проекте..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  disabled={isCreating}
-                  rows={5}
                   className="resize-none text-base"
+                  disabled={isCreating}
+                  id="description"
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Опишите, что вы планируете создать в этом проекте..."
+                  rows={5}
+                  value={description}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Добавьте заметки о целях или идеях проекта
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
+              <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row">
                 <Button
-                  variant="outline"
-                  onClick={() => router.back()}
-                  disabled={isCreating}
                   className="sm:flex-1"
+                  disabled={isCreating}
+                  onClick={() => router.back()}
+                  variant="outline"
                 >
                   Отмена
                 </Button>
-                <Button 
-                  onClick={handleCreate} 
+                <Button
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 sm:flex-1"
                   disabled={isCreating || !title.trim()}
-                  className="sm:flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  onClick={handleCreate}
                 >
                   {isCreating ? (
                     <>

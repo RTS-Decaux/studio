@@ -6,11 +6,11 @@ export default async function GenerationsPage() {
   const generations = await getUserGenerationsAction();
 
   return (
-    <div className="flex flex-col h-full">
-      <StudioHeader title="Generations" showNewButton={false} />
+    <div className="flex h-full flex-col">
+      <StudioHeader showNewButton={false} title="Generations" />
 
       <main className="flex-1 overflow-auto p-4 md:p-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-6xl">
           <GenerationHistory generations={generations} />
         </div>
       </main>

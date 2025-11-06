@@ -1,24 +1,24 @@
 "use client";
 
+import { format } from "date-fns";
+import {
+  CheckCircle2,
+  Clock,
+  Download,
+  ExternalLink,
+  Image as ImageIcon,
+  Loader2,
+  Sparkles,
+  Video,
+  XCircle,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { StudioGeneration } from "@/lib/studio/types";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import {
-    CheckCircle2,
-    Clock,
-    Download,
-    ExternalLink,
-    Image as ImageIcon,
-    Loader2,
-    Sparkles,
-    Video,
-    XCircle,
-} from "lucide-react";
-import { useEffect, useState } from "react";
 
 interface GenerationHistoryProps {
   generations: StudioGeneration[];
@@ -89,9 +89,9 @@ export function GenerationHistory({
   if (generations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <Sparkles className="h-12 w-12 text-muted-foreground mb-3" />
-        <h3 className="text-lg font-semibold mb-1">No generations yet</h3>
-        <p className="text-sm text-muted-foreground max-w-sm">
+        <Sparkles className="mb-3 h-12 w-12 text-muted-foreground" />
+        <h3 className="mb-1 font-semibold text-lg">No generations yet</h3>
+        <p className="max-w-sm text-muted-foreground text-sm">
           Start generating content and your history will appear here
         </p>
       </div>
@@ -102,15 +102,15 @@ export function GenerationHistory({
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium">
+        <h3 className="font-medium text-sm">
           Recent Generations ({generations.length})
         </h3>
         {onRefresh && (
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={onRefresh}
             disabled={autoRefresh}
+            onClick={onRefresh}
+            size="sm"
+            variant="ghost"
           >
             {autoRefresh ? "Auto-refresh" : "Refresh"}
           </Button>
@@ -127,21 +127,24 @@ export function GenerationHistory({
             const MediaIcon = isVideo ? Video : ImageIcon;
 
             return (
-              <Card key={generation.id} className="bg-background border-thin border-border shadow-xs">
+              <Card
+                className="border-border border-thin bg-background shadow-xs"
+                key={generation.id}
+              >
                 <CardContent className="p-3">
                   <div className="flex gap-3">
                     {/* Thumbnail/Preview */}
                     <div className="shrink-0">
                       {generation.status === "completed" &&
                       generation.outputAssetId ? (
-                        <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted/30 flex items-center justify-center border-thin border-border">
+                        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg border-border border-thin bg-muted/30">
                           {/* TODO: Load actual asset thumbnail */}
                           <MediaIcon className="h-7 w-7 text-muted-foreground/60" />
                         </div>
                       ) : (
                         <div
                           className={cn(
-                            "w-20 h-20 rounded-lg flex items-center justify-center border-thin border-border",
+                            "flex h-20 w-20 items-center justify-center rounded-lg border-border border-thin",
                             status.bgColor
                           )}
                         >
@@ -157,10 +160,11 @@ export function GenerationHistory({
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0 space-y-2">
+                    <div className="min-w-0 flex-1 space-y-2">
                       {/* Status Badge */}
                       <div className="flex items-center justify-between">
                         <Badge
+                          className="text-xs"
                           variant={
                             generation.status === "completed"
                               ? "default"
@@ -168,31 +172,30 @@ export function GenerationHistory({
                                 ? "destructive"
                                 : "secondary"
                           }
-                          className="text-xs"
                         >
                           <Icon
                             className={cn(
-                              "h-3 w-3 mr-1",
+                              "mr-1 h-3 w-3",
                               status.animate && "animate-spin"
                             )}
                           />
                           {status.label}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-muted-foreground text-xs">
                           {format(generation.createdAt, "MMM d, HH:mm")}
                         </span>
                       </div>
 
                       {/* Prompt */}
                       {generation.prompt && (
-                        <p className="text-sm line-clamp-2">
+                        <p className="line-clamp-2 text-sm">
                           {generation.prompt}
                         </p>
                       )}
 
                       {/* Model Info */}
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Badge variant="outline" className="text-xs">
+                      <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                        <Badge className="text-xs" variant="outline">
                           {generation.modelId.split("/").pop()}
                         </Badge>
                         <span>•</span>
@@ -209,7 +212,7 @@ export function GenerationHistory({
 
                       {/* Error Message */}
                       {generation.status === "failed" && generation.error && (
-                        <p className="text-xs text-destructive">
+                        <p className="text-destructive text-xs">
                           {generation.error}
                         </p>
                       )}
@@ -218,12 +221,12 @@ export function GenerationHistory({
                       {generation.status === "completed" &&
                         generation.outputAssetId && (
                           <div className="flex items-center gap-2 pt-1">
-                            <Button variant="outline" size="sm">
-                              <ExternalLink className="h-3 w-3 mr-1" />
+                            <Button size="sm" variant="outline">
+                              <ExternalLink className="mr-1 h-3 w-3" />
                               View
                             </Button>
-                            <Button variant="outline" size="sm">
-                              <Download className="h-3 w-3 mr-1" />
+                            <Button size="sm" variant="outline">
+                              <Download className="mr-1 h-3 w-3" />
                               Download
                             </Button>
                           </div>

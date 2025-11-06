@@ -4,10 +4,10 @@
  */
 
 import {
-    getAssetPreviewUrl,
-    getTransformedImageUrl,
-    ImagePresets,
-    isVideoUrl,
+  getAssetPreviewUrl,
+  getTransformedImageUrl,
+  ImagePresets,
+  isVideoUrl,
 } from "../image-transform";
 
 console.log("🧪 Testing Image Transformation Utilities\n");
@@ -42,9 +42,7 @@ const basicTransform = getTransformedImageUrl(testUrls.supabasePublic, {
   quality: 75,
 });
 console.log("✅ Result:", basicTransform);
-console.log(
-  "   Should contain: render/image/public and width=300&height=300"
-);
+console.log("   Should contain: render/image/public and width=300&height=300");
 console.log("");
 
 // Test 2: Full transformation with all options
@@ -68,7 +66,10 @@ const externalTransform = getTransformedImageUrl(testUrls.externalUrl, {
   width: 300,
 });
 console.log("✅ Result:", externalTransform);
-console.log("   Should be unchanged:", externalTransform === testUrls.externalUrl);
+console.log(
+  "   Should be unchanged:",
+  externalTransform === testUrls.externalUrl
+);
 console.log("");
 
 // Test 4: Null URL

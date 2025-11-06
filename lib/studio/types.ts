@@ -1,10 +1,8 @@
-
-
 // ============================================================================
 // Database Types
 // ============================================================================
 
-import { FalStudioModel } from "../ai/studio-models";
+import type { FalStudioModel } from "../ai/studio-models";
 
 export type StudioProject = {
   id: string;

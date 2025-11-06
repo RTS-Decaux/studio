@@ -1,5 +1,19 @@
 "use client";
 
+import type { User } from "@supabase/supabase-js";
+import {
+  ChevronRight,
+  Film,
+  FolderOpen,
+  Layout,
+  MessageSquare,
+  Plus,
+  Sparkles,
+  Video,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import * as React from "react";
 import { SidebarUserNav } from "@/components/sidebar-user-nav";
 import {
   DropdownMenu,
@@ -21,16 +35,11 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import type { User } from "@supabase/supabase-js";
-import { ChevronRight, Film, FolderOpen, Layout, MessageSquare, Plus, Sparkles, Video } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import * as React from "react";
 
-export function StudioSidebar({ 
+export function StudioSidebar({
   user,
-  ...props 
-}: { 
+  ...props
+}: {
   user: User;
 } & React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
@@ -108,8 +117,8 @@ export function StudioSidebar({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
-                  size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  size="lg"
                 >
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                     {activeWorkspace.type === "chat" ? (
@@ -119,20 +128,23 @@ export function StudioSidebar({
                     )}
                   </div>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{activeWorkspace.name}</span>
+                    <span className="truncate font-semibold">
+                      {activeWorkspace.name}
+                    </span>
                     <span className="truncate text-xs">Workspace</span>
                   </div>
                   <ChevronRight className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
                 align="start"
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
                 side="bottom"
                 sideOffset={4}
               >
                 {workspaces.map((workspace) => (
                   <DropdownMenuItem
+                    className="gap-2 p-2"
                     key={workspace.type}
                     onClick={() => {
                       setActiveWorkspace(workspace);
@@ -143,7 +155,6 @@ export function StudioSidebar({
                         router.push("/");
                       }
                     }}
-                    className="gap-2 p-2"
                   >
                     <div className="flex size-6 items-center justify-center rounded-sm border">
                       <workspace.icon className="size-4" />
@@ -183,10 +194,7 @@ export function StudioSidebar({
                     isActive={isActive(item.href, item.exact)}
                     tooltip={item.name}
                   >
-                    <Link
-                      href={item.href}
-                      onClick={() => setOpenMobile(false)}
-                    >
+                    <Link href={item.href} onClick={() => setOpenMobile(false)}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.name}</span>
                     </Link>

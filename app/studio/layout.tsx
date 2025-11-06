@@ -1,8 +1,8 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { StudioSidebar } from "@/components/studio-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getUser } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export default async function StudioLayout({
   children,
@@ -20,10 +20,8 @@ export default async function StudioLayout({
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <StudioSidebar user={user} variant="inset" collapsible="icon" />
-      <SidebarInset>
-        {children}
-      </SidebarInset>
+      <StudioSidebar collapsible="icon" user={user} variant="inset" />
+      <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   );
 }

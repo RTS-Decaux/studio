@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { getFalClient } from "@/lib/studio/fal-client";
 import { getModelById } from "@/lib/studio/model-mapping";
 import type {
@@ -7,7 +8,6 @@ import type {
   GenerationRequest,
   GenerationResponse,
 } from "@/lib/studio/types";
-import { redirect } from "next/navigation";
 import {
   createAsset,
   createGeneration,
@@ -80,7 +80,7 @@ export async function createProjectAction(title: string, description?: string) {
 
 export async function updateProjectAction(
   id: string,
-  updates: { title?: string; description?: string; thumbnail?: string },
+  updates: { title?: string; description?: string; thumbnail?: string }
 ) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -163,7 +163,7 @@ export async function getProjectGenerationsAction(projectId: string) {
  * Запускает генерацию контента через fal.ai
  */
 export async function generateAction(
-  request: GenerationRequest,
+  request: GenerationRequest
 ): Promise<GenerationResponse> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -213,7 +213,7 @@ export async function generateAction(
  */
 async function processGeneration(
   generationId: string,
-  request: GenerationRequest,
+  request: GenerationRequest
 ): Promise<void> {
   try {
     // Обновляем статус

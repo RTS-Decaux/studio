@@ -1,28 +1,35 @@
 "use client";
 
+import {
+  Film,
+  Image,
+  ImagePlus,
+  Layers,
+  Sparkles,
+  Video,
+  Wand2,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { FalStudioModel, ReferenceInputKind } from "@/lib/ai/studio-models";
+import type {
+  FalStudioModel,
+  ReferenceInputKind,
+} from "@/lib/ai/studio-models";
 import { getModelGenerationTypes } from "@/lib/studio/model-mapping";
 import type { StudioGenerationType } from "@/lib/studio/types";
-import {
-    Film,
-    Image,
-    ImagePlus,
-    Layers,
-    Sparkles,
-    Video,
-    Wand2
-} from "lucide-react";
 
 const GENERATION_TYPE_CONFIG: Record<
   StudioGenerationType,
-  { label: string; icon: React.ComponentType<{ className?: string }>; color: string }
+  {
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    color: string;
+  }
 > = {
   "text-to-image": {
     label: "Text → Image",
@@ -32,12 +39,14 @@ const GENERATION_TYPE_CONFIG: Record<
   "text-to-video": {
     label: "Text → Video",
     icon: Video,
-    color: "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
+    color:
+      "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20",
   },
   "image-to-image": {
     label: "Image → Image",
     icon: ImagePlus,
-    color: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+    color:
+      "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
   },
   "image-to-video": {
     label: "Image → Video",
@@ -47,17 +56,20 @@ const GENERATION_TYPE_CONFIG: Record<
   "video-to-video": {
     label: "Video → Video",
     icon: Layers,
-    color: "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20",
+    color:
+      "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20",
   },
   inpaint: {
     label: "Inpaint",
     icon: Wand2,
-    color: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
+    color:
+      "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20",
   },
   lipsync: {
     label: "Lipsync",
     icon: Sparkles,
-    color: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20",
+    color:
+      "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20",
   },
 };
 
@@ -73,7 +85,10 @@ interface ModelCapabilityBadgeProps {
   showAll?: boolean;
 }
 
-export function ModelCapabilityBadge({ model, showAll = false }: ModelCapabilityBadgeProps) {
+export function ModelCapabilityBadge({
+  model,
+  showAll = false,
+}: ModelCapabilityBadgeProps) {
   const generationTypes = getModelGenerationTypes(model.id);
   const primaryType = generationTypes[0];
 
@@ -87,17 +102,17 @@ export function ModelCapabilityBadge({ model, showAll = false }: ModelCapability
       <TooltipProvider>
         <Tooltip delayDuration={200}>
           <TooltipTrigger asChild>
-            <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="flex flex-wrap items-center gap-1.5">
               {generationTypes.map((type) => {
                 const typeConfig = GENERATION_TYPE_CONFIG[type];
                 const TypeIcon = typeConfig.icon;
                 return (
                   <Badge
+                    className={`px-2 py-0.5 font-medium text-xs ${typeConfig.color}`}
                     key={type}
                     variant="outline"
-                    className={`text-xs px-2 py-0.5 font-medium ${typeConfig.color}`}
                   >
-                    <TypeIcon className="h-3 w-3 mr-1" />
+                    <TypeIcon className="mr-1 h-3 w-3" />
                     {typeConfig.label}
                   </Badge>
                 );
@@ -116,10 +131,10 @@ export function ModelCapabilityBadge({ model, showAll = false }: ModelCapability
 
   return (
     <Badge
+      className={`px-2 py-0.5 font-medium text-xs ${config.color}`}
       variant="outline"
-      className={`text-xs px-2 py-0.5 font-medium ${config.color}`}
     >
-      <Icon className="h-3 w-3 mr-1" />
+      <Icon className="mr-1 h-3 w-3" />
       {config.label}
     </Badge>
   );
@@ -129,7 +144,9 @@ interface ModelRequirementsBadgesProps {
   model: FalStudioModel;
 }
 
-export function ModelRequirementsBadges({ model }: ModelRequirementsBadgesProps) {
+export function ModelRequirementsBadges({
+  model,
+}: ModelRequirementsBadgesProps) {
   const requiredInputs = model.requiredInputs || [];
   const optionalInputs = model.optionalInputs || [];
 
@@ -138,21 +155,21 @@ export function ModelRequirementsBadges({ model }: ModelRequirementsBadgesProps)
   }
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap">
+    <div className="flex flex-wrap items-center gap-1.5">
       {requiredInputs.map((input) => (
         <Badge
+          className="border-red-500/20 bg-red-500/10 px-2 py-0.5 font-medium text-red-700 text-xs dark:text-red-400"
           key={input}
           variant="outline"
-          className="text-xs px-2 py-0.5 font-medium bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20"
         >
           {INPUT_REQUIREMENT_LABELS[input]} (Required)
         </Badge>
       ))}
       {optionalInputs.map((input) => (
         <Badge
+          className="border-gray-500/20 bg-gray-500/10 px-2 py-0.5 font-medium text-gray-700 text-xs dark:text-gray-400"
           key={input}
           variant="outline"
-          className="text-xs px-2 py-0.5 font-medium bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20"
         >
           {INPUT_REQUIREMENT_LABELS[input]} (Optional)
         </Badge>

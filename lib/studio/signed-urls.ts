@@ -1,6 +1,6 @@
 /**
  * Supabase Storage Signed URLs Utilities
- * 
+ *
  * Generates temporary signed URLs for private storage buckets.
  * Signed URLs expire after a set time for security.
  */
@@ -32,7 +32,7 @@ function parseStorageUrl(url: string): {
 
   const withoutProtocol = url.replace("supabase://storage/", "");
   const firstSlash = withoutProtocol.indexOf("/");
-  
+
   if (firstSlash === -1) {
     return null;
   }
@@ -45,7 +45,7 @@ function parseStorageUrl(url: string): {
 
 /**
  * Generate a signed URL for a private storage object
- * 
+ *
  * @param storageUrl - Internal storage URL (supabase://storage/{bucket}/{path}) or storage path
  * @param options - URL generation options
  * @returns Signed URL with temporary access
@@ -79,11 +79,16 @@ export async function getSignedStorageUrl(
     // Build transform options for images
     const transformOptions: any = {};
     if (options.transform) {
-      if (options.transform.width) transformOptions.width = options.transform.width;
-      if (options.transform.height) transformOptions.height = options.transform.height;
-      if (options.transform.quality) transformOptions.quality = options.transform.quality;
-      if (options.transform.format) transformOptions.format = options.transform.format;
-      if (options.transform.resize) transformOptions.resize = options.transform.resize;
+      if (options.transform.width)
+        transformOptions.width = options.transform.width;
+      if (options.transform.height)
+        transformOptions.height = options.transform.height;
+      if (options.transform.quality)
+        transformOptions.quality = options.transform.quality;
+      if (options.transform.format)
+        transformOptions.format = options.transform.format;
+      if (options.transform.resize)
+        transformOptions.resize = options.transform.resize;
     }
 
     // Generate signed URL
@@ -91,7 +96,10 @@ export async function getSignedStorageUrl(
       .from(bucket)
       .createSignedUrl(path, expiresIn, {
         download: options.download,
-        transform: Object.keys(transformOptions).length > 0 ? transformOptions : undefined,
+        transform:
+          Object.keys(transformOptions).length > 0
+            ? transformOptions
+            : undefined,
       });
 
     if (error) {
@@ -228,13 +236,17 @@ export function isStorageUrl(url: string | null): boolean {
  * Batch process assets to add signed URLs
  * Useful for server-side rendering
  */
-export async function enrichAssetsWithSignedUrls<T extends {
-  url: string;
-  thumbnailUrl: string | null;
-}>(
+export async function enrichAssetsWithSignedUrls<
+  T extends {
+    url: string;
+    thumbnailUrl: string | null;
+  },
+>(
   assets: T[],
   options: SignedUrlOptions = {}
-): Promise<(T & { signedUrl: string | null; signedThumbnailUrl: string | null })[]> {
+): Promise<
+  (T & { signedUrl: string | null; signedThumbnailUrl: string | null })[]
+> {
   const urls = assets.map((asset) => asset.url);
   const thumbnailUrls = assets.map((asset) => asset.thumbnailUrl);
 

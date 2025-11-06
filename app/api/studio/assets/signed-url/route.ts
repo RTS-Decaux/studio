@@ -1,5 +1,5 @@
-import { getSignedStorageUrl } from "@/lib/studio/signed-urls";
 import { NextResponse } from "next/server";
+import { getSignedStorageUrl } from "@/lib/studio/signed-urls";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

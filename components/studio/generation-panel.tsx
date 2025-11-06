@@ -1,16 +1,36 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  AlertCircle,
+  ChevronRight,
+  Image as ImageIcon,
+  Info,
+  Loader2,
+  Settings2,
+  Sparkles,
+  Upload,
+  Video,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -18,32 +38,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import type { FalStudioModel, ReferenceInputKind } from "@/lib/ai/studio-models";
+import { Textarea } from "@/components/ui/textarea";
+import type {
+  FalStudioModel,
+  ReferenceInputKind,
+} from "@/lib/ai/studio-models";
 import { generateAction } from "@/lib/studio/actions";
-import { getRecommendedModels, getModelById } from "@/lib/studio/model-mapping";
+import { getModelById, getRecommendedModels } from "@/lib/studio/model-mapping";
 import type { StudioGenerationType } from "@/lib/studio/types";
 import { cn } from "@/lib/utils";
-import {
-  ChevronRight,
-  Image as ImageIcon,
-  Loader2,
-  Settings2,
-  Sparkles,
-  Video,
-  AlertCircle,
-  Info,
-  Upload,
-} from "lucide-react";
-import { useCallback, useState, useMemo, useEffect } from "react";
-import { toast } from "sonner";
 import { Slider } from "../ui/slider";
 import { Switch } from "../ui/switch";
+import { ModelCapabilityBadge } from "./model-capability-badge";
 import { ModelSelectorDialog } from "./model-selector-dialog";
 import { ReferenceInputManager } from "./reference-input-manager";
-import { ModelCapabilityBadge } from "./model-capability-badge";
 
 interface GenerationPanelProps {
   projectId?: string;
@@ -260,10 +269,10 @@ export function GenerationPanel({
       <div className="space-y-6 p-6">
         {/* Header */}
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+          <h2 className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text font-bold text-2xl text-transparent tracking-tight">
             Generate Content
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Choose your generation type, select a model, and configure parameters
           </p>
         </div>
@@ -272,7 +281,7 @@ export function GenerationPanel({
 
         {/* Generation Type Selector */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">Generation Type</Label>
+          <Label className="font-medium text-sm">Generation Type</Label>
           <div className="grid grid-cols-2 gap-3">
             {GENERATION_TYPES.map((type) => {
               const Icon = type.icon;
@@ -280,18 +289,18 @@ export function GenerationPanel({
 
               return (
                 <button
-                  key={type.value}
-                  onClick={() => handleGenerationTypeChange(type.value)}
                   className={cn(
-                    "flex items-start gap-3 p-3 rounded-xl border text-left transition-all",
+                    "flex items-start gap-3 rounded-xl border p-3 text-left transition-all",
                     isActive
-                      ? "border-purple-500 bg-purple-500/5 shadow-sm shadow-purple-500/10"
+                      ? "border-purple-500 bg-purple-500/5 shadow-purple-500/10 shadow-sm"
                       : "border-border bg-background hover:border-purple-500/50 hover:bg-accent/50"
                   )}
+                  key={type.value}
+                  onClick={() => handleGenerationTypeChange(type.value)}
                 >
                   <div
                     className={cn(
-                      "shrink-0 flex items-center justify-center w-9 h-9 rounded-lg transition-all",
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all",
                       isActive
                         ? "bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-md"
                         : "bg-muted/50 text-muted-foreground"
@@ -299,9 +308,9 @@ export function GenerationPanel({
                   >
                     <Icon className="h-4 w-4" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm mb-0.5">{type.label}</h4>
-                    <p className="text-xs text-muted-foreground/80 line-clamp-2">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="mb-0.5 font-medium text-sm">{type.label}</h4>
+                    <p className="line-clamp-2 text-muted-foreground/80 text-xs">
                       {type.description}
                     </p>
                   </div>
@@ -313,70 +322,70 @@ export function GenerationPanel({
 
       {/* Model Selector */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium">Model</Label>
+        <Label className="font-medium text-sm">Model</Label>
         <button
+          className="flex w-full items-center justify-between rounded-xl border-border border-thin bg-background p-3 text-left shadow-xs transition-bg-background hover:border-foreground/50"
           onClick={() => setModelDialogOpen(true)}
-          className="w-full flex items-center justify-between p-3 rounded-xl border-thin border-border bg-background hover:border-foreground/50 transition-bg-background text-left shadow-xs"
         >
           {selectedModel ? (
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-medium text-sm truncate">
+            <div className="min-w-0 flex-1">
+              <div className="mb-0.5 flex items-center gap-2">
+                <span className="truncate font-medium text-sm">
                   {selectedModel.name}
                 </span>
                 {selectedModel.quality && (
-                  <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                  <Badge className="px-1.5 py-0 text-xs" variant="secondary">
                     {selectedModel.quality}
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground/80 line-clamp-1">
+              <p className="line-clamp-1 text-muted-foreground/80 text-xs">
                 {selectedModel.description}
               </p>
             </div>
           ) : (
-            <span className="text-sm text-muted-foreground/70">Select model...</span>
+            <span className="text-muted-foreground/70 text-sm">Select model...</span>
           )}
-          <ChevronRight className="h-4 w-4 text-muted-foreground/60 shrink-0 ml-2" />
+          <ChevronRight className="ml-2 h-4 w-4 shrink-0 text-muted-foreground/60" />
         </button>
       </div>
 
       {/* Reference Image Upload (if needed) */}
       {needsReferenceImage && (
         <div className="space-y-3">
-          <Label className="text-sm font-medium">Reference Image</Label>
+          <Label className="font-medium text-sm">Reference Image</Label>
           {referenceImagePreview ? (
-            <div className="relative aspect-video rounded-xl overflow-hidden border-thin border-border bg-background shadow-xs">
+            <div className="relative aspect-video overflow-hidden rounded-xl border-border border-thin bg-background shadow-xs">
               <img
-                src={referenceImagePreview}
                 alt="Reference"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
+                src={referenceImagePreview}
               />
               <Button
-                size="sm"
-                variant="secondary"
                 className="absolute top-2 right-2 shadow-md"
                 onClick={() => {
                   setReferenceImage(null);
                   setReferenceImagePreview(null);
                 }}
+                size="sm"
+                variant="secondary"
               >
                 Remove
               </Button>
             </div>
           ) : (
-            <label className="flex flex-col items-center justify-center w-full h-40 border-thin border-dashed border-border rounded-xl cursor-pointer bg-background hover:border-foreground/50 transition-bg-background">
+            <label className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-border border-thin border-dashed bg-background transition-bg-background hover:border-foreground/50">
               <div className="flex flex-col items-center justify-center gap-2">
                 <Upload className="h-7 w-7 text-muted-foreground/60" />
-                <p className="text-sm text-muted-foreground/80">
+                <p className="text-muted-foreground/80 text-sm">
                   Click to upload or drag and drop
                 </p>
               </div>
               <input
-                type="file"
-                className="hidden"
                 accept="image/*"
+                className="hidden"
                 onChange={handleImageUpload}
+                type="file"
               />
             </label>
           )}
@@ -385,49 +394,49 @@ export function GenerationPanel({
 
       {/* Prompt */}
       <div className="space-y-3">
-        <Label htmlFor="prompt" className="text-sm font-medium">
+        <Label className="font-medium text-sm" htmlFor="prompt">
           Prompt
         </Label>
         <Textarea
-          id="prompt"
-          placeholder="Describe what you want to generate..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          rows={4}
           className="resize-none"
+          id="prompt"
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Describe what you want to generate..."
+          rows={4}
+          value={prompt}
         />
       </div>
 
       {/* Advanced Settings */}
-      <Card className="bg-background border-thin border-border shadow-xs">
-        <CardContent className="pt-5 space-y-4">
+      <Card className="border-border border-thin bg-background shadow-xs">
+        <CardContent className="space-y-4 pt-5">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">Advanced Settings</Label>
+            <Label className="font-medium text-sm">Advanced Settings</Label>
             <Settings2 className="h-4 w-4 text-muted-foreground/60" />
           </div>
 
           {/* Negative Prompt */}
           <div className="space-y-2">
-            <Label htmlFor="negative-prompt" className="text-xs">
+            <Label className="text-xs" htmlFor="negative-prompt">
               Negative Prompt
             </Label>
             <Textarea
-              id="negative-prompt"
-              placeholder="What to avoid in the generation..."
-              value={negativePrompt}
-              onChange={(e) => setNegativePrompt(e.target.value)}
-              rows={2}
               className="resize-none text-sm"
+              id="negative-prompt"
+              onChange={(e) => setNegativePrompt(e.target.value)}
+              placeholder="What to avoid in the generation..."
+              rows={2}
+              value={negativePrompt}
             />
           </div>
 
           {/* Image Size */}
           {generationType.includes("image") && (
             <div className="space-y-2">
-              <Label htmlFor="image-size" className="text-xs">
+              <Label className="text-xs" htmlFor="image-size">
                 Image Size
               </Label>
-              <Select value={imageSize} onValueChange={setImageSize}>
+              <Select onValueChange={setImageSize} value={imageSize}>
                 <SelectTrigger id="image-size">
                   <SelectValue />
                 </SelectTrigger>
@@ -449,14 +458,14 @@ export function GenerationPanel({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs">Inference Steps</Label>
-              <span className="text-xs text-muted-foreground">{steps[0]}</span>
+              <span className="text-muted-foreground text-xs">{steps[0]}</span>
             </div>
             <Slider
-              value={steps}
-              onValueChange={setSteps}
-              min={1}
               max={50}
+              min={1}
+              onValueChange={setSteps}
               step={1}
+              value={steps}
             />
           </div>
 
@@ -464,39 +473,39 @@ export function GenerationPanel({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs">Guidance Scale</Label>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 {guidanceScale[0]}
               </span>
             </div>
             <Slider
-              value={guidanceScale}
-              onValueChange={setGuidanceScale}
-              min={1}
               max={20}
+              min={1}
+              onValueChange={setGuidanceScale}
               step={0.5}
+              value={guidanceScale}
             />
           </div>
 
           {/* Seed */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="random-seed" className="text-xs">
+              <Label className="text-xs" htmlFor="random-seed">
                 Random Seed
               </Label>
               <Switch
-                id="random-seed"
                 checked={randomSeed}
+                id="random-seed"
                 onCheckedChange={setRandomSeed}
               />
             </div>
             {!randomSeed && (
               <Input
-                type="number"
-                placeholder="Enter seed..."
-                value={seed || ""}
                 onChange={(e) =>
                   setSeed(e.target.value ? Number(e.target.value) : undefined)
                 }
+                placeholder="Enter seed..."
+                type="number"
+                value={seed || ""}
               />
             )}
           </div>
@@ -505,9 +514,9 @@ export function GenerationPanel({
 
       {/* Generate Button */}
       <Button
-        onClick={handleGenerate}
+        className="h-11 w-full rounded-xl font-medium text-sm shadow-md transition-bg-background"
         disabled={isGenerating || !selectedModel}
-        className="w-full h-11 text-sm font-medium rounded-xl shadow-md transition-bg-background"
+        onClick={handleGenerate}
         size="lg"
       >
         {isGenerating ? (
@@ -525,11 +534,11 @@ export function GenerationPanel({
 
       {/* Model Selector Dialog */}
       <ModelSelectorDialog
-        open={modelDialogOpen}
-        onOpenChange={setModelDialogOpen}
-        onSelectModel={setSelectedModel}
         currentModel={selectedModel}
         generationType={generationType}
+        onOpenChange={setModelDialogOpen}
+        onSelectModel={setSelectedModel}
+        open={modelDialogOpen}
       />
     </div>
   );

@@ -9,18 +9,24 @@ import type {
 
 // Database row types (snake_case)
 type StudioProjectRow = Database["public"]["Tables"]["StudioProject"]["Row"];
-type StudioProjectInsert = Database["public"]["Tables"]["StudioProject"]["Insert"];
-type StudioProjectUpdate = Database["public"]["Tables"]["StudioProject"]["Update"];
+type StudioProjectInsert =
+  Database["public"]["Tables"]["StudioProject"]["Insert"];
+type StudioProjectUpdate =
+  Database["public"]["Tables"]["StudioProject"]["Update"];
 
 type StudioAssetRow = Database["public"]["Tables"]["StudioAsset"]["Row"];
 type StudioAssetInsert = Database["public"]["Tables"]["StudioAsset"]["Insert"];
 
-type StudioGenerationRow = Database["public"]["Tables"]["StudioGeneration"]["Row"];
-type StudioGenerationInsert = Database["public"]["Tables"]["StudioGeneration"]["Insert"];
-type StudioGenerationUpdate = Database["public"]["Tables"]["StudioGeneration"]["Update"];
+type StudioGenerationRow =
+  Database["public"]["Tables"]["StudioGeneration"]["Row"];
+type StudioGenerationInsert =
+  Database["public"]["Tables"]["StudioGeneration"]["Insert"];
+type StudioGenerationUpdate =
+  Database["public"]["Tables"]["StudioGeneration"]["Update"];
 
 type StudioTemplateRow = Database["public"]["Tables"]["StudioTemplate"]["Row"];
-type StudioTemplateInsert = Database["public"]["Tables"]["StudioTemplate"]["Insert"];
+type StudioTemplateInsert =
+  Database["public"]["Tables"]["StudioTemplate"]["Insert"];
 
 // Type conversion helpers
 function projectRowToModel(row: StudioProjectRow): StudioProject {
@@ -40,7 +46,7 @@ function assetRowToModel(row: StudioAssetRow): StudioAsset {
   // If thumbnailUrl is null but we have an image, use the main URL
   // The getAssetPreviewUrl function will handle the transformation
   let thumbnailUrl = row.thumbnail_url;
-  
+
   // For images without explicit thumbnails, use the main URL
   // (transformations will be applied on the client side)
   if (!thumbnailUrl && row.type === "image") {
@@ -109,7 +115,9 @@ function templateRowToModel(row: StudioTemplateRow): StudioTemplate {
 // Studio Projects
 // ============================================================================
 
-export async function getProjectsByUserId(userId: string): Promise<StudioProject[]> {
+export async function getProjectsByUserId(
+  userId: string
+): Promise<StudioProject[]> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -126,7 +134,9 @@ export async function getProjectsByUserId(userId: string): Promise<StudioProject
   return data.map(projectRowToModel);
 }
 
-export async function getProjectById(id: string): Promise<StudioProject | null> {
+export async function getProjectById(
+  id: string
+): Promise<StudioProject | null> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -153,7 +163,8 @@ export async function createProject(
     title: project.title,
     description: project.description,
     thumbnail: project.thumbnail,
-    settings: project.settings as Database["public"]["Tables"]["StudioProject"]["Insert"]["settings"],
+    settings:
+      project.settings as Database["public"]["Tables"]["StudioProject"]["Insert"]["settings"],
   };
 
   const { data, error } = await supabase
@@ -172,16 +183,21 @@ export async function createProject(
 
 export async function updateProject(
   id: string,
-  updates: Partial<Omit<StudioProject, "id" | "userId" | "createdAt" | "updatedAt">>
+  updates: Partial<
+    Omit<StudioProject, "id" | "userId" | "createdAt" | "updatedAt">
+  >
 ): Promise<StudioProject> {
   const supabase = await createSupabaseServerClient();
 
   const updateData: StudioProjectUpdate = {
     ...(updates.title !== undefined && { title: updates.title }),
-    ...(updates.description !== undefined && { description: updates.description }),
+    ...(updates.description !== undefined && {
+      description: updates.description,
+    }),
     ...(updates.thumbnail !== undefined && { thumbnail: updates.thumbnail }),
-    ...(updates.settings !== undefined && { 
-      settings: updates.settings as Database["public"]["Tables"]["StudioProject"]["Update"]["settings"]
+    ...(updates.settings !== undefined && {
+      settings:
+        updates.settings as Database["public"]["Tables"]["StudioProject"]["Update"]["settings"],
     }),
     updated_at: new Date().toISOString(),
   };
@@ -216,7 +232,9 @@ export async function deleteProject(id: string): Promise<void> {
 // Studio Assets
 // ============================================================================
 
-export async function getAssetsByProjectId(projectId: string): Promise<StudioAsset[]> {
+export async function getAssetsByProjectId(
+  projectId: string
+): Promise<StudioAsset[]> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -233,7 +251,9 @@ export async function getAssetsByProjectId(projectId: string): Promise<StudioAss
   return data.map(assetRowToModel);
 }
 
-export async function getAssetsByUserId(userId: string): Promise<StudioAsset[]> {
+export async function getAssetsByUserId(
+  userId: string
+): Promise<StudioAsset[]> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -279,7 +299,8 @@ export async function createAsset(
     name: asset.name,
     url: asset.url,
     thumbnail_url: asset.thumbnailUrl,
-    metadata: asset.metadata as Database["public"]["Tables"]["StudioAsset"]["Insert"]["metadata"],
+    metadata:
+      asset.metadata as Database["public"]["Tables"]["StudioAsset"]["Insert"]["metadata"],
     source_type: asset.sourceType,
     source_generation_id: asset.sourceGenerationId,
   };
@@ -344,7 +365,9 @@ export async function deleteAsset(id: string): Promise<void> {
 // Studio Generations
 // ============================================================================
 
-export async function getGenerationsByUserId(userId: string): Promise<StudioGeneration[]> {
+export async function getGenerationsByUserId(
+  userId: string
+): Promise<StudioGeneration[]> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -380,7 +403,9 @@ export async function getGenerationsByProjectId(
   return data.map(generationRowToModel);
 }
 
-export async function getGenerationById(id: string): Promise<StudioGeneration | null> {
+export async function getGenerationById(
+  id: string
+): Promise<StudioGeneration | null> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -416,9 +441,11 @@ export async function createGeneration(
     reference_video_url: generation.referenceVideoUrl,
     input_asset_id: generation.inputAssetId,
     output_asset_id: generation.outputAssetId,
-    parameters: generation.parameters as Database["public"]["Tables"]["StudioGeneration"]["Insert"]["parameters"],
+    parameters:
+      generation.parameters as Database["public"]["Tables"]["StudioGeneration"]["Insert"]["parameters"],
     fal_request_id: generation.falRequestId,
-    fal_response: generation.falResponse as Database["public"]["Tables"]["StudioGeneration"]["Insert"]["fal_response"],
+    fal_response:
+      generation.falResponse as Database["public"]["Tables"]["StudioGeneration"]["Insert"]["fal_response"],
     error: generation.error,
     cost: generation.cost,
     processing_time: generation.processingTime,
@@ -446,16 +473,25 @@ export async function updateGeneration(
 
   const updateData: StudioGenerationUpdate = {
     ...(updates.status !== undefined && { status: updates.status }),
-    ...(updates.falRequestId !== undefined && { fal_request_id: updates.falRequestId }),
-    ...(updates.falResponse !== undefined && { 
-      fal_response: updates.falResponse as Database["public"]["Tables"]["StudioGeneration"]["Update"]["fal_response"]
+    ...(updates.falRequestId !== undefined && {
+      fal_request_id: updates.falRequestId,
     }),
-    ...(updates.outputAssetId !== undefined && { output_asset_id: updates.outputAssetId }),
+    ...(updates.falResponse !== undefined && {
+      fal_response:
+        updates.falResponse as Database["public"]["Tables"]["StudioGeneration"]["Update"]["fal_response"],
+    }),
+    ...(updates.outputAssetId !== undefined && {
+      output_asset_id: updates.outputAssetId,
+    }),
     ...(updates.error !== undefined && { error: updates.error }),
     ...(updates.cost !== undefined && { cost: updates.cost }),
-    ...(updates.processingTime !== undefined && { processing_time: updates.processingTime }),
-    ...(updates.completedAt !== undefined && { 
-      completed_at: updates.completedAt ? updates.completedAt.toISOString() : null 
+    ...(updates.processingTime !== undefined && {
+      processing_time: updates.processingTime,
+    }),
+    ...(updates.completedAt !== undefined && {
+      completed_at: updates.completedAt
+        ? updates.completedAt.toISOString()
+        : null,
     }),
   };
 
@@ -495,7 +531,9 @@ export async function getPublicTemplates(): Promise<StudioTemplate[]> {
   return data.map(templateRowToModel);
 }
 
-export async function getTemplatesByUserId(userId: string): Promise<StudioTemplate[]> {
+export async function getTemplatesByUserId(
+  userId: string
+): Promise<StudioTemplate[]> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
@@ -524,7 +562,8 @@ export async function createTemplate(
     description: template.description,
     thumbnail: template.thumbnail,
     model_id: template.modelId,
-    config: template.config as Database["public"]["Tables"]["StudioTemplate"]["Insert"]["config"],
+    config:
+      template.config as Database["public"]["Tables"]["StudioTemplate"]["Insert"]["config"],
     is_public: template.isPublic,
   };
 

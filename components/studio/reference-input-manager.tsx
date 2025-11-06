@@ -1,12 +1,12 @@
 "use client";
 
+import { Image, Upload, Video, X } from "lucide-react";
+import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { ReferenceInputKind } from "@/lib/ai/studio-models";
 import { cn } from "@/lib/utils";
-import { Image, Upload, Video, X } from "lucide-react";
-import { useCallback, useState } from "react";
 
 interface ReferenceInputManagerProps {
   type: ReferenceInputKind;
@@ -126,10 +126,10 @@ export function ReferenceInputManager({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium flex items-center gap-2">
+        <Label className="flex items-center gap-2 font-medium text-sm">
           {label}
           {required && (
-            <Badge variant="destructive" className="text-xs px-1.5 py-0">
+            <Badge className="px-1.5 py-0 text-xs" variant="destructive">
               Required
             </Badge>
           )}
@@ -137,32 +137,32 @@ export function ReferenceInputManager({
       </div>
 
       {preview ? (
-        <div className="relative group">
-          <div className="relative aspect-video rounded-xl overflow-hidden border border-border bg-muted">
+        <div className="group relative">
+          <div className="relative aspect-video overflow-hidden rounded-xl border border-border bg-muted">
             {isVideo ? (
               <video
-                src={preview}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
                 controls
+                src={preview}
               />
             ) : (
               <img
-                src={preview}
                 alt={label}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
+                src={preview}
               />
             )}
 
             {/* Overlay on hover */}
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
               <Button
+                className="shadow-lg"
+                disabled={disabled}
+                onClick={handleRemove}
                 size="sm"
                 variant="destructive"
-                onClick={handleRemove}
-                disabled={disabled}
-                className="shadow-lg"
               >
-                <X className="h-4 w-4 mr-2" />
+                <X className="mr-2 h-4 w-4" />
                 Remove
               </Button>
             </div>
@@ -170,7 +170,7 @@ export function ReferenceInputManager({
 
           {/* File info */}
           {value instanceof File && (
-            <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="mt-2 flex items-center gap-2 text-muted-foreground text-xs">
               <Icon className="h-3.5 w-3.5" />
               <span className="truncate">{value.name}</span>
               <span>({(value.size / 1024 / 1024).toFixed(2)} MB)</span>
@@ -179,16 +179,16 @@ export function ReferenceInputManager({
         </div>
       ) : (
         <label
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
           className={cn(
-            "flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all",
+            "flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all",
             isDragging
-              ? "border-primary bg-primary/5 scale-[1.02]"
+              ? "scale-[1.02] border-primary bg-primary/5"
               : "border-border bg-background hover:border-primary/50 hover:bg-accent/50",
-            disabled && "opacity-50 cursor-not-allowed"
+            disabled && "cursor-not-allowed opacity-50"
           )}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
         >
           <div className="flex flex-col items-center justify-center gap-3 px-4 py-6">
             <div
@@ -207,21 +207,25 @@ export function ReferenceInputManager({
             </div>
 
             <div className="text-center">
-              <p className="text-sm font-medium text-foreground mb-1">
-                {isDragging ? "Drop file here" : "Click to upload or drag and drop"}
+              <p className="mb-1 font-medium text-foreground text-sm">
+                {isDragging
+                  ? "Drop file here"
+                  : "Click to upload or drag and drop"}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {isVideo ? "MP4, WebM, MOV up to 100MB" : "PNG, JPG, WebP up to 10MB"}
+              <p className="text-muted-foreground text-xs">
+                {isVideo
+                  ? "MP4, WebM, MOV up to 100MB"
+                  : "PNG, JPG, WebP up to 10MB"}
               </p>
             </div>
           </div>
 
           <input
-            type="file"
-            className="hidden"
             accept={config.accept}
-            onChange={handleInputChange}
+            className="hidden"
             disabled={disabled}
+            onChange={handleInputChange}
+            type="file"
           />
         </label>
       )}

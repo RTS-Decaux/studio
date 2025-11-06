@@ -1,5 +1,5 @@
-import { getAssetById, updateAsset } from "@/lib/studio/queries";
 import { NextResponse } from "next/server";
+import { getAssetById, updateAsset } from "@/lib/studio/queries";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -34,10 +34,7 @@ export async function GET(
     return NextResponse.json(asset);
   } catch (error) {
     console.error("Get asset error:", error);
-    return NextResponse.json(
-      { error: "Failed to get asset" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to get asset" }, { status: 500 });
   }
 }
 
@@ -76,10 +73,7 @@ export async function PATCH(
 
     if (name !== undefined) {
       if (typeof name !== "string" || name.trim().length === 0) {
-        return NextResponse.json(
-          { error: "Invalid name" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid name" }, { status: 400 });
       }
       updates.name = name.trim();
     }

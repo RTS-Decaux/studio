@@ -1,35 +1,35 @@
 "use client";
 
+import {
+  AlertCircle,
+  FileCheck,
+  Image as ImageIcon,
+  Music,
+  Upload,
+  Video,
+  X,
+} from "lucide-react";
+import { useCallback, useRef, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import type { StudioAssetType } from "@/lib/studio/types";
-import {
-    AlertCircle,
-    FileCheck,
-    Image as ImageIcon,
-    Music,
-    Upload,
-    Video,
-    X,
-} from "lucide-react";
-import { useCallback, useRef, useState } from "react";
-import { toast } from "sonner";
 
 interface UploadAssetDialogProps {
   open: boolean;
@@ -93,7 +93,7 @@ export function UploadAssetDialog({
         // Validate file size
         if (file.size > maxSizes[assetType]) {
           toast.error(
-            `File too large: ${file.name} (max ${maxSizes[assetType] / 1024 / 1024}MB)`,
+            `File too large: ${file.name} (max ${maxSizes[assetType] / 1024 / 1024}MB)`
           );
           return;
         }
@@ -119,7 +119,7 @@ export function UploadAssetDialog({
 
       setFiles((prev) => [...prev, ...newFiles]);
     },
-    [assetType],
+    [assetType]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -138,7 +138,7 @@ export function UploadAssetDialog({
       setIsDragging(false);
       handleFileSelect(e.dataTransfer.files);
     },
-    [handleFileSelect],
+    [handleFileSelect]
   );
 
   const removeFile = (index: number) => {
@@ -160,8 +160,8 @@ export function UploadAssetDialog({
         // Update status to uploading
         setFiles((prev) =>
           prev.map((f, idx) =>
-            idx === i ? { ...f, status: "uploading" as const } : f,
-          ),
+            idx === i ? { ...f, status: "uploading" as const } : f
+          )
         );
 
         try {
@@ -190,8 +190,8 @@ export function UploadAssetDialog({
             prev.map((f, idx) =>
               idx === i
                 ? { ...f, status: "success" as const, progress: 100 }
-                : f,
-            ),
+                : f
+            )
           );
 
           onUploadComplete?.(result.id);
@@ -205,8 +205,8 @@ export function UploadAssetDialog({
                     status: "error" as const,
                     error: "Upload failed",
                   }
-                : f,
-            ),
+                : f
+            )
           );
           toast.error(`Failed to upload ${uploadFile.file.name}`);
         }
@@ -236,7 +236,7 @@ export function UploadAssetDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -253,12 +253,12 @@ export function UploadAssetDialog({
           <div className="space-y-2">
             <Label>Asset Type</Label>
             <Select
-              value={assetType}
+              disabled={isUploading}
               onValueChange={(value) => {
                 setAssetType(value as StudioAssetType);
                 setFiles([]);
               }}
-              disabled={isUploading}
+              value={assetType}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -288,25 +288,22 @@ export function UploadAssetDialog({
 
           {/* Drop Zone */}
           <div
-            className={`
-              border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
-              transition-colors
-              ${isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}
-              ${isUploading ? "opacity-50 pointer-events-none" : ""}
+            className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}
+              ${isUploading ? "pointer-events-none opacity-50" : ""}
             `}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
           >
             <input
-              ref={fileInputRef}
-              type="file"
-              multiple
               accept={acceptedTypes[assetType]}
-              onChange={(e) => handleFileSelect(e.target.files)}
               className="hidden"
               disabled={isUploading}
+              multiple
+              onChange={(e) => handleFileSelect(e.target.files)}
+              ref={fileInputRef}
+              type="file"
             />
 
             <div className="flex flex-col items-center gap-3">
@@ -315,7 +312,7 @@ export function UploadAssetDialog({
                 <p className="font-medium">
                   Drop files here or click to browse
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="mt-1 text-muted-foreground text-sm">
                   Supported: {acceptedTypes[assetType]} (max{" "}
                   {maxSizes[assetType] / 1024 / 1024}MB per file)
                 </p>
@@ -325,20 +322,20 @@ export function UploadAssetDialog({
 
           {/* File List */}
           {files.length > 0 && (
-            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            <div className="max-h-[300px] space-y-2 overflow-y-auto">
               <Label>Files ({files.length})</Label>
               {files.map((uploadFile, index) => (
                 <div
+                  className="flex items-center gap-3 rounded-lg border p-3"
                   key={index}
-                  className="flex items-center gap-3 p-3 border rounded-lg"
                 >
                   {/* Preview/Icon */}
-                  <div className="shrink-0 w-12 h-12 bg-muted rounded flex items-center justify-center overflow-hidden">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded bg-muted">
                     {uploadFile.preview ? (
                       <img
-                        src={uploadFile.preview}
                         alt="Preview"
-                        className="w-full h-full object-cover"
+                        className="h-full w-full object-cover"
+                        src={uploadFile.preview}
                       />
                     ) : (
                       getIcon()
@@ -346,22 +343,22 @@ export function UploadAssetDialog({
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-sm">
                       {uploadFile.file.name}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {(uploadFile.file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
 
                     {/* Progress */}
                     {uploadFile.status === "uploading" && (
-                      <Progress value={uploadFile.progress} className="mt-2" />
+                      <Progress className="mt-2" value={uploadFile.progress} />
                     )}
 
                     {/* Error */}
                     {uploadFile.status === "error" && (
-                      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                      <p className="mt-1 flex items-center gap-1 text-destructive text-xs">
                         <AlertCircle className="h-3 w-3" />
                         {uploadFile.error}
                       </p>
@@ -375,16 +372,16 @@ export function UploadAssetDialog({
                     ) : uploadFile.status === "error" ? (
                       <AlertCircle className="h-5 w-5 text-destructive" />
                     ) : uploadFile.status === "uploading" ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent" />
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                     ) : (
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        disabled={isUploading}
                         onClick={(e) => {
                           e.stopPropagation();
                           removeFile(index);
                         }}
-                        disabled={isUploading}
+                        size="sm"
+                        variant="ghost"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -398,23 +395,23 @@ export function UploadAssetDialog({
 
         <DialogFooter>
           <Button
-            variant="outline"
+            disabled={isUploading}
             onClick={() => {
               onOpenChange(false);
               setFiles([]);
             }}
-            disabled={isUploading}
+            variant="outline"
           >
             Cancel
           </Button>
           <Button
-            onClick={handleUpload}
-            disabled={files.length === 0 || isUploading}
             className="gap-2"
+            disabled={files.length === 0 || isUploading}
+            onClick={handleUpload}
           >
             {isUploading ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-background border-t-transparent" />
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
                 Uploading...
               </>
             ) : (

@@ -6,13 +6,13 @@ export default async function AssetsPage() {
   const assets = await getUserAssetsAction();
 
   return (
-    <div className="flex flex-col h-full">
-      <StudioHeader title="Библиотека ресурсов" showNewButton={false} />
+    <div className="flex h-full flex-col">
+      <StudioHeader showNewButton={false} title="Библиотека ресурсов" />
 
       <main className="flex-1 overflow-auto p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+            <h1 className="mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text font-bold text-3xl text-transparent">
               Библиотека ресурсов
             </h1>
             <p className="text-muted-foreground">

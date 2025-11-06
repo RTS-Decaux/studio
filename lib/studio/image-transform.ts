@@ -1,9 +1,9 @@
 /**
  * Supabase Storage Image Transformation Utilities
- * 
+ *
  * Uses Supabase's built-in image transformation API to generate
  * optimized thumbnails and previews on-the-fly.
- * 
+ *
  * Documentation: https://supabase.com/docs/guides/storage/serving/image-transformations
  */
 
@@ -25,11 +25,11 @@ function parseSupabaseStorageUrl(url: string): {
 } | null {
   try {
     const urlObj = new URL(url);
-    
+
     // Handle both public and authenticated storage URLs
     // Format: https://{project}.supabase.co/storage/v1/object/{public|authenticated}/{bucket}/{path}
     const match = urlObj.pathname.match(
-      /^\/storage\/v1\/object\/(public|authenticated|sign)\/([^\/]+)\/(.+)$/
+      /^\/storage\/v1\/object\/(public|authenticated|sign)\/([^/]+)\/(.+)$/
     );
 
     if (!match) {
@@ -52,7 +52,7 @@ function parseSupabaseStorageUrl(url: string): {
 
 /**
  * Generates a transformed image URL using Supabase's image transformation API
- * 
+ *
  * @param originalUrl - Original Supabase Storage URL
  * @param options - Transformation options
  * @returns Transformed image URL or original URL if transformation is not possible
@@ -79,29 +79,32 @@ export function getTransformedImageUrl(
 
   // Build transformation parameters
   const params = new URLSearchParams();
-  
+
   if (options.width) {
     params.append("width", options.width.toString());
   }
-  
+
   if (options.height) {
     params.append("height", options.height.toString());
   }
-  
+
   if (options.quality) {
-    params.append("quality", Math.max(20, Math.min(100, options.quality)).toString());
+    params.append(
+      "quality",
+      Math.max(20, Math.min(100, options.quality)).toString()
+    );
   }
-  
+
   if (options.format) {
     params.append("format", options.format);
   }
-  
+
   if (options.resize) {
     params.append("resize", options.resize);
   }
 
   const queryString = params.toString();
-  const transformPath = queryString 
+  const transformPath = queryString
     ? `${baseUrl}/render/image/public/${bucket}/${path}?${queryString}`
     : originalUrl;
 
@@ -178,7 +181,7 @@ export const ImagePresets = {
  */
 export function getResponsiveSrcSet(url: string | null): string | undefined {
   if (!url) {
-    return undefined;
+    return;
   }
 
   const sizes = [400, 800, 1200, 1600];
@@ -218,7 +221,8 @@ export function getAssetPreviewUrl(
       return size === "small"
         ? ImagePresets.thumbnailSmall(asset.thumbnailUrl) || asset.thumbnailUrl
         : size === "medium"
-          ? ImagePresets.thumbnailMedium(asset.thumbnailUrl) || asset.thumbnailUrl
+          ? ImagePresets.thumbnailMedium(asset.thumbnailUrl) ||
+            asset.thumbnailUrl
           : ImagePresets.previewLarge(asset.thumbnailUrl) || asset.thumbnailUrl;
     }
     return asset.url;
@@ -226,7 +230,7 @@ export function getAssetPreviewUrl(
 
   // For images, transform the main URL
   const previewUrl = asset.thumbnailUrl || asset.url;
-  
+
   return size === "small"
     ? ImagePresets.thumbnailSmall(previewUrl) || previewUrl
     : size === "medium"

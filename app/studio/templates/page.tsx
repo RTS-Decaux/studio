@@ -1,39 +1,46 @@
 "use client";
 
+import {
+  CheckCheck,
+  Clock,
+  Copy,
+  Eye,
+  Gauge,
+  Image as ImageIcon,
+  Layers,
+  Search,
+  Sparkles,
+  Target,
+  Video,
+  Wand2,
+  Zap,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { StudioHeader } from "@/components/studio/studio-header";
 import { TemplateDetailDialog } from "@/components/studio/template-detail-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    PROJECT_TEMPLATE_CATEGORIES,
-    PROJECT_TEMPLATES,
-    PROMPT_TEMPLATES,
-    TEMPLATE_CATEGORIES,
-    type ProjectTemplate,
-    type PromptTemplate
+  PROJECT_TEMPLATE_CATEGORIES,
+  PROJECT_TEMPLATES,
+  PROMPT_TEMPLATES,
+  type ProjectTemplate,
+  type PromptTemplate,
+  TEMPLATE_CATEGORIES,
 } from "@/lib/studio/templates";
-import {
-    CheckCheck,
-    Clock,
-    Copy,
-    Eye,
-    Gauge,
-    Image as ImageIcon,
-    Layers,
-    Search,
-    Sparkles,
-    Target,
-    Video,
-    Wand2,
-    Zap
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 type ViewMode = "prompts" | "projects";
 
@@ -42,39 +49,46 @@ export default function TemplatesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [detailTemplate, setDetailTemplate] = useState<PromptTemplate | ProjectTemplate | null>(null);
+  const [detailTemplate, setDetailTemplate] = useState<
+    PromptTemplate | ProjectTemplate | null
+  >(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   // Filter templates based on search and category
   const filteredPromptTemplates = PROMPT_TEMPLATES.filter((template) => {
-    const matchesSearch = 
+    const matchesSearch =
       template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesCategory = selectedCategory === "all" || template.category === selectedCategory;
-    
+      template.tags.some((tag) =>
+        tag.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+    const matchesCategory =
+      selectedCategory === "all" || template.category === selectedCategory;
+
     return matchesSearch && matchesCategory;
   });
 
   const filteredProjectTemplates = PROJECT_TEMPLATES.filter((template) => {
-    const matchesSearch = 
+    const matchesSearch =
       template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const matchesCategory = selectedCategory === "all" || template.category === selectedCategory;
-    
+      template.tags.some((tag) =>
+        tag.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+    const matchesCategory =
+      selectedCategory === "all" || template.category === selectedCategory;
+
     return matchesSearch && matchesCategory;
   });
 
   // Get category counts
   const getCategoryCount = (categoryId: string) => {
     if (viewMode === "prompts") {
-      return PROMPT_TEMPLATES.filter(t => t.category === categoryId).length;
-    } else {
-      return PROJECT_TEMPLATES.filter(t => t.category === categoryId).length;
+      return PROMPT_TEMPLATES.filter((t) => t.category === categoryId).length;
     }
+    return PROJECT_TEMPLATES.filter((t) => t.category === categoryId).length;
   };
 
   const handleCopyPrompt = (template: PromptTemplate) => {
@@ -97,23 +111,25 @@ Settings: ${JSON.stringify(settings, null, 2)}`;
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const categories = viewMode === "prompts" ? TEMPLATE_CATEGORIES : PROJECT_TEMPLATE_CATEGORIES;
-  const currentTemplates = viewMode === "prompts" ? filteredPromptTemplates : filteredProjectTemplates;
+  const categories =
+    viewMode === "prompts" ? TEMPLATE_CATEGORIES : PROJECT_TEMPLATE_CATEGORIES;
+  const currentTemplates =
+    viewMode === "prompts" ? filteredPromptTemplates : filteredProjectTemplates;
 
   return (
-    <div className="flex flex-col h-full">
-      <StudioHeader title="Template Gallery" showNewButton={false} />
-      
+    <div className="flex h-full flex-col">
+      <StudioHeader showNewButton={false} title="Template Gallery" />
+
       <main className="flex-1 overflow-auto">
-        <div className="container mx-auto p-4 md:p-6 max-w-7xl">
+        <div className="container mx-auto max-w-7xl p-4 md:p-6">
           {/* Header Section */}
           <div className="mb-8 space-y-4">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text font-bold text-3xl text-transparent">
                   Template Gallery
                 </h1>
-                <p className="text-muted-foreground mt-1">
+                <p className="mt-1 text-muted-foreground">
                   Browse and use pre-made templates for quick generation
                 </p>
               </div>
@@ -121,23 +137,23 @@ Settings: ${JSON.stringify(settings, null, 2)}`;
               {/* View Mode Toggle */}
               <div className="flex gap-2">
                 <Button
-                  variant={viewMode === "prompts" ? "default" : "outline"}
+                  className="gap-2"
                   onClick={() => {
                     setViewMode("prompts");
                     setSelectedCategory("all");
                   }}
-                  className="gap-2"
+                  variant={viewMode === "prompts" ? "default" : "outline"}
                 >
                   <Sparkles className="h-4 w-4" />
                   Prompts ({PROMPT_TEMPLATES.length})
                 </Button>
                 <Button
-                  variant={viewMode === "projects" ? "default" : "outline"}
+                  className="gap-2"
                   onClick={() => {
                     setViewMode("projects");
                     setSelectedCategory("all");
                   }}
-                  className="gap-2"
+                  variant={viewMode === "projects" ? "default" : "outline"}
                 >
                   <Wand2 className="h-4 w-4" />
                   Projects ({PROJECT_TEMPLATES.length})
@@ -147,269 +163,349 @@ Settings: ${JSON.stringify(settings, null, 2)}`;
 
             {/* Search Bar */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
               <Input
+                className="pl-10"
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search templates by name, description, or tags..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
               />
             </div>
           </div>
 
           {/* Category Tabs */}
-          <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="space-y-6">
-            <TabsList className="w-full justify-start overflow-x-auto flex-wrap h-auto gap-2 bg-muted/50 p-2">
-              <TabsTrigger value="all" className="gap-2">
+          <Tabs
+            className="space-y-6"
+            onValueChange={setSelectedCategory}
+            value={selectedCategory}
+          >
+            <TabsList className="h-auto w-full flex-wrap justify-start gap-2 overflow-x-auto bg-muted/50 p-2">
+              <TabsTrigger className="gap-2" value="all">
                 <Layers className="h-4 w-4" />
                 All
-                <Badge variant="secondary" className="ml-1">
-                  {viewMode === "prompts" ? PROMPT_TEMPLATES.length : PROJECT_TEMPLATES.length}
+                <Badge className="ml-1" variant="secondary">
+                  {viewMode === "prompts"
+                    ? PROMPT_TEMPLATES.length
+                    : PROJECT_TEMPLATES.length}
                 </Badge>
               </TabsTrigger>
               {categories.map((cat) => (
-                <TabsTrigger key={cat.id} value={cat.id} className="gap-2">
+                <TabsTrigger className="gap-2" key={cat.id} value={cat.id}>
                   <span>{cat.icon}</span>
                   {cat.name}
-                  <Badge variant="secondary" className="ml-1">
+                  <Badge className="ml-1" variant="secondary">
                     {getCategoryCount(cat.id)}
                   </Badge>
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            <TabsContent value={selectedCategory} className="space-y-6">
+            <TabsContent className="space-y-6" value={selectedCategory}>
               {currentTemplates.length === 0 ? (
                 <Card className="p-12">
                   <div className="text-center">
-                    <Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">No templates found</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <Search className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                    <h3 className="mb-2 font-semibold text-lg">
+                      No templates found
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
                       Try adjusting your search or category filter
                     </p>
                   </div>
                 </Card>
               ) : (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {viewMode === "prompts" ? (
-                    // Prompt Templates
-                    filteredPromptTemplates.map((template) => (
-                      <Card key={template.id} className="group hover:shadow-lg transition-all duration-300 hover:border-purple-500/50">
-                        <CardHeader>
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1">
-                              <CardTitle className="text-lg mb-2">{template.name}</CardTitle>
-                              <CardDescription>{template.description}</CardDescription>
-                            </div>
-                            <Badge variant="outline" className="shrink-0">
-                              {TEMPLATE_CATEGORIES.find(c => c.id === template.category)?.icon}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        
-                        <CardContent className="space-y-4">
-                          {/* Generation Types */}
-                          <div className="flex flex-wrap gap-2">
-                            {template.generationType.map((type) => (
-                              <Badge key={type} variant="secondary" className="text-xs gap-1">
-                                {type.includes("video") ? (
-                                  <Video className="h-3 w-3" />
-                                ) : (
-                                  <ImageIcon className="h-3 w-3" />
-                                )}
-                                {type === "text-to-image" ? "Image" : 
-                                 type === "text-to-video" ? "Video" :
-                                 type === "image-to-image" ? "I2I" :
-                                 type === "image-to-video" ? "I2V" : type}
-                              </Badge>
-                            ))}
-                          </div>
-
-                          {/* Prompt Preview */}
-                          <div className="space-y-2">
-                            <div className="text-xs font-medium text-muted-foreground">Prompt Preview:</div>
-                            <ScrollArea className="h-20 rounded-md border bg-muted/50 p-3">
-                              <p className="text-xs leading-relaxed">{template.prompt}</p>
-                            </ScrollArea>
-                          </div>
-
-                          {/* Tags */}
-                          <div className="flex flex-wrap gap-1">
-                            {template.tags.slice(0, 4).map((tag) => (
-                              <Badge key={tag} variant="outline" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                            {template.tags.length > 4 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{template.tags.length - 4}
-                              </Badge>
-                            )}
-                          </div>
-
-                          {/* Examples */}
-                          {template.examples && template.examples.length > 0 && (
-                            <div className="text-xs text-muted-foreground">
-                              <span className="font-medium">Try with:</span> {template.examples.join(", ")}
-                            </div>
-                          )}
-                        </CardContent>
-
-                        <CardFooter className="flex gap-2">
-                          <Button
-                            onClick={() => {
-                              setDetailTemplate(template);
-                              setDetailDialogOpen(true);
-                            }}
-                            variant="outline"
-                            className="flex-1 gap-2"
-                          >
-                            <Eye className="h-4 w-4" />
-                            Details
-                          </Button>
-                          <Button
-                            onClick={() => handleCopyPrompt(template)}
-                            className="flex-1 gap-2"
-                            variant={copiedId === template.id ? "outline" : "default"}
-                          >
-                            {copiedId === template.id ? (
-                              <>
-                                <CheckCheck className="h-4 w-4" />
-                                Copied!
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-4 w-4" />
-                                Copy
-                              </>
-                            )}
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    ))
-                  ) : (
-                    // Project Templates
-                    filteredProjectTemplates.map((template) => (
-                      <Card key={template.id} className="group hover:shadow-lg transition-all duration-300 hover:border-blue-500/50">
-                        <CardHeader>
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-2xl">{template.icon}</span>
-                                <CardTitle className="text-lg">{template.name}</CardTitle>
+                  {viewMode === "prompts"
+                    ? // Prompt Templates
+                      filteredPromptTemplates.map((template) => (
+                        <Card
+                          className="group transition-all duration-300 hover:border-purple-500/50 hover:shadow-lg"
+                          key={template.id}
+                        >
+                          <CardHeader>
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <CardTitle className="mb-2 text-lg">
+                                  {template.name}
+                                </CardTitle>
+                                <CardDescription>
+                                  {template.description}
+                                </CardDescription>
                               </div>
-                              <CardDescription>{template.description}</CardDescription>
+                              <Badge className="shrink-0" variant="outline">
+                                {
+                                  TEMPLATE_CATEGORIES.find(
+                                    (c) => c.id === template.category
+                                  )?.icon
+                                }
+                              </Badge>
                             </div>
-                            <Badge variant="outline" className="shrink-0">
-                              {PROJECT_TEMPLATE_CATEGORIES.find(c => c.id === template.category)?.icon}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        
-                        <CardContent className="space-y-4">
-                          {/* Generation Type */}
-                          <Badge variant="secondary" className="gap-1">
-                            {template.generationType === "text-to-video" || template.generationType === "image-to-video" ? (
-                              <Video className="h-3 w-3" />
-                            ) : (
-                              <ImageIcon className="h-3 w-3" />
-                            )}
-                            {template.generationType === "text-to-image" ? "Image Generation" : 
-                             template.generationType === "text-to-video" ? "Video Generation" :
-                             template.generationType === "image-to-image" ? "Image to Image" :
-                             template.generationType === "image-to-video" ? "Image to Video" : template.generationType}
-                          </Badge>
+                          </CardHeader>
 
-                          {/* Settings Preview */}
-                          <div className="space-y-2">
-                            <div className="text-xs font-medium text-muted-foreground">Pre-configured Settings:</div>
-                            <div className="grid grid-cols-2 gap-2 text-xs">
-                              {template.defaultSettings.imageSize && (
-                                <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
-                                  <Layers className="h-3 w-3 text-muted-foreground" />
-                                  <span>{template.defaultSettings.imageSize}</span>
-                                </div>
-                              )}
-                              {template.defaultSettings.duration && (
-                                <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
-                                  <Clock className="h-3 w-3 text-muted-foreground" />
-                                  <span>{template.defaultSettings.duration}s</span>
-                                </div>
-                              )}
-                              {template.defaultSettings.fps && (
-                                <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
-                                  <Gauge className="h-3 w-3 text-muted-foreground" />
-                                  <span>{template.defaultSettings.fps} FPS</span>
-                                </div>
-                              )}
-                              {template.defaultSettings.steps && (
-                                <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
-                                  <Zap className="h-3 w-3 text-muted-foreground" />
-                                  <span>{template.defaultSettings.steps} steps</span>
-                                </div>
-                              )}
-                              {template.defaultSettings.guidance && (
-                                <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
-                                  <Target className="h-3 w-3 text-muted-foreground" />
-                                  <span>G: {template.defaultSettings.guidance}</span>
-                                </div>
-                              )}
+                          <CardContent className="space-y-4">
+                            {/* Generation Types */}
+                            <div className="flex flex-wrap gap-2">
+                              {template.generationType.map((type) => (
+                                <Badge
+                                  className="gap-1 text-xs"
+                                  key={type}
+                                  variant="secondary"
+                                >
+                                  {type.includes("video") ? (
+                                    <Video className="h-3 w-3" />
+                                  ) : (
+                                    <ImageIcon className="h-3 w-3" />
+                                  )}
+                                  {type === "text-to-image"
+                                    ? "Image"
+                                    : type === "text-to-video"
+                                      ? "Video"
+                                      : type === "image-to-image"
+                                        ? "I2I"
+                                        : type === "image-to-video"
+                                          ? "I2V"
+                                          : type}
+                                </Badge>
+                              ))}
                             </div>
-                          </div>
 
-                          {/* Prompt Preview */}
-                          {template.promptTemplate && (
+                            {/* Prompt Preview */}
                             <div className="space-y-2">
-                              <div className="text-xs font-medium text-muted-foreground">Prompt Template:</div>
-                              <ScrollArea className="h-16 rounded-md border bg-muted/50 p-2">
-                                <p className="text-xs leading-relaxed">{template.promptTemplate}</p>
+                              <div className="font-medium text-muted-foreground text-xs">
+                                Prompt Preview:
+                              </div>
+                              <ScrollArea className="h-20 rounded-md border bg-muted/50 p-3">
+                                <p className="text-xs leading-relaxed">
+                                  {template.prompt}
+                                </p>
                               </ScrollArea>
                             </div>
-                          )}
 
-                          {/* Tags */}
-                          <div className="flex flex-wrap gap-1">
-                            {template.tags.map((tag) => (
-                              <Badge key={tag} variant="outline" className="text-xs">
-                                {tag}
+                            {/* Tags */}
+                            <div className="flex flex-wrap gap-1">
+                              {template.tags.slice(0, 4).map((tag) => (
+                                <Badge
+                                  className="text-xs"
+                                  key={tag}
+                                  variant="outline"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {template.tags.length > 4 && (
+                                <Badge className="text-xs" variant="outline">
+                                  +{template.tags.length - 4}
+                                </Badge>
+                              )}
+                            </div>
+
+                            {/* Examples */}
+                            {template.examples &&
+                              template.examples.length > 0 && (
+                                <div className="text-muted-foreground text-xs">
+                                  <span className="font-medium">Try with:</span>{" "}
+                                  {template.examples.join(", ")}
+                                </div>
+                              )}
+                          </CardContent>
+
+                          <CardFooter className="flex gap-2">
+                            <Button
+                              className="flex-1 gap-2"
+                              onClick={() => {
+                                setDetailTemplate(template);
+                                setDetailDialogOpen(true);
+                              }}
+                              variant="outline"
+                            >
+                              <Eye className="h-4 w-4" />
+                              Details
+                            </Button>
+                            <Button
+                              className="flex-1 gap-2"
+                              onClick={() => handleCopyPrompt(template)}
+                              variant={
+                                copiedId === template.id ? "outline" : "default"
+                              }
+                            >
+                              {copiedId === template.id ? (
+                                <>
+                                  <CheckCheck className="h-4 w-4" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-4 w-4" />
+                                  Copy
+                                </>
+                              )}
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))
+                    : // Project Templates
+                      filteredProjectTemplates.map((template) => (
+                        <Card
+                          className="group transition-all duration-300 hover:border-blue-500/50 hover:shadow-lg"
+                          key={template.id}
+                        >
+                          <CardHeader>
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <div className="mb-2 flex items-center gap-2">
+                                  <span className="text-2xl">
+                                    {template.icon}
+                                  </span>
+                                  <CardTitle className="text-lg">
+                                    {template.name}
+                                  </CardTitle>
+                                </div>
+                                <CardDescription>
+                                  {template.description}
+                                </CardDescription>
+                              </div>
+                              <Badge className="shrink-0" variant="outline">
+                                {
+                                  PROJECT_TEMPLATE_CATEGORIES.find(
+                                    (c) => c.id === template.category
+                                  )?.icon
+                                }
                               </Badge>
-                            ))}
-                          </div>
-                        </CardContent>
+                            </div>
+                          </CardHeader>
 
-                        <CardFooter className="flex gap-2">
-                          <Button
-                            onClick={() => {
-                              setDetailTemplate(template);
-                              setDetailDialogOpen(true);
-                            }}
-                            variant="outline"
-                            className="flex-1 gap-2"
-                          >
-                            <Eye className="h-4 w-4" />
-                            Details
-                          </Button>
-                          <Button
-                            onClick={() => handleCopyProject(template)}
-                            className="flex-1 gap-2"
-                            variant={copiedId === template.id ? "outline" : "default"}
-                          >
-                            {copiedId === template.id ? (
-                              <>
-                                <CheckCheck className="h-4 w-4" />
-                                Copied!
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-4 w-4" />
-                                Copy
-                              </>
+                          <CardContent className="space-y-4">
+                            {/* Generation Type */}
+                            <Badge className="gap-1" variant="secondary">
+                              {template.generationType === "text-to-video" ||
+                              template.generationType === "image-to-video" ? (
+                                <Video className="h-3 w-3" />
+                              ) : (
+                                <ImageIcon className="h-3 w-3" />
+                              )}
+                              {template.generationType === "text-to-image"
+                                ? "Image Generation"
+                                : template.generationType === "text-to-video"
+                                  ? "Video Generation"
+                                  : template.generationType === "image-to-image"
+                                    ? "Image to Image"
+                                    : template.generationType ===
+                                        "image-to-video"
+                                      ? "Image to Video"
+                                      : template.generationType}
+                            </Badge>
+
+                            {/* Settings Preview */}
+                            <div className="space-y-2">
+                              <div className="font-medium text-muted-foreground text-xs">
+                                Pre-configured Settings:
+                              </div>
+                              <div className="grid grid-cols-2 gap-2 text-xs">
+                                {template.defaultSettings.imageSize && (
+                                  <div className="flex items-center gap-2 rounded-md bg-muted/50 p-2">
+                                    <Layers className="h-3 w-3 text-muted-foreground" />
+                                    <span>
+                                      {template.defaultSettings.imageSize}
+                                    </span>
+                                  </div>
+                                )}
+                                {template.defaultSettings.duration && (
+                                  <div className="flex items-center gap-2 rounded-md bg-muted/50 p-2">
+                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                    <span>
+                                      {template.defaultSettings.duration}s
+                                    </span>
+                                  </div>
+                                )}
+                                {template.defaultSettings.fps && (
+                                  <div className="flex items-center gap-2 rounded-md bg-muted/50 p-2">
+                                    <Gauge className="h-3 w-3 text-muted-foreground" />
+                                    <span>
+                                      {template.defaultSettings.fps} FPS
+                                    </span>
+                                  </div>
+                                )}
+                                {template.defaultSettings.steps && (
+                                  <div className="flex items-center gap-2 rounded-md bg-muted/50 p-2">
+                                    <Zap className="h-3 w-3 text-muted-foreground" />
+                                    <span>
+                                      {template.defaultSettings.steps} steps
+                                    </span>
+                                  </div>
+                                )}
+                                {template.defaultSettings.guidance && (
+                                  <div className="flex items-center gap-2 rounded-md bg-muted/50 p-2">
+                                    <Target className="h-3 w-3 text-muted-foreground" />
+                                    <span>
+                                      G: {template.defaultSettings.guidance}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Prompt Preview */}
+                            {template.promptTemplate && (
+                              <div className="space-y-2">
+                                <div className="font-medium text-muted-foreground text-xs">
+                                  Prompt Template:
+                                </div>
+                                <ScrollArea className="h-16 rounded-md border bg-muted/50 p-2">
+                                  <p className="text-xs leading-relaxed">
+                                    {template.promptTemplate}
+                                  </p>
+                                </ScrollArea>
+                              </div>
                             )}
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    ))
-                  )}
+
+                            {/* Tags */}
+                            <div className="flex flex-wrap gap-1">
+                              {template.tags.map((tag) => (
+                                <Badge
+                                  className="text-xs"
+                                  key={tag}
+                                  variant="outline"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </CardContent>
+
+                          <CardFooter className="flex gap-2">
+                            <Button
+                              className="flex-1 gap-2"
+                              onClick={() => {
+                                setDetailTemplate(template);
+                                setDetailDialogOpen(true);
+                              }}
+                              variant="outline"
+                            >
+                              <Eye className="h-4 w-4" />
+                              Details
+                            </Button>
+                            <Button
+                              className="flex-1 gap-2"
+                              onClick={() => handleCopyProject(template)}
+                              variant={
+                                copiedId === template.id ? "outline" : "default"
+                              }
+                            >
+                              {copiedId === template.id ? (
+                                <>
+                                  <CheckCheck className="h-4 w-4" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-4 w-4" />
+                                  Copy
+                                </>
+                              )}
+                            </Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
                 </div>
               )}
             </TabsContent>
@@ -417,17 +513,21 @@ Settings: ${JSON.stringify(settings, null, 2)}`;
 
           {/* Footer Stats */}
           <Separator className="my-8" />
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-muted-foreground text-sm">
             <p>
-              Showing {currentTemplates.length} of {viewMode === "prompts" ? PROMPT_TEMPLATES.length : PROJECT_TEMPLATES.length} templates
+              Showing {currentTemplates.length} of{" "}
+              {viewMode === "prompts"
+                ? PROMPT_TEMPLATES.length
+                : PROJECT_TEMPLATES.length}{" "}
+              templates
             </p>
           </div>
         </div>
 
         {/* Template Detail Dialog */}
         <TemplateDetailDialog
-          open={detailDialogOpen}
           onOpenChange={setDetailDialogOpen}
+          open={detailDialogOpen}
           template={detailTemplate}
           type={viewMode === "prompts" ? "prompt" : "project"}
         />

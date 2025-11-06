@@ -1,13 +1,13 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type {
-    StudioAsset,
-    StudioGeneration,
-    StudioProject,
-} from "@/lib/studio/types";
 import { FolderOpen, Sparkles } from "lucide-react";
 import { useCallback, useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type {
+  StudioAsset,
+  StudioGeneration,
+  StudioProject,
+} from "@/lib/studio/types";
 import { AssetGallery } from "./asset-gallery";
 import { GenerationHistory } from "./generation-history";
 import { GenerationPanelV2 as GenerationPanel } from "./generation-panel-v2";
@@ -43,41 +43,47 @@ export function ProjectStudio({
   }, []);
 
   return (
-    <div className="h-full flex flex-col bg-background">
+    <div className="flex h-full flex-col bg-background">
       {/* Project Description */}
       {project.description && (
-        <div className="px-6 py-4 border-b bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5">
-          <p className="text-sm text-muted-foreground leading-relaxed">
+        <div className="border-b bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5 px-6 py-4">
+          <p className="text-muted-foreground text-sm leading-relaxed">
             {project.description}
           </p>
         </div>
       )}
 
       {/* Main Content - Grid Layout */}
-      <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0">
+      <div className="grid flex-1 grid-cols-1 gap-0 overflow-hidden lg:grid-cols-12">
         {/* Left Panel - Generation Form */}
-        <div className="lg:col-span-5 xl:col-span-4 border-r bg-card/50 overflow-hidden">
+        <div className="overflow-hidden border-r bg-card/50 lg:col-span-5 xl:col-span-4">
           <GenerationPanel
-            projectId={project.id}
-            onGenerationStart={handleGenerationStart}
             onGenerationComplete={handleGenerationComplete}
+            onGenerationStart={handleGenerationStart}
+            projectId={project.id}
           />
         </div>
 
         {/* Right Panel - Results & History */}
-        <div className="lg:col-span-7 xl:col-span-8 flex flex-col bg-background">
+        <div className="flex flex-col bg-background lg:col-span-7 xl:col-span-8">
           <Tabs
-            value={activeTab}
+            className="flex h-full flex-col"
             onValueChange={setActiveTab}
-            className="h-full flex flex-col"
+            value={activeTab}
           >
-            <div className="border-b bg-card/30 backdrop-blur-sm px-6 py-2">
+            <div className="border-b bg-card/30 px-6 py-2 backdrop-blur-sm">
               <TabsList className="h-11 bg-background/50">
-                <TabsTrigger value="generate" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/10 data-[state=active]:to-pink-500/10 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-400">
+                <TabsTrigger
+                  className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/10 data-[state=active]:to-pink-500/10 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-400"
+                  value="generate"
+                >
                   <Sparkles className="h-4 w-4" />
                   <span className="font-medium">Generation History</span>
                 </TabsTrigger>
-                <TabsTrigger value="assets" className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/10 data-[state=active]:to-purple-500/10 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400">
+                <TabsTrigger
+                  className="gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/10 data-[state=active]:to-purple-500/10 data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-400"
+                  value="assets"
+                >
                   <FolderOpen className="h-4 w-4" />
                   <span className="font-medium">Assets Library</span>
                 </TabsTrigger>
@@ -85,14 +91,14 @@ export function ProjectStudio({
             </div>
 
             <div className="flex-1 overflow-auto">
-              <TabsContent value="generate" className="mt-0 p-6 h-full">
+              <TabsContent className="mt-0 h-full p-6" value="generate">
                 <GenerationHistory
                   generations={generations}
                   onRefresh={refreshGenerations}
                 />
               </TabsContent>
 
-              <TabsContent value="assets" className="mt-0 p-6 h-full">
+              <TabsContent className="mt-0 h-full p-6" value="assets">
                 <AssetGallery assets={assets} />
               </TabsContent>
             </div>

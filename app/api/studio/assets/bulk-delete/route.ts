@@ -1,5 +1,5 @@
-import { getAssetById, deleteAsset } from "@/lib/studio/queries";
 import { NextResponse } from "next/server";
+import { deleteAsset, getAssetById } from "@/lib/studio/queries";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,16 +21,11 @@ export async function POST(request: Request) {
     const { assetIds } = body;
 
     if (!Array.isArray(assetIds) || assetIds.length === 0) {
-      return NextResponse.json(
-        { error: "Invalid asset IDs" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid asset IDs" }, { status: 400 });
     }
 
     // Validate all assets exist and belong to user
-    const assets = await Promise.all(
-      assetIds.map((id) => getAssetById(id))
-    );
+    const assets = await Promise.all(assetIds.map((id) => getAssetById(id)));
 
     const notFound = assets.filter((a) => !a);
     if (notFound.length > 0) {

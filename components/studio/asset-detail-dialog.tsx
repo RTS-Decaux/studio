@@ -1,14 +1,31 @@
 "use client";
 
+import { format } from "date-fns";
+import {
+  Calendar,
+  CheckCheck,
+  Clock,
+  Copy,
+  Download,
+  ExternalLink,
+  FileText,
+  Image as ImageIcon,
+  Layers,
+  Music,
+  Trash2,
+  Video,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,23 +33,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useAssetSignedUrl, useSignedUrl } from "@/hooks/use-signed-url";
 import type { StudioAsset } from "@/lib/studio/types";
-import { format } from "date-fns";
-import {
-    Calendar,
-    CheckCheck,
-    Clock,
-    Copy,
-    Download,
-    ExternalLink,
-    FileText,
-    Image as ImageIcon,
-    Layers,
-    Music,
-    Trash2,
-    Video
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface AssetDetailDialogProps {
   open: boolean;
@@ -55,15 +55,18 @@ export function AssetDetailDialog({
 
   // Get signed URLs for display
   const { signedUrl: largePreview } = useAssetSignedUrl(asset, "large");
-  const { signedUrl: thumbnailPreview } = useSignedUrl(asset?.thumbnailUrl || null, {
-    transform: {
-      width: 800,
-      height: 600,
-      resize: "contain",
-      quality: 85,
-      format: "webp",
-    },
-  });
+  const { signedUrl: thumbnailPreview } = useSignedUrl(
+    asset?.thumbnailUrl || null,
+    {
+      transform: {
+        width: 800,
+        height: 600,
+        resize: "contain",
+        quality: 85,
+        format: "webp",
+      },
+    }
+  );
   const { signedUrl: videoUrl } = useSignedUrl(asset?.url || null);
 
   if (!asset) return null;
@@ -121,30 +124,32 @@ export function AssetDetailDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <Dialog onOpenChange={onOpenChange} open={open}>
+      <DialogContent className="flex max-h-[90vh] max-w-4xl flex-col overflow-hidden">
         <DialogHeader>
           <div className="flex items-start gap-3">
             {getIcon()}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               {isEditing ? (
                 <Input
-                  value={editedName}
+                  autoFocus
+                  className="font-semibold text-lg"
                   onChange={(e) => setEditedName(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleSave();
                     if (e.key === "Escape") setIsEditing(false);
                   }}
-                  autoFocus
-                  className="font-semibold text-lg"
+                  value={editedName}
                 />
               ) : (
-                <DialogTitle className="text-2xl truncate">
+                <DialogTitle className="truncate text-2xl">
                   {asset.name}
                 </DialogTitle>
               )}
-              <div className="flex items-center gap-2 mt-1">
-                <Badge variant={asset.type === "video" ? "default" : "secondary"}>
+              <div className="mt-1 flex items-center gap-2">
+                <Badge
+                  variant={asset.type === "video" ? "default" : "secondary"}
+                >
                   {asset.type}
                 </Badge>
                 <DialogDescription className="text-xs">
@@ -153,19 +158,19 @@ export function AssetDetailDialog({
               </div>
             </div>
             {!isEditing && (
-              <Button variant="ghost" size="sm" onClick={handleEdit}>
+              <Button onClick={handleEdit} size="sm" variant="ghost">
                 Edit Name
               </Button>
             )}
             {isEditing && (
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleSave}>
+                <Button onClick={handleSave} size="sm">
                   Save
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="sm"
                   onClick={() => setIsEditing(false)}
+                  size="sm"
+                  variant="ghost"
                 >
                   Cancel
                 </Button>
@@ -178,48 +183,48 @@ export function AssetDetailDialog({
           <div className="space-y-6 py-4">
             {/* Preview */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold flex items-center gap-2">
+              <h3 className="flex items-center gap-2 font-semibold text-sm">
                 <Layers className="h-4 w-4" />
                 Preview
               </h3>
-              <div className="relative bg-muted rounded-lg overflow-hidden">
+              <div className="relative overflow-hidden rounded-lg bg-muted">
                 {asset.type === "image" ? (
                   largePreview ? (
                     <img
-                      src={largePreview}
                       alt={asset.name}
-                      className="w-full h-auto max-h-[500px] object-contain"
+                      className="h-auto max-h-[500px] w-full object-contain"
                       loading="lazy"
+                      src={largePreview}
                     />
                   ) : (
-                    <div className="aspect-video flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
+                    <div className="flex aspect-video items-center justify-center">
+                      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                     </div>
                   )
                 ) : asset.type === "video" ? (
                   <>
                     {thumbnailPreview && (
                       <img
-                        src={thumbnailPreview}
                         alt={`${asset.name} thumbnail`}
-                        className="absolute inset-0 w-full h-full object-contain opacity-50 blur-sm"
+                        className="absolute inset-0 h-full w-full object-contain opacity-50 blur-sm"
+                        src={thumbnailPreview}
                       />
                     )}
                     {videoUrl ? (
                       <video
-                        src={videoUrl}
+                        className="relative h-auto max-h-[500px] w-full"
                         controls
-                        className="relative w-full h-auto max-h-[500px]"
                         preload="metadata"
+                        src={videoUrl}
                       />
                     ) : (
-                      <div className="aspect-video flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
+                      <div className="flex aspect-video items-center justify-center">
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="aspect-video flex items-center justify-center">
+                  <div className="flex aspect-video items-center justify-center">
                     <Music className="h-16 w-16 text-muted-foreground" />
                   </div>
                 )}
@@ -230,7 +235,7 @@ export function AssetDetailDialog({
 
             {/* Metadata */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold flex items-center gap-2">
+              <h3 className="flex items-center gap-2 font-semibold text-sm">
                 <FileText className="h-4 w-4" />
                 Details
               </h3>
@@ -238,10 +243,10 @@ export function AssetDetailDialog({
                 {/* File Size */}
                 {asset.metadata.size && (
                   <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">
+                    <Label className="text-muted-foreground text-xs">
                       File Size
                     </Label>
-                    <p className="text-sm font-medium">
+                    <p className="font-medium text-sm">
                       {formatBytes(asset.metadata.size)}
                     </p>
                   </div>
@@ -250,10 +255,10 @@ export function AssetDetailDialog({
                 {/* Dimensions */}
                 {asset.metadata.width && asset.metadata.height && (
                   <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">
+                    <Label className="text-muted-foreground text-xs">
                       Dimensions
                     </Label>
-                    <p className="text-sm font-medium">
+                    <p className="font-medium text-sm">
                       {asset.metadata.width} × {asset.metadata.height}
                     </p>
                   </div>
@@ -262,10 +267,10 @@ export function AssetDetailDialog({
                 {/* Duration */}
                 {asset.metadata.duration && (
                   <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">
+                    <Label className="text-muted-foreground text-xs">
                       Duration
                     </Label>
-                    <p className="text-sm font-medium flex items-center gap-1">
+                    <p className="flex items-center gap-1 font-medium text-sm">
                       <Clock className="h-3 w-3" />
                       {asset.metadata.duration.toFixed(1)}s
                     </p>
@@ -275,10 +280,10 @@ export function AssetDetailDialog({
                 {/* Format */}
                 {asset.metadata.format && (
                   <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">
+                    <Label className="text-muted-foreground text-xs">
                       Format
                     </Label>
-                    <p className="text-sm font-medium uppercase">
+                    <p className="font-medium text-sm uppercase">
                       {asset.metadata.format}
                     </p>
                   </div>
@@ -286,15 +291,14 @@ export function AssetDetailDialog({
 
                 {/* Created Date */}
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground">
+                  <Label className="text-muted-foreground text-xs">
                     Created
                   </Label>
-                  <p className="text-sm font-medium flex items-center gap-1">
+                  <p className="flex items-center gap-1 font-medium text-sm">
                     <Calendar className="h-3 w-3" />
                     {format(asset.createdAt, "MMM d, yyyy")}
                   </p>
                 </div>
-
               </div>
             </div>
 
@@ -302,27 +306,27 @@ export function AssetDetailDialog({
 
             {/* URL */}
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold">Public URL</h3>
+              <h3 className="font-semibold text-sm">Public URL</h3>
               <div className="flex gap-2">
                 <Input
-                  value={asset.url}
-                  readOnly
                   className="font-mono text-xs"
+                  readOnly
+                  value={asset.url}
                 />
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopyUrl}
                   className="shrink-0"
+                  onClick={handleCopyUrl}
+                  size="sm"
+                  variant="outline"
                 >
                   {copiedUrl ? (
                     <>
-                      <CheckCheck className="h-4 w-4 mr-1" />
+                      <CheckCheck className="mr-1 h-4 w-4" />
                       Copied
                     </>
                   ) : (
                     <>
-                      <Copy className="h-4 w-4 mr-1" />
+                      <Copy className="mr-1 h-4 w-4" />
                       Copy
                     </>
                   )}
@@ -335,26 +339,34 @@ export function AssetDetailDialog({
               <>
                 <Separator />
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold">Source Info</h3>
-                  <div className="p-3 bg-muted/50 rounded-lg space-y-2 text-sm">
+                  <h3 className="font-semibold text-sm">Source Info</h3>
+                  <div className="space-y-2 rounded-lg bg-muted/50 p-3 text-sm">
                     {asset.sourceType && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Source:</span>
-                        <Badge variant="outline" className="capitalize">
+                        <Badge className="capitalize" variant="outline">
                           {asset.sourceType}
                         </Badge>
                       </div>
                     )}
                     {asset.sourceGenerationId && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Generation ID:</span>
-                        <span className="font-mono text-xs">{asset.sourceGenerationId}</span>
+                        <span className="text-muted-foreground">
+                          Generation ID:
+                        </span>
+                        <span className="font-mono text-xs">
+                          {asset.sourceGenerationId}
+                        </span>
                       </div>
                     )}
                     {asset.projectId && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Project ID:</span>
-                        <span className="font-mono text-xs">{asset.projectId}</span>
+                        <span className="text-muted-foreground">
+                          Project ID:
+                        </span>
+                        <span className="font-mono text-xs">
+                          {asset.projectId}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -365,23 +377,23 @@ export function AssetDetailDialog({
         </ScrollArea>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={handleDownload} className="gap-2">
+          <Button className="gap-2" onClick={handleDownload} variant="outline">
             <Download className="h-4 w-4" />
             Download
           </Button>
           <Button
-            variant="outline"
-            onClick={() => window.open(asset.url, "_blank")}
             className="gap-2"
+            onClick={() => window.open(asset.url, "_blank")}
+            variant="outline"
           >
             <ExternalLink className="h-4 w-4" />
             Open
           </Button>
           <div className="flex-1" />
           <Button
-            variant="destructive"
-            onClick={handleDelete}
             className="gap-2"
+            onClick={handleDelete}
+            variant="destructive"
           >
             <Trash2 className="h-4 w-4" />
             Delete

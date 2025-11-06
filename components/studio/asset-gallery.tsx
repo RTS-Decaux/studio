@@ -1,19 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useAssetSignedUrl } from "@/hooks/use-signed-url";
-import { deleteAssetAction } from "@/lib/studio/actions";
-import type { StudioAsset, StudioAssetType } from "@/lib/studio/types";
 import { format } from "date-fns";
 import {
   Download,
@@ -28,6 +14,20 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAssetSignedUrl } from "@/hooks/use-signed-url";
+import { deleteAssetAction } from "@/lib/studio/actions";
+import type { StudioAsset, StudioAssetType } from "@/lib/studio/types";
 import { AssetDetailDialog } from "./asset-detail-dialog";
 import { UploadAssetDialog } from "./upload-asset-dialog";
 
@@ -38,10 +38,7 @@ interface AssetGalleryProps {
 
 type ViewMode = "grid" | "list";
 
-export function AssetGallery({
-  assets,
-  projectId,
-}: AssetGalleryProps) {
+export function AssetGallery({ assets, projectId }: AssetGalleryProps) {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [search, setSearch] = useState("");
@@ -56,8 +53,7 @@ export function AssetGallery({
   // Filter assets
   const filteredAssets = assets.filter((asset) => {
     const matchesSearch =
-      !search ||
-      asset.name.toLowerCase().includes(search.toLowerCase());
+      !search || asset.name.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === "all" || asset.type === typeFilter;
     return matchesSearch && matchesType;
   });
@@ -166,10 +162,10 @@ export function AssetGallery({
   if (assets.length === 0) {
     return (
       <>
-        <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-lg">
-          <Upload className="h-12 w-12 text-muted-foreground mb-3" />
-          <h3 className="text-lg font-semibold mb-1">No assets yet</h3>
-          <p className="text-sm text-muted-foreground max-w-sm mb-4">
+        <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-12 text-center">
+          <Upload className="mb-3 h-12 w-12 text-muted-foreground" />
+          <h3 className="mb-1 font-semibold text-lg">No assets yet</h3>
+          <p className="mb-4 max-w-sm text-muted-foreground text-sm">
             Generate content or upload files to see them here
           </p>
           <Button onClick={() => setUploadDialogOpen(true)}>
@@ -179,9 +175,9 @@ export function AssetGallery({
         </div>
 
         <UploadAssetDialog
-          open={uploadDialogOpen}
           onOpenChange={setUploadDialogOpen}
           onUploadComplete={handleUploadComplete}
+          open={uploadDialogOpen}
           projectId={projectId}
         />
       </>
@@ -194,21 +190,21 @@ export function AssetGallery({
       <div className="flex items-center gap-3">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
           <Input
+            className="pl-9"
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search assets..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
           />
         </div>
 
         {/* Type Filter */}
         <Select
-          value={typeFilter}
           onValueChange={(value) =>
             setTypeFilter(value as StudioAssetType | "all")
           }
+          value={typeFilter}
         >
           <SelectTrigger className="w-32">
             <SelectValue />
@@ -222,20 +218,20 @@ export function AssetGallery({
         </Select>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center border rounded-lg">
+        <div className="flex items-center rounded-lg border">
           <Button
-            variant={viewMode === "grid" ? "secondary" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("grid")}
             className="rounded-r-none"
+            onClick={() => setViewMode("grid")}
+            size="sm"
+            variant={viewMode === "grid" ? "secondary" : "ghost"}
           >
             <Grid3x3 className="h-4 w-4" />
           </Button>
           <Button
-            variant={viewMode === "list" ? "secondary" : "ghost"}
-            size="sm"
-            onClick={() => setViewMode("list")}
             className="rounded-l-none"
+            onClick={() => setViewMode("list")}
+            size="sm"
+            variant={viewMode === "list" ? "secondary" : "ghost"}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -244,9 +240,9 @@ export function AssetGallery({
         {/* Selection Mode Toggle */}
         {!selectionMode && (
           <Button
-            variant="outline"
             onClick={() => setSelectionMode(true)}
             size="sm"
+            variant="outline"
           >
             Select
           </Button>
@@ -261,44 +257,44 @@ export function AssetGallery({
 
       {/* Selection Mode Toolbar */}
       {selectionMode && (
-        <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
+        <div className="flex items-center justify-between rounded-lg border bg-muted/50 p-3">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium">
+            <span className="font-medium text-sm">
               {selectedAssets.size} selected
             </span>
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={selectAll}
               disabled={selectedAssets.size === filteredAssets.length}
+              onClick={selectAll}
+              size="sm"
+              variant="ghost"
             >
               Select All
             </Button>
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={deselectAll}
               disabled={selectedAssets.size === 0}
+              onClick={deselectAll}
+              size="sm"
+              variant="ghost"
             >
               Deselect All
             </Button>
           </div>
           <div className="flex items-center gap-2">
             <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleBulkDelete}
               disabled={selectedAssets.size === 0 || isDeleting}
+              onClick={handleBulkDelete}
+              size="sm"
+              variant="destructive"
             >
               {isDeleting ? "Deleting..." : `Delete (${selectedAssets.size})`}
             </Button>
             <Button
-              variant="outline"
-              size="sm"
               onClick={() => {
                 setSelectionMode(false);
                 setSelectedAssets(new Set());
               }}
+              size="sm"
+              variant="outline"
             >
               Cancel
             </Button>
@@ -307,27 +303,28 @@ export function AssetGallery({
       )}
 
       {/* Asset Count */}
-      <div className="text-sm text-muted-foreground">
-        {filteredAssets.length} {filteredAssets.length === 1 ? "asset" : "assets"}
+      <div className="text-muted-foreground text-sm">
+        {filteredAssets.length}{" "}
+        {filteredAssets.length === 1 ? "asset" : "assets"}
       </div>
 
       {/* Assets */}
       {filteredAssets.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Search className="h-12 w-12 text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground">
+          <Search className="mb-3 h-12 w-12 text-muted-foreground" />
+          <p className="text-muted-foreground text-sm">
             No assets found matching your filters
           </p>
         </div>
       ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {filteredAssets.map((asset) => (
             <AssetCard
-              key={asset.id}
               asset={asset}
+              isSelected={selectedAssets.has(asset.id)}
+              key={asset.id}
               onClick={() => handleAssetClick(asset)}
               selectionMode={selectionMode}
-              isSelected={selectedAssets.has(asset.id)}
             />
           ))}
         </div>
@@ -335,11 +332,11 @@ export function AssetGallery({
         <div className="space-y-2">
           {filteredAssets.map((asset) => (
             <AssetListItem
-              key={asset.id}
               asset={asset}
+              isSelected={selectedAssets.has(asset.id)}
+              key={asset.id}
               onClick={() => handleAssetClick(asset)}
               selectionMode={selectionMode}
-              isSelected={selectedAssets.has(asset.id)}
             />
           ))}
         </div>
@@ -347,16 +344,16 @@ export function AssetGallery({
 
       {/* Dialogs */}
       <AssetDetailDialog
-        open={detailDialogOpen}
-        onOpenChange={setDetailDialogOpen}
         asset={selectedAsset}
         onDelete={handleDelete}
+        onOpenChange={setDetailDialogOpen}
+        open={detailDialogOpen}
       />
 
       <UploadAssetDialog
-        open={uploadDialogOpen}
         onOpenChange={setUploadDialogOpen}
         onUploadComplete={handleUploadComplete}
+        open={uploadDialogOpen}
         projectId={projectId}
       />
     </div>
@@ -382,7 +379,7 @@ function AssetCard({
 
   return (
     <Card
-      className={`group cursor-pointer bg-background border-thin transition-all ${
+      className={`group cursor-pointer border-thin bg-background transition-all ${
         isSelected
           ? "border-primary ring-2 ring-primary ring-offset-2"
           : "border-border hover:border-foreground/50"
@@ -391,19 +388,19 @@ function AssetCard({
       <CardContent className="p-0">
         {/* Thumbnail */}
         <div
-          className="relative aspect-video bg-muted/30 flex items-center justify-center overflow-hidden"
+          className="relative flex aspect-video items-center justify-center overflow-hidden bg-muted/30"
           onClick={onClick}
         >
           {!loading && signedUrl ? (
             <img
-              src={signedUrl}
               alt={asset.name}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
               loading="lazy"
+              src={signedUrl}
             />
           ) : loading ? (
             <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             </div>
           ) : (
             <Icon className="h-7 w-7 text-muted-foreground/60" />
@@ -413,28 +410,30 @@ function AssetCard({
           {selectionMode && (
             <div
               className={`absolute inset-0 flex items-center justify-center transition-colors ${
-                isSelected ? "bg-primary/20" : "bg-background/0 hover:bg-background/10"
+                isSelected
+                  ? "bg-primary/20"
+                  : "bg-background/0 hover:bg-background/10"
               }`}
             >
               <div
-                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${
+                className={`flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all ${
                   isSelected
-                    ? "bg-primary border-primary"
-                    : "bg-background border-border"
+                    ? "border-primary bg-primary"
+                    : "border-border bg-background"
                 }`}
               >
                 {isSelected && (
                   <svg
-                    className="w-5 h-5 text-primary-foreground"
+                    className="h-5 w-5 text-primary-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
                     <path
+                      d="M5 13l4 4L19 7"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M5 13l4 4L19 7"
                     />
                   </svg>
                 )}
@@ -444,11 +443,11 @@ function AssetCard({
 
           {/* Hover Overlay (only when not in selection mode) */}
           {!selectionMode && (
-            <div className="absolute inset-0 bg-background/90 opacity-0 group-hover:opacity-100 transition-smooth flex items-center justify-center gap-2">
-              <Button size="sm" variant="secondary" className="shadow-md">
+            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-background/90 opacity-0 transition-smooth group-hover:opacity-100">
+              <Button className="shadow-md" size="sm" variant="secondary">
                 <ExternalLink className="h-3 w-3" />
               </Button>
-              <Button size="sm" variant="secondary" className="shadow-md">
+              <Button className="shadow-md" size="sm" variant="secondary">
                 <Download className="h-3 w-3" />
               </Button>
             </div>
@@ -456,7 +455,7 @@ function AssetCard({
 
           {/* Type Badge */}
           <Badge
-            className="absolute top-2 right-2 bg-card border-thin border-border text-xs px-1.5 py-0"
+            className="absolute top-2 right-2 border-border border-thin bg-card px-1.5 py-0 text-xs"
             variant={isVideo ? "default" : "secondary"}
           >
             {asset.type}
@@ -464,9 +463,9 @@ function AssetCard({
         </div>
 
         {/* Info */}
-        <div className="p-3 space-y-0.5">
-          <h4 className="font-medium text-sm truncate">{asset.name}</h4>
-          <div className="flex items-center justify-between text-xs text-muted-foreground/70">
+        <div className="space-y-0.5 p-3">
+          <h4 className="truncate font-medium text-sm">{asset.name}</h4>
+          <div className="flex items-center justify-between text-muted-foreground/70 text-xs">
             <span>{format(asset.createdAt, "MMM d, yyyy")}</span>
             {asset.metadata.size && (
               <span>{formatBytes(asset.metadata.size)}</span>
@@ -509,24 +508,24 @@ function AssetListItem({
           {/* Selection Checkbox */}
           {selectionMode && (
             <div
-              className={`shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
                 isSelected
-                  ? "bg-primary border-primary"
-                  : "bg-background border-border"
+                  ? "border-primary bg-primary"
+                  : "border-border bg-background"
               }`}
             >
               {isSelected && (
                 <svg
-                  className="w-5 h-5 text-primary-foreground"
+                  className="h-5 w-5 text-primary-foreground"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path
+                    d="M5 13l4 4L19 7"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M5 13l4 4L19 7"
                   />
                 </svg>
               )}
@@ -534,25 +533,25 @@ function AssetListItem({
           )}
 
           {/* Thumbnail */}
-          <div className="shrink-0 w-20 h-20 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
             {!loading && signedUrl ? (
               <img
-                src={signedUrl}
                 alt={asset.name}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
                 loading="lazy"
+                src={signedUrl}
               />
             ) : loading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             ) : (
               <Icon className="h-6 w-6 text-muted-foreground" />
             )}
           </div>
 
           {/* Info */}
-          <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-sm truncate mb-1">{asset.name}</h4>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="min-w-0 flex-1">
+            <h4 className="mb-1 truncate font-medium text-sm">{asset.name}</h4>
+            <div className="flex items-center gap-3 text-muted-foreground text-xs">
               <Badge variant={isVideo ? "default" : "secondary"}>
                 {asset.type}
               </Badge>
@@ -572,25 +571,25 @@ function AssetListItem({
           {!selectionMode && (
             <div className="flex items-center gap-2">
               <Button
-                size="sm"
-                variant="outline"
                 onClick={(e) => {
                   e.stopPropagation();
                   window.open(asset.url, "_blank");
                 }}
+                size="sm"
+                variant="outline"
               >
-                <ExternalLink className="h-3 w-3 mr-1" />
+                <ExternalLink className="mr-1 h-3 w-3" />
                 View
               </Button>
               <Button
-                size="sm"
-                variant="outline"
                 onClick={(e) => {
                   e.stopPropagation();
                   window.open(asset.url, "_blank");
                 }}
+                size="sm"
+                variant="outline"
               >
-                <Download className="h-3 w-3 mr-1" />
+                <Download className="mr-1 h-3 w-3" />
                 Download
               </Button>
             </div>

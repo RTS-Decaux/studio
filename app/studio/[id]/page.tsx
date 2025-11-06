@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { ProjectStudio } from "@/components/studio/project-studio";
 import { StudioHeader } from "@/components/studio/studio-header";
 import {
@@ -5,10 +6,9 @@ import {
   getProjectAssetsAction,
   getProjectGenerationsAction,
 } from "@/lib/studio/actions";
-import { notFound } from "next/navigation";
 
-export default async function ProjectPage(props: { 
-  params: Promise<{ id: string }> 
+export default async function ProjectPage(props: {
+  params: Promise<{ id: string }>;
 }) {
   const params = await props.params;
   const { id } = params;
@@ -21,14 +21,14 @@ export default async function ProjectPage(props: {
     ]);
 
     return (
-      <div className="flex flex-col h-full">
-        <StudioHeader title={project.title} showNewButton={false} />
+      <div className="flex h-full flex-col">
+        <StudioHeader showNewButton={false} title={project.title} />
 
         <main className="flex-1 overflow-hidden">
           <ProjectStudio
-            project={project}
             initialAssets={assets}
             initialGenerations={generations}
+            project={project}
           />
         </main>
       </div>

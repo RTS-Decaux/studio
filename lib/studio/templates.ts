@@ -8,7 +8,14 @@ export type PromptTemplate = {
   id: string;
   name: string;
   description: string;
-  category: "photography" | "art" | "cinematic" | "anime" | "3d" | "abstract" | "product";
+  category:
+    | "photography"
+    | "art"
+    | "cinematic"
+    | "anime"
+    | "3d"
+    | "abstract"
+    | "product";
   prompt: string;
   negativePrompt: string;
   generationType: StudioGenerationType[];
@@ -24,8 +31,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Professional Portrait",
     description: "High-quality professional portrait photography",
     category: "photography",
-    prompt: "Professional headshot portrait of [subject], studio lighting, shallow depth of field, neutral background, sharp focus, Canon EOS R5, 85mm f/1.4, bokeh effect, high detail, 8K quality",
-    negativePrompt: "blurry, distorted, low quality, overexposed, underexposed, noisy, amateur, snapshot, bad lighting, cluttered background",
+    prompt:
+      "Professional headshot portrait of [subject], studio lighting, shallow depth of field, neutral background, sharp focus, Canon EOS R5, 85mm f/1.4, bokeh effect, high detail, 8K quality",
+    negativePrompt:
+      "blurry, distorted, low quality, overexposed, underexposed, noisy, amateur, snapshot, bad lighting, cluttered background",
     generationType: ["text-to-image", "image-to-image"],
     tags: ["portrait", "professional", "studio", "photography"],
     examples: ["business person", "actor", "model"],
@@ -35,8 +44,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Landscape Photography",
     description: "Stunning landscape photography with dramatic lighting",
     category: "photography",
-    prompt: "[location] landscape at golden hour, dramatic clouds, vivid colors, wide angle, professional photography, HDR, award-winning composition, foreground interest, leading lines, rule of thirds, 8K resolution",
-    negativePrompt: "people, buildings, cars, urban, overprocessed, oversaturated, fake, cartoon, low quality, blurry",
+    prompt:
+      "[location] landscape at golden hour, dramatic clouds, vivid colors, wide angle, professional photography, HDR, award-winning composition, foreground interest, leading lines, rule of thirds, 8K resolution",
+    negativePrompt:
+      "people, buildings, cars, urban, overprocessed, oversaturated, fake, cartoon, low quality, blurry",
     generationType: ["text-to-image"],
     tags: ["landscape", "nature", "scenic", "photography"],
     examples: ["mountain range", "ocean sunset", "forest"],
@@ -46,8 +57,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Product Photography",
     description: "Clean professional product shots",
     category: "product",
-    prompt: "[product] on white background, studio lighting, professional product photography, high resolution, sharp focus, clean shadows, commercial quality, minimalist composition, perfect lighting, 8K",
-    negativePrompt: "cluttered, messy background, poor lighting, blurry, distorted, reflections, low quality, amateur",
+    prompt:
+      "[product] on white background, studio lighting, professional product photography, high resolution, sharp focus, clean shadows, commercial quality, minimalist composition, perfect lighting, 8K",
+    negativePrompt:
+      "cluttered, messy background, poor lighting, blurry, distorted, reflections, low quality, amateur",
     generationType: ["text-to-image", "image-to-image"],
     tags: ["product", "commercial", "e-commerce", "clean"],
     examples: ["luxury watch", "smartphone", "perfume bottle"],
@@ -59,8 +72,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Cinematic Scene",
     description: "Movie-quality cinematic composition",
     category: "cinematic",
-    prompt: "[scene description], cinematic composition, dramatic lighting, film grain, anamorphic lens, color grading, depth of field, atmospheric, movie still, ARRI Alexa, 2.39:1 aspect ratio, professional cinematography",
-    negativePrompt: "flat lighting, amateur, snapshot, poor composition, oversaturated, low quality, blurry, distorted",
+    prompt:
+      "[scene description], cinematic composition, dramatic lighting, film grain, anamorphic lens, color grading, depth of field, atmospheric, movie still, ARRI Alexa, 2.39:1 aspect ratio, professional cinematography",
+    negativePrompt:
+      "flat lighting, amateur, snapshot, poor composition, oversaturated, low quality, blurry, distorted",
     generationType: ["text-to-image", "text-to-video", "image-to-video"],
     tags: ["cinematic", "movie", "dramatic", "film"],
     examples: ["dystopian city", "spaceship interior", "ancient temple"],
@@ -70,8 +85,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Cinematic Character",
     description: "Epic character portrait in cinematic style",
     category: "cinematic",
-    prompt: "Epic [character] portrait, cinematic lighting, dramatic atmosphere, heroic pose, detailed costume, photorealistic, movie poster quality, rim lighting, volumetric fog, 8K, professional",
-    negativePrompt: "cartoon, anime, low quality, blurry, amateur, flat lighting, bad anatomy, distorted",
+    prompt:
+      "Epic [character] portrait, cinematic lighting, dramatic atmosphere, heroic pose, detailed costume, photorealistic, movie poster quality, rim lighting, volumetric fog, 8K, professional",
+    negativePrompt:
+      "cartoon, anime, low quality, blurry, amateur, flat lighting, bad anatomy, distorted",
     generationType: ["text-to-image"],
     tags: ["character", "portrait", "epic", "heroic"],
     examples: ["warrior", "wizard", "cyberpunk hacker"],
@@ -83,8 +100,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Oil Painting",
     description: "Classical oil painting style",
     category: "art",
-    prompt: "[subject], oil painting, classical art style, rich colors, visible brush strokes, Renaissance inspired, museum quality, masterpiece, detailed, warm color palette, artistic lighting",
-    negativePrompt: "photograph, digital, modern, flat, cartoon, low detail, amateur, blurry",
+    prompt:
+      "[subject], oil painting, classical art style, rich colors, visible brush strokes, Renaissance inspired, museum quality, masterpiece, detailed, warm color palette, artistic lighting",
+    negativePrompt:
+      "photograph, digital, modern, flat, cartoon, low detail, amateur, blurry",
     generationType: ["text-to-image", "image-to-image"],
     tags: ["painting", "classical", "art", "traditional"],
     examples: ["still life", "landscape", "portrait"],
@@ -94,8 +113,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Watercolor Art",
     description: "Delicate watercolor painting style",
     category: "art",
-    prompt: "[subject], watercolor painting, soft edges, flowing colors, artistic, delicate, light and airy, paper texture, translucent layers, organic, painterly style",
-    negativePrompt: "photograph, digital, harsh, solid colors, sharp edges, low quality",
+    prompt:
+      "[subject], watercolor painting, soft edges, flowing colors, artistic, delicate, light and airy, paper texture, translucent layers, organic, painterly style",
+    negativePrompt:
+      "photograph, digital, harsh, solid colors, sharp edges, low quality",
     generationType: ["text-to-image", "image-to-image"],
     tags: ["watercolor", "painting", "soft", "artistic"],
     examples: ["flowers", "landscape", "animals"],
@@ -105,8 +126,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Impressionist",
     description: "Impressionist painting style",
     category: "art",
-    prompt: "[subject], impressionist painting style, loose brushwork, visible strokes, emphasis on light, vibrant colors, outdoor scene, Monet inspired, artistic interpretation, atmospheric",
-    negativePrompt: "photograph, realistic, detailed, sharp, digital, modern, low quality",
+    prompt:
+      "[subject], impressionist painting style, loose brushwork, visible strokes, emphasis on light, vibrant colors, outdoor scene, Monet inspired, artistic interpretation, atmospheric",
+    negativePrompt:
+      "photograph, realistic, detailed, sharp, digital, modern, low quality",
     generationType: ["text-to-image", "image-to-image"],
     tags: ["impressionist", "painting", "artistic", "monet"],
     examples: ["garden", "water lilies", "sunset"],
@@ -118,8 +141,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Anime Character",
     description: "High-quality anime character art",
     category: "anime",
-    prompt: "[character description], anime style, detailed eyes, cel shading, vibrant colors, clean lines, professional anime art, dynamic pose, detailed clothing, manga style, high quality",
-    negativePrompt: "realistic, photograph, western cartoon, low quality, blurry, distorted anatomy, bad proportions",
+    prompt:
+      "[character description], anime style, detailed eyes, cel shading, vibrant colors, clean lines, professional anime art, dynamic pose, detailed clothing, manga style, high quality",
+    negativePrompt:
+      "realistic, photograph, western cartoon, low quality, blurry, distorted anatomy, bad proportions",
     generationType: ["text-to-image", "image-to-image"],
     tags: ["anime", "manga", "character", "japanese"],
     examples: ["warrior", "magical girl", "school student"],
@@ -129,8 +154,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Anime Scene",
     description: "Beautiful anime background and scene",
     category: "anime",
-    prompt: "[scene description], anime background art, detailed scenery, vibrant colors, Studio Ghibli inspired, atmospheric lighting, beautiful composition, high quality anime art, detailed environment",
-    negativePrompt: "realistic, photograph, low detail, blurry, poor composition, dull colors",
+    prompt:
+      "[scene description], anime background art, detailed scenery, vibrant colors, Studio Ghibli inspired, atmospheric lighting, beautiful composition, high quality anime art, detailed environment",
+    negativePrompt:
+      "realistic, photograph, low detail, blurry, poor composition, dull colors",
     generationType: ["text-to-image"],
     tags: ["anime", "background", "scenery", "ghibli"],
     examples: ["fantasy forest", "city street", "magical library"],
@@ -142,8 +169,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "3D Render",
     description: "Professional 3D render quality",
     category: "3d",
-    prompt: "[subject], professional 3D render, octane render, ray tracing, photorealistic materials, perfect lighting, clean composition, high detail, 8K resolution, studio setup, realistic textures",
-    negativePrompt: "2D, flat, cartoon, low poly, low quality, blurry, amateur, bad materials",
+    prompt:
+      "[subject], professional 3D render, octane render, ray tracing, photorealistic materials, perfect lighting, clean composition, high detail, 8K resolution, studio setup, realistic textures",
+    negativePrompt:
+      "2D, flat, cartoon, low poly, low quality, blurry, amateur, bad materials",
     generationType: ["text-to-image"],
     tags: ["3d", "render", "cgi", "octane"],
     examples: ["product", "character", "architecture"],
@@ -153,8 +182,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Stylized 3D",
     description: "Colorful stylized 3D art",
     category: "3d",
-    prompt: "[subject], stylized 3D art, vibrant colors, clean shapes, playful design, smooth surfaces, ambient occlusion, cartoon-like but detailed, professional 3D illustration, appealing aesthetics",
-    negativePrompt: "realistic, photograph, low quality, messy, dark, gritty, complex",
+    prompt:
+      "[subject], stylized 3D art, vibrant colors, clean shapes, playful design, smooth surfaces, ambient occlusion, cartoon-like but detailed, professional 3D illustration, appealing aesthetics",
+    negativePrompt:
+      "realistic, photograph, low quality, messy, dark, gritty, complex",
     generationType: ["text-to-image"],
     tags: ["3d", "stylized", "colorful", "cartoon"],
     examples: ["character", "scene", "object"],
@@ -166,8 +197,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Modern Abstract",
     description: "Contemporary abstract art",
     category: "abstract",
-    prompt: "[concept], abstract art, modern, vibrant colors, geometric shapes, fluid forms, contemporary design, artistic composition, bold colors, creative, expressive",
-    negativePrompt: "realistic, photograph, representational, low quality, muddy colors, cluttered",
+    prompt:
+      "[concept], abstract art, modern, vibrant colors, geometric shapes, fluid forms, contemporary design, artistic composition, bold colors, creative, expressive",
+    negativePrompt:
+      "realistic, photograph, representational, low quality, muddy colors, cluttered",
     generationType: ["text-to-image"],
     tags: ["abstract", "modern", "artistic", "contemporary"],
     examples: ["emotion", "concept", "pattern"],
@@ -179,8 +212,10 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Smooth Camera Motion",
     description: "Cinematic camera movements",
     category: "cinematic",
-    prompt: "[scene], smooth camera movement, cinematic shot, professional cinematography, steady cam, fluid motion, dynamic angle, establishing shot, film quality",
-    negativePrompt: "shaky, jerky, amateur, poor framing, unstable, low quality",
+    prompt:
+      "[scene], smooth camera movement, cinematic shot, professional cinematography, steady cam, fluid motion, dynamic angle, establishing shot, film quality",
+    negativePrompt:
+      "shaky, jerky, amateur, poor framing, unstable, low quality",
     generationType: ["text-to-video", "image-to-video"],
     tags: ["video", "camera", "motion", "cinematic"],
     examples: ["flyover", "dolly shot", "crane shot"],
@@ -190,7 +225,8 @@ export const PROMPT_TEMPLATES: PromptTemplate[] = [
     name: "Time Lapse Effect",
     description: "Accelerated time passage",
     category: "cinematic",
-    prompt: "[scene] time lapse, clouds moving fast, light changing, dynamic transformation, smooth acceleration, professional time lapse photography, dramatic sky",
+    prompt:
+      "[scene] time lapse, clouds moving fast, light changing, dynamic transformation, smooth acceleration, professional time lapse photography, dramatic sky",
     negativePrompt: "static, still, no motion, jerky, low quality, amateur",
     generationType: ["text-to-video", "image-to-video"],
     tags: ["video", "timelapse", "motion", "transformation"],
@@ -411,7 +447,8 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
       steps: 28,
       guidance: 6,
     },
-    promptTemplate: "[creative concept], experimental, unique, innovative, artistic interpretation",
+    promptTemplate:
+      "[creative concept], experimental, unique, innovative, artistic interpretation",
     negativePromptTemplate: "conventional, boring, standard, typical",
     tags: ["experimental", "creative", "unique", "ai"],
   },
@@ -429,11 +466,15 @@ export function getTemplateById(id: string): PromptTemplate | undefined {
   return PROMPT_TEMPLATES.find((t) => t.id === id);
 }
 
-export function getProjectTemplatesByCategory(category: string): ProjectTemplate[] {
+export function getProjectTemplatesByCategory(
+  category: string
+): ProjectTemplate[] {
   return PROJECT_TEMPLATES.filter((t) => t.category === category);
 }
 
-export function getProjectTemplateById(id: string): ProjectTemplate | undefined {
+export function getProjectTemplateById(
+  id: string
+): ProjectTemplate | undefined {
   return PROJECT_TEMPLATES.find((t) => t.id === id);
 }
 
@@ -450,7 +491,9 @@ export function searchTemplates(query: string): PromptTemplate[] {
 export function getTemplatesByGenerationType(
   generationType: StudioGenerationType
 ): PromptTemplate[] {
-  return PROMPT_TEMPLATES.filter((t) => t.generationType.includes(generationType));
+  return PROMPT_TEMPLATES.filter((t) =>
+    t.generationType.includes(generationType)
+  );
 }
 
 // Template categories for UI

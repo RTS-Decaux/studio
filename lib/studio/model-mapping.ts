@@ -4,23 +4,29 @@ import type { ModelModalityMapping, StudioGenerationType } from "./types";
 /**
  * Определяет тип генерации на основе характеристик модели
  */
-export function inferGenerationType(model: FalStudioModel): StudioGenerationType[] {
+export function inferGenerationType(
+  model: FalStudioModel
+): StudioGenerationType[] {
   const types: StudioGenerationType[] = [];
 
   // Проверяем поддержку различных модальностей
   const modelId = model.id.toLowerCase();
   const description = model.description.toLowerCase();
-  const hasImageInput = model.supportsImageInput || model.requiresReferenceImage;
+  const hasImageInput =
+    model.supportsImageInput || model.requiresReferenceImage;
   const hasVideoInput = model.supportsVideoInput;
   const requiresFirstLastFrame = model.requiredInputs?.includes("first-frame");
-  const requiresReferenceVideo = model.requiredInputs?.includes("reference-video");
+  const requiresReferenceVideo =
+    model.requiredInputs?.includes("reference-video");
 
   // Text-to-Image
   if (
     model.type === "image" &&
     !hasImageInput &&
     !hasVideoInput &&
-    (modelId.includes("text-to-image") || modelId.includes("flux") || modelId.includes("sdxl"))
+    (modelId.includes("text-to-image") ||
+      modelId.includes("flux") ||
+      modelId.includes("sdxl"))
   ) {
     types.push("text-to-image");
   }
@@ -32,7 +38,9 @@ export function inferGenerationType(model: FalStudioModel): StudioGenerationType
     !hasVideoInput &&
     !requiresFirstLastFrame &&
     !requiresReferenceVideo &&
-    (modelId.includes("text-to-video") || description.includes("text-to-video") || !model.requiresReferenceImage)
+    (modelId.includes("text-to-video") ||
+      description.includes("text-to-video") ||
+      !model.requiresReferenceImage)
   ) {
     types.push("text-to-video");
   }
@@ -64,7 +72,9 @@ export function inferGenerationType(model: FalStudioModel): StudioGenerationType
   if (
     model.type === "video" &&
     (hasVideoInput || requiresReferenceVideo) &&
-    (modelId.includes("video-to-video") || modelId.includes("remix") || description.includes("video-to-video"))
+    (modelId.includes("video-to-video") ||
+      modelId.includes("remix") ||
+      description.includes("video-to-video"))
   ) {
     types.push("video-to-video");
   }
@@ -119,7 +129,9 @@ export function createModelModalityMapping(): ModelModalityMapping {
 /**
  * Получает модели для конкретного типа генерации
  */
-export function getModelsByGenerationType(type: StudioGenerationType): FalStudioModel[] {
+export function getModelsByGenerationType(
+  type: StudioGenerationType
+): FalStudioModel[] {
   const mapping = createModelModalityMapping();
   return mapping[type] || [];
 }
@@ -134,19 +146,29 @@ export function getModelById(modelId: string): FalStudioModel | undefined {
 /**
  * Получает рекомендуемые модели для типа генерации
  */
-export function getRecommendedModels(type: StudioGenerationType, limit = 5): FalStudioModel[] {
+export function getRecommendedModels(
+  type: StudioGenerationType,
+  limit = 5
+): FalStudioModel[] {
   const models = getModelsByGenerationType(type);
 
   // Приоритеты для рекомендаций
   const priorities = {
-    "text-to-image": ["fal-ai/flux/dev", "fal-ai/flux/ultra", "fal-ai/flux/realism"],
+    "text-to-image": [
+      "fal-ai/flux/dev",
+      "fal-ai/flux/ultra",
+      "fal-ai/flux/realism",
+    ],
     "text-to-video": [
       "veo3.1",
       "sora-2/text-to-video",
       "fal-ai/runway-gen3/turbo",
       "fal-ai/mochi/mochi-1",
     ],
-    "image-to-image": ["flux-kontext-lora/image-to-image", "flux-pro/kontext/image-to-image"],
+    "image-to-image": [
+      "flux-kontext-lora/image-to-image",
+      "flux-pro/kontext/image-to-image",
+    ],
     "image-to-video": [
       "veo3.1/image-to-video",
       "sora-2/image-to-video",
@@ -172,7 +194,9 @@ export function getRecommendedModels(type: StudioGenerationType, limit = 5): Fal
 /**
  * Получает все типы генерации, которые поддерживает модель
  */
-export function getModelGenerationTypes(modelId: string): StudioGenerationType[] {
+export function getModelGenerationTypes(
+  modelId: string
+): StudioGenerationType[] {
   const model = getModelById(modelId);
   if (!model) return [];
   return inferGenerationType(model);
