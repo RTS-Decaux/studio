@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createProjectAction } from "@/lib/studio/actions";
+import { showStudioError, showStudioSuccess } from "@/lib/studio/error-handler";
 
 export default function NewProjectPage() {
   const router = useRouter();
@@ -21,7 +22,16 @@ export default function NewProjectPage() {
 
   const handleCreate = async () => {
     if (!title.trim()) {
-      toast.error("Пожалуйста, введите название проекта");
+      toast.error("Title required", {
+        description: "Please enter a project name to continue",
+      });
+      return;
+    }
+
+    if (title.trim().length > 200) {
+      toast.error("Title too long", {
+        description: "Project title must be 200 characters or less",
+      });
       return;
     }
 
@@ -31,11 +41,10 @@ export default function NewProjectPage() {
         title.trim(),
         description.trim() || undefined
       );
-      toast.success("Проект успешно создан");
+      showStudioSuccess("Project created!", `${project.title} is ready to use`);
       router.push(`/studio/${project.id}`);
-    } catch (error) {
-      toast.error("Не удалось создать проект");
-      console.error(error);
+    } catch (error: any) {
+      showStudioError(error, "project");
     } finally {
       setIsCreating(false);
     }

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { ChatSDKError } from "@/lib/errors";
 import { getFalClient } from "@/lib/studio/fal-client";
 import { getModelById } from "@/lib/studio/model-mapping";
 import type {
@@ -51,8 +52,13 @@ export async function getProjectAction(id: string) {
   if (!user) redirect("/login");
 
   const project = await getProjectById(id);
-  if (!project || project.userId !== user.id) {
-    throw new Error("Project not found or access denied");
+  
+  if (!project) {
+    throw new ChatSDKError("not_found:studio_project");
+  }
+  
+  if (project.userId !== user.id) {
+    throw new ChatSDKError("forbidden:studio_project");
   }
 
   return project;
@@ -62,16 +68,31 @@ export async function createProjectAction(title: string, description?: string) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  return await createProject({
-    userId: user.id,
-    title,
-    description: description || null,
-    thumbnail: null,
-    settings: {
-      resolution: { width: 1920, height: 1080 },
-      fps: 30,
-    },
-  });
+  if (!title || title.trim().length === 0) {
+    throw new ChatSDKError("bad_request:studio_project", "Project title is required");
+  }
+
+  if (title.trim().length > 200) {
+    throw new ChatSDKError("bad_request:studio_project", "Project title is too long (max 200 characters)");
+  }
+
+  try {
+    return await createProject({
+      userId: user.id,
+      title: title.trim(),
+      description: description?.trim() || null,
+      thumbnail: null,
+      settings: {
+        resolution: { width: 1920, height: 1080 },
+        fps: 30,
+      },
+    });
+  } catch (error: any) {
+    if (error.message?.includes("rate limit") || error.message?.includes("quota")) {
+      throw new ChatSDKError("rate_limit:studio_project");
+    }
+    throw new ChatSDKError("bad_request:studio_project", error.message);
+  }
 }
 
 export async function updateProjectAction(
@@ -82,11 +103,29 @@ export async function updateProjectAction(
   if (!user) redirect("/login");
 
   const project = await getProjectById(id);
-  if (!project || project.userId !== user.id) {
-    throw new Error("Project not found or access denied");
+  
+  if (!project) {
+    throw new ChatSDKError("not_found:studio_project");
+  }
+  
+  if (project.userId !== user.id) {
+    throw new ChatSDKError("forbidden:studio_project");
   }
 
-  return await updateProject(id, updates);
+  if (updates.title !== undefined) {
+    if (!updates.title || updates.title.trim().length === 0) {
+      throw new ChatSDKError("bad_request:studio_project", "Project title cannot be empty");
+    }
+    if (updates.title.trim().length > 200) {
+      throw new ChatSDKError("bad_request:studio_project", "Project title is too long (max 200 characters)");
+    }
+  }
+
+  try {
+    return await updateProject(id, updates);
+  } catch (error: any) {
+    throw new ChatSDKError("bad_request:studio_project", error.message);
+  }
 }
 
 export async function deleteProjectAction(id: string) {
@@ -94,11 +133,20 @@ export async function deleteProjectAction(id: string) {
   if (!user) redirect("/login");
 
   const project = await getProjectById(id);
-  if (!project || project.userId !== user.id) {
-    throw new Error("Project not found or access denied");
+  
+  if (!project) {
+    throw new ChatSDKError("not_found:studio_project");
+  }
+  
+  if (project.userId !== user.id) {
+    throw new ChatSDKError("forbidden:studio_project");
   }
 
-  await deleteProject(id);
+  try {
+    await deleteProject(id);
+  } catch (error: any) {
+    throw new ChatSDKError("bad_request:studio_project", error.message);
+  }
 }
 
 // ============================================================================
@@ -110,11 +158,20 @@ export async function getProjectAssetsAction(projectId: string) {
   if (!user) redirect("/login");
 
   const project = await getProjectById(projectId);
-  if (!project || project.userId !== user.id) {
-    throw new Error("Project not found or access denied");
+  
+  if (!project) {
+    throw new ChatSDKError("not_found:studio_project");
+  }
+  
+  if (project.userId !== user.id) {
+    throw new ChatSDKError("forbidden:studio_project");
   }
 
-  return await getAssetsByProjectId(projectId);
+  try {
+    return await getAssetsByProjectId(projectId);
+  } catch (error: any) {
+    throw new ChatSDKError("bad_request:studio_asset", error.message);
+  }
 }
 
 export async function getUserAssetsAction() {
@@ -128,8 +185,15 @@ export async function deleteAssetAction(id: string) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  // TODO: Verify asset ownership
-  await deleteAsset(id);
+  // TODO: Verify asset ownership before deletion
+  try {
+    await deleteAsset(id);
+  } catch (error: any) {
+    if (error.message?.includes("not found")) {
+      throw new ChatSDKError("not_found:studio_asset");
+    }
+    throw new ChatSDKError("bad_request:studio_asset", error.message);
+  }
 }
 
 // ============================================================================
@@ -148,11 +212,20 @@ export async function getProjectGenerationsAction(projectId: string) {
   if (!user) redirect("/login");
 
   const project = await getProjectById(projectId);
-  if (!project || project.userId !== user.id) {
-    throw new Error("Project not found or access denied");
+  
+  if (!project) {
+    throw new ChatSDKError("not_found:studio_project");
+  }
+  
+  if (project.userId !== user.id) {
+    throw new ChatSDKError("forbidden:studio_project");
   }
 
-  return await getGenerationsByProjectId(projectId);
+  try {
+    return await getGenerationsByProjectId(projectId);
+  } catch (error: any) {
+    throw new ChatSDKError("bad_request:studio_generation", error.message);
+  }
 }
 
 /**
@@ -167,41 +240,72 @@ export async function generateAction(
   // Валидация модели
   const model = getModelById(request.modelId);
   if (!model) {
-    throw new Error(`Model not found: ${request.modelId}`);
+    throw new ChatSDKError("not_found:fal_api", `Model not found: ${request.modelId}`);
   }
 
-  // Создаём запись в БД
-  const generation = await createGeneration({
-    userId: user.id,
-    projectId: request.projectId || null,
-    modelId: request.modelId,
-    generationType: request.generationType,
-    status: "pending",
-    prompt: request.prompt || null,
-    negativePrompt: request.negativePrompt || null,
-    referenceImageUrl: request.referenceImageUrl || null,
-    firstFrameUrl: request.firstFrameUrl || null,
-    lastFrameUrl: request.lastFrameUrl || null,
-    referenceVideoUrl: request.referenceVideoUrl || null,
-    inputAssetId: request.inputAssetId || null,
-    outputAssetId: null,
-    parameters: request.parameters || {},
-    falRequestId: null,
-    falResponse: null,
-    error: null,
-    cost: null,
-    processingTime: null,
-  });
+  // Валидация prompt для text-to-* моделей
+  if (request.generationType.startsWith("text-to")) {
+    if (!request.prompt || request.prompt.trim().length === 0) {
+      throw new ChatSDKError("bad_request:studio_generation", "Prompt is required for text-to-* generations");
+    }
+    if (request.prompt.trim().length > 10000) {
+      throw new ChatSDKError("bad_request:studio_generation", "Prompt is too long (max 10000 characters)");
+    }
+  }
 
-  // Запускаем фоновую генерацию
-  processGeneration(generation.id, request).catch((error) => {
-    console.error("Background generation failed:", error);
-  });
+  // Валидация проекта если указан
+  if (request.projectId) {
+    const project = await getProjectById(request.projectId);
+    if (!project) {
+      throw new ChatSDKError("not_found:studio_project");
+    }
+    if (project.userId !== user.id) {
+      throw new ChatSDKError("forbidden:studio_project");
+    }
+  }
 
-  return {
-    generationId: generation.id,
-    status: "pending",
-  };
+  try {
+    // Создаём запись в БД
+    const generation = await createGeneration({
+      userId: user.id,
+      projectId: request.projectId || null,
+      modelId: request.modelId,
+      generationType: request.generationType,
+      status: "pending",
+      prompt: request.prompt || null,
+      negativePrompt: request.negativePrompt || null,
+      referenceImageUrl: request.referenceImageUrl || null,
+      firstFrameUrl: request.firstFrameUrl || null,
+      lastFrameUrl: request.lastFrameUrl || null,
+      referenceVideoUrl: request.referenceVideoUrl || null,
+      inputAssetId: request.inputAssetId || null,
+      outputAssetId: null,
+      parameters: request.parameters || {},
+      falRequestId: null,
+      falResponse: null,
+      error: null,
+      cost: null,
+      processingTime: null,
+    });
+
+    // Запускаем фоновую генерацию
+    processGeneration(generation.id, request).catch((error) => {
+      console.error("Background generation failed:", error);
+    });
+
+    return {
+      generationId: generation.id,
+      status: "pending",
+    };
+  } catch (error: any) {
+    if (error instanceof ChatSDKError) {
+      throw error;
+    }
+    if (error.message?.includes("rate limit") || error.message?.includes("quota")) {
+      throw new ChatSDKError("rate_limit:studio_generation");
+    }
+    throw new ChatSDKError("bad_request:studio_generation", error.message);
+  }
 }
 
 /**
@@ -230,11 +334,35 @@ async function processGeneration(
 
     // Запускаем генерацию
     const startTime = Date.now();
-    const result = await falClient.run(request.modelId, input, {
-      onProgress: (status) => {
-        console.log(`Generation ${generationId} status:`, status.status);
-      },
-    });
+    let result: any;
+    
+    try {
+      result = await falClient.run(request.modelId, input, {
+        onProgress: (status) => {
+          console.log(`Generation ${generationId} status:`, status.status);
+        },
+      });
+    } catch (falError: any) {
+      // Обрабатываем специфичные ошибки fal.ai
+      let errorMessage = falError.message || "Unknown fal.ai error";
+      
+      if (falError.message?.includes("timeout")) {
+        errorMessage = "Generation timeout - the AI service took too long to respond";
+      } else if (falError.message?.includes("rate limit")) {
+        errorMessage = "AI service rate limit exceeded - please try again later";
+      } else if (falError.message?.includes("authentication") || falError.message?.includes("unauthorized")) {
+        errorMessage = "AI service authentication failed - please contact support";
+      } else if (falError.message?.includes("invalid") || falError.message?.includes("bad request")) {
+        errorMessage = "Invalid generation parameters - please check your inputs";
+      } else if (falError.message?.includes("not found")) {
+        errorMessage = "AI model not found or deprecated";
+      } else if (falError.message?.includes("unavailable") || falError.message?.includes("offline")) {
+        errorMessage = "AI service temporarily unavailable";
+      }
+      
+      throw new Error(errorMessage);
+    }
+    
     const processingTime = Math.floor((Date.now() - startTime) / 1000);
 
     // Получаем URL результата
@@ -262,18 +390,23 @@ async function processGeneration(
     // Создаём asset с результатом
     let outputAssetId: string | null = null;
     if (outputUrl) {
-      const asset = await createAsset({
-        projectId: request.projectId || null,
-        userId: (await getCurrentUser())!.id,
-        type: result.video ? "video" : "image",
-        name: `Generated ${result.video ? "video" : "image"}`,
-        url: outputUrl,
-        thumbnailUrl: result.video ? null : outputUrl,
-        metadata,
-        sourceType: "generated",
-        sourceGenerationId: generationId,
-      });
-      outputAssetId = asset.id;
+      try {
+        const asset = await createAsset({
+          projectId: request.projectId || null,
+          userId: (await getCurrentUser())!.id,
+          type: result.video ? "video" : "image",
+          name: `Generated ${result.video ? "video" : "image"}`,
+          url: outputUrl,
+          thumbnailUrl: result.video ? null : outputUrl,
+          metadata,
+          sourceType: "generated",
+          sourceGenerationId: generationId,
+        });
+        outputAssetId = asset.id;
+      } catch (assetError: any) {
+        console.error(`Failed to create asset for generation ${generationId}:`, assetError);
+        // Продолжаем даже если не удалось создать asset
+      }
     }
 
     // Обновляем генерацию
@@ -286,9 +419,13 @@ async function processGeneration(
     });
   } catch (error: any) {
     console.error(`Generation ${generationId} failed:`, error);
+    
+    // Формируем понятное сообщение об ошибке
+    let errorMessage = error.message || "Unknown error occurred during generation";
+    
     await updateGeneration(generationId, {
       status: "failed",
-      error: error.message || "Unknown error",
+      error: errorMessage,
     });
   }
 }

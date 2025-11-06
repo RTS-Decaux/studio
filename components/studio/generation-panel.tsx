@@ -45,6 +45,7 @@ import type {
   ReferenceInputKind,
 } from "@/lib/ai/studio-models";
 import { generateAction } from "@/lib/studio/actions";
+import { showStudioError, showStudioSuccess } from "@/lib/studio/error-handler";
 import { getModelById, getRecommendedModels } from "@/lib/studio/model-mapping";
 import type { StudioGenerationType } from "@/lib/studio/types";
 import { cn } from "@/lib/utils";
@@ -237,7 +238,10 @@ export function GenerationPanel({
         },
       });
 
-      toast.success("Generation started!");
+      showStudioSuccess(
+        "Generation started!",
+        `Your ${generationType.replace("-", " ")} is being generated`
+      );
       onGenerationStart?.(response.generationId);
 
       // Reset form
@@ -250,8 +254,7 @@ export function GenerationPanel({
         "reference-video": null,
       });
     } catch (error: any) {
-      toast.error(error.message || "Failed to start generation");
-      console.error(error);
+      showStudioError(error, "generation");
     } finally {
       setIsGenerating(false);
     }

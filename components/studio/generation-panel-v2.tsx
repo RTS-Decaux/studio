@@ -26,6 +26,7 @@ import type {
   ReferenceInputKind,
 } from "@/lib/ai/studio-models";
 import { generateAction } from "@/lib/studio/actions";
+import { showStudioError, showStudioSuccess } from "@/lib/studio/error-handler";
 import { getRecommendedModels } from "@/lib/studio/model-mapping";
 import type { ProjectTemplate, PromptTemplate } from "@/lib/studio/templates";
 import type { StudioGenerationType } from "@/lib/studio/types";
@@ -231,17 +232,23 @@ export function GenerationPanelV2({
 
   const handleGenerate = async () => {
     if (!selectedModel) {
-      toast.error("Please select a model");
+      toast.error("Please select a model", {
+        description: "Choose an AI model to start generating",
+      });
       return;
     }
 
     if (needsPrompt && !prompt.trim()) {
-      toast.error("Please enter a prompt");
+      toast.error("Prompt required", {
+        description: "Please describe what you want to generate",
+      });
       return;
     }
 
     if (!hasAllRequiredInputs) {
-      toast.error("Please provide all required inputs for this model");
+      toast.error("Missing required inputs", {
+        description: "Please provide all required reference images/videos",
+      });
       return;
     }
 
@@ -272,7 +279,10 @@ export function GenerationPanelV2({
         },
       });
 
-      toast.success("Generation started!");
+      showStudioSuccess(
+        "Generation started!",
+        `Your ${generationType.replace("-", " ")} is being generated`
+      );
       onGenerationStart?.(response.generationId);
 
       // Reset form
@@ -285,8 +295,7 @@ export function GenerationPanelV2({
         "reference-video": null,
       });
     } catch (error: any) {
-      toast.error(error.message || "Failed to start generation");
-      console.error(error);
+      showStudioError(error, "generation");
     } finally {
       setIsGenerating(false);
     }
@@ -557,8 +566,11 @@ export function GenerationPanelV2({
         <Separator />
         <Accordion collapsible defaultValue="advanced" type="single">
           <AccordionItem className="border-none" value="advanced">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="font-medium text-xs">Advanced Settings</span>
+            <AccordionTrigger className="py-2 hover:no-underline" disabled>
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-xs text-muted-foreground">Advanced Settings</span>
+                <Badge variant="secondary" className="text-[9px] px-1.5 py-0">Coming Soon</Badge>
+              </div>
             </AccordionTrigger>
             <AccordionContent className="space-y-3 pt-1">
               {/* Negative Prompt */}
