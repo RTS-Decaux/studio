@@ -3,12 +3,12 @@
 import { saveChatModelAsCookie, saveProviderAsCookie } from "@/app/(chat)/actions";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ChatModelId } from "@/lib/ai/models";
 import { getConfiguredProviders } from "@/lib/ai/provider-selector";

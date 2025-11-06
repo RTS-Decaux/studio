@@ -336,7 +336,7 @@ function PureMultimodalInput({
         onSubmit={(event) => {
           event.preventDefault();
           if (status !== "ready") {
-            toast.error("Please wait for the model to finish its response!");
+            toast.error("Подождите, пока модель завершит свой ответ!");
           } else {
             submitForm();
           }
@@ -384,7 +384,7 @@ function PureMultimodalInput({
             maxHeight={200}
             minHeight={44}
             onChange={handleInput}
-            placeholder="Ask a question or make a request..."
+            placeholder="Задайте вопрос или сделайте запрос..."
             ref={textareaRef}
             rows={1}
             value={input}

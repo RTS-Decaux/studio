@@ -3,8 +3,9 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { customProvider } from "ai";
 import { isTestEnvironment } from "../constants";
 import {
+  getDefaultProvider,
   type ProviderId,
-  getDefaultProvider, validateProviderConfig
+  validateProviderConfig,
 } from "./provider-selector";
 
 const MODEL_REGISTRY = {
@@ -137,11 +138,15 @@ export const myProvider = isTestEnvironment
   };
 
 export { MODEL_REGISTRY as MODEL_PROVIDER_REGISTRY };
-export type { ProviderId as ModelProviderId, ModelId as RegisteredModelId };
+export type { ModelId as RegisteredModelId, ProviderId as ModelProviderId };
 
 // Re-export provider selector utilities for use in components
-  export {
-    AVAILABLE_PROVIDERS, getConfiguredProviders, getDefaultProvider, getProviderDisplayName,
-    isProviderConfigured, isValidProvider, selectProvider
-  } from "./provider-selector";
-
+export {
+  AVAILABLE_PROVIDERS,
+  getConfiguredProviders,
+  getDefaultProvider,
+  getProviderDisplayName,
+  isProviderConfigured,
+  isValidProvider,
+  selectProvider,
+} from "./provider-selector";

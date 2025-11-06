@@ -21,13 +21,13 @@ import { useMemo, useState } from "react";
 import { ModelCapabilityBadge, ModelRequirementsBadges } from "./model-capability-badge";
 
 const GENERATION_TYPE_LABELS: Record<StudioGenerationType, string> = {
-  "text-to-image": "Text to Image",
-  "text-to-video": "Text to Video",
-  "image-to-image": "Image to Image",
-  "image-to-video": "Image to Video",
-  "video-to-video": "Video to Video",
-  inpaint: "Inpainting",
-  lipsync: "Lip Sync",
+  "text-to-image": "Текст в изображение",
+  "text-to-video": "Текст в видео",
+  "image-to-image": "Изображение в изображение",
+  "image-to-video": "Изображение в видео",
+  "video-to-video": "Видео в видео",
+  inpaint: "Редактирование",
+  lipsync: "Синхронизация губ",
 };
 
 interface ModelSelectorDialogProps {
@@ -161,17 +161,17 @@ export function ModelSelectorDialog({
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                Select Model
+                Выберите модель
               </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground mt-1">
-                Choose a model for{" "}
+                Выберите модель для{" "}
                 <Badge variant="outline" className="ml-1">
                   {GENERATION_TYPE_LABELS[generationType]}
                 </Badge>
               </DialogDescription>
             </div>
             <Badge variant="secondary" className="text-xs">
-              {filteredModels.length} models
+              {filteredModels.length} моделей
             </Badge>
           </div>
         </DialogHeader>
@@ -184,7 +184,7 @@ export function ModelSelectorDialog({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search models by name, creator, or description..."
+              placeholder="Поиск моделей по названию, создателю или описанию..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9"
@@ -198,11 +198,11 @@ export function ModelSelectorDialog({
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="groups" className="text-xs">
                 <Filter className="h-3 w-3 mr-1" />
-                By Creator
+                По создателю
               </TabsTrigger>
               <TabsTrigger value="all" className="text-xs">
                 <Sparkles className="h-3 w-3 mr-1" />
-                All Models
+                Все модели
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -242,7 +242,7 @@ export function ModelSelectorDialog({
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Sparkles className="h-12 w-12 text-muted-foreground mb-3" />
               <p className="text-sm text-muted-foreground">
-                No models found matching "{search}"
+                Модели, соответствующие "{search}", не найдены
               </p>
             </div>
           )}

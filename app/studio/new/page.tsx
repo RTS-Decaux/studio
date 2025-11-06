@@ -21,17 +21,17 @@ export default function NewProjectPage() {
 
   const handleCreate = async () => {
     if (!title.trim()) {
-      toast.error("Please enter a project title");
+      toast.error("Пожалуйста, введите название проекта");
       return;
     }
 
     setIsCreating(true);
     try {
       const project = await createProjectAction(title.trim(), description.trim() || undefined);
-      toast.success("Project created successfully");
+      toast.success("Проект успешно создан");
       router.push(`/studio/${project.id}`);
     } catch (error) {
-      toast.error("Failed to create project");
+      toast.error("Не удалось создать проект");
       console.error(error);
     } finally {
       setIsCreating(false);
@@ -40,7 +40,7 @@ export default function NewProjectPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <StudioHeader title="New Project" showNewButton={false} />
+      <StudioHeader title="Новый проект" showNewButton={false} />
       
       <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8">
         <div className="max-w-2xl mx-auto space-y-6">
@@ -53,15 +53,15 @@ export default function NewProjectPage() {
           >
             <Link href="/studio">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to projects
+              Назад к проектам
             </Link>
           </Button>
 
           {/* Header */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Create new project</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Создать новый проект</h1>
             <p className="text-muted-foreground">
-              Start a new AI Studio project. You can add generations and assets later.
+              Начните новый проект RTS Studio. Вы можете добавить генерации и ресурсы позже.
             </p>
           </div>
 
@@ -70,11 +70,11 @@ export default function NewProjectPage() {
             <CardContent className="p-6 md:p-8 space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-base font-semibold">
-                  Project title <span className="text-destructive">*</span>
+                  Название проекта <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="title"
-                  placeholder="Enter a descriptive name for your project"
+                  placeholder="Введите описательное имя для вашего проекта"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   disabled={isCreating}
@@ -87,17 +87,17 @@ export default function NewProjectPage() {
                   }}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Choose a memorable name that describes your project
+                  Выберите запоминающееся имя, которое описывает ваш проект
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-base font-semibold">
-                  Description <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+                  Описание <span className="text-xs font-normal text-muted-foreground">(необязательно)</span>
                 </Label>
                 <Textarea
                   id="description"
-                  placeholder="Describe what you plan to create in this project..."
+                  placeholder="Опишите, что вы планируете создать в этом проекте..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   disabled={isCreating}
@@ -105,7 +105,7 @@ export default function NewProjectPage() {
                   className="resize-none text-base"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Add notes about your project goals or ideas
+                  Добавьте заметки о целях или идеях проекта
                 </p>
               </div>
 
@@ -116,7 +116,7 @@ export default function NewProjectPage() {
                   disabled={isCreating}
                   className="sm:flex-1"
                 >
-                  Cancel
+                  Отмена
                 </Button>
                 <Button 
                   onClick={handleCreate} 
@@ -125,11 +125,11 @@ export default function NewProjectPage() {
                 >
                   {isCreating ? (
                     <>
-                      <span className="mr-2">Creating...</span>
+                      <span className="mr-2">Создание...</span>
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent" />
                     </>
                   ) : (
-                    "Create project"
+                    "Создать проект"
                   )}
                 </Button>
               </div>

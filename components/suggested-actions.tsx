@@ -27,35 +27,35 @@ function PureSuggestedActions({ chatId, sendMessage }: SuggestedActionsProps) {
   const suggestedActions = [
     {
       icon: Database,
-      text: "Consolidate financial data from all subsidiaries",
+      text: "Консолидировать финансовые данные из всех дочерних компаний",
     },
     {
       icon: FileText,
-      text: "Generate the monthly income statement",
+      text: "Сформировать ежемесячный отчет о прибылях и убытках",
     },
     {
       icon: Calendar,
-      text: "Reconcile the bank accounts for March",
+      text: "Сверить банковские счета за март",
     },
     {
       icon: Globe,
-      text: "Book a journal entry",
+      text: "Записать проводку",
     },
     {
       icon: Target,
-      text: "Provide a 12-month cash flow forecast",
+      text: "Предоставить прогноз движения денежных средств на 12 месяцев",
     },
     {
       icon: BarChart3,
-      text: "Generate the quarterly profit and loss statement",
+      text: "Сформировать квартальный отчет о прибылях и убытках",
     },
     {
       icon: TrendingUp,
-      text: "Show the budget variance for Q1 compared to actuals",
+      text: "Показать отклонение бюджета за 1 квартал по сравнению с фактическими данными",
     },
     {
       icon: PieChart,
-      text: "Create a real-time financial performance dashboard",
+      text: "Создать панель управления финансовой эффективностью в реальном времени",
     },
   ];
 

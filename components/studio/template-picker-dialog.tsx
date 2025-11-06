@@ -83,14 +83,14 @@ export function TemplatePickerDialog({
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                Prompt Templates
+                Шаблоны промптов
               </DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground mt-1">
-                Choose from professionally crafted prompts
+                Выберите из профессионально созданных промптов
               </DialogDescription>
             </div>
             <Badge variant="secondary" className="text-xs">
-              {filteredTemplates.length} templates
+              {filteredTemplates.length} шаблонов
             </Badge>
           </div>
         </DialogHeader>
@@ -102,7 +102,7 @@ export function TemplatePickerDialog({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search templates by name, style, or tags..."
+            placeholder="Поиск шаблонов по названию, стилю или тегам..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -114,7 +114,7 @@ export function TemplatePickerDialog({
           <ScrollArea className="w-full whitespace-nowrap pb-2">
             <TabsList className="inline-flex w-auto">
               <TabsTrigger value="all" className="text-xs">
-                All ({getTemplatesByGenerationType(generationType).length})
+                Все ({getTemplatesByGenerationType(generationType).length})
               </TabsTrigger>
               {categoriesWithCount
                 .filter((cat) => cat.count > 0)
@@ -143,7 +143,7 @@ export function TemplatePickerDialog({
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Sparkles className="h-12 w-12 text-muted-foreground mb-3" />
               <p className="text-sm text-muted-foreground">
-                No templates found matching your search
+                Шаблоны, соответствующие вашему запросу, не найдены
               </p>
             </div>
           )}
@@ -185,7 +185,7 @@ function TemplateCard({
 
       {/* Prompt Preview */}
       <div className="space-y-2">
-        <div className="text-xs font-medium text-foreground/70">Prompt:</div>
+        <div className="text-xs font-medium text-foreground/70">Промпт:</div>
         <div className="text-xs text-muted-foreground line-clamp-3 font-mono bg-muted/30 rounded-lg p-2">
           {template.prompt}
         </div>
@@ -213,7 +213,7 @@ function TemplateCard({
       {template.examples && template.examples.length > 0 && (
         <div className="text-xs text-muted-foreground/70 flex items-center gap-1">
           <Tag className="h-3 w-3" />
-          Try: {template.examples.join(", ")}
+          Попробуйте: {template.examples.join(", ")}
         </div>
       )}
     </button>

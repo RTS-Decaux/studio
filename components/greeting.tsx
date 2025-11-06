@@ -15,7 +15,7 @@ export const Greeting = ({ userName }: { userName?: string }) => {
         initial={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.3 }}
       >
-        Hi, {firstName}
+        Привет, {firstName}
       </motion.div>
       <motion.div
         animate={{ opacity: 1, y: 0 }}
@@ -24,7 +24,7 @@ export const Greeting = ({ userName }: { userName?: string }) => {
         initial={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.4 }}
       >
-        What can I help you with?
+        Чем я могу вам помочь?
       </motion.div>
       <motion.div
         animate={{ opacity: 1, y: 0 }}
@@ -33,7 +33,7 @@ export const Greeting = ({ userName }: { userName?: string }) => {
         initial={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.5 }}
       >
-        Choose a prompt below or write your own to start chatting with Lumina.
+        Выберите промпт ниже или напишите свой, чтобы начать общение с Lumina.
       </motion.div>
     </div>
   );

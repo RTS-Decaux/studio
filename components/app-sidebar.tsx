@@ -40,15 +40,15 @@ export function AppSidebar({
 
   const teams = [
     {
-      name: "Chat",
+      name: "Чат",
       logo: MessageSquare,
-      plan: "Workspace",
+      plan: "Рабочая область",
       url: "/",
     },
     {
-      name: "Studio",
+      name: "Студия",
       logo: Video,
-      plan: "Workspace",
+      plan: "Рабочая область",
       url: "/studio",
     },
   ]
@@ -59,7 +59,7 @@ export function AppSidebar({
     description: model.description,
   }))
 
-  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Guest"
+  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Гость"
   const userEmail = user?.email || ""
 
   return (
@@ -79,10 +79,10 @@ export function AppSidebar({
                 router.push("/")
                 router.refresh()
               }}
-              tooltip="New Chat"
+              tooltip="Новый чат"
             >
               <Plus className="h-4 w-4" />
-              <span>New chat</span>
+              <span>Новый чат</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -91,7 +91,7 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton 
-              tooltip="Search chats"
+              tooltip="Поиск чатов"
               onClick={() => {
                 if (!open) {
                   setOpen(true)
@@ -99,7 +99,7 @@ export function AppSidebar({
               }}
             >
               <Search className="h-4 w-4" />
-              <span className="group-data-[collapsible=icon]:hidden">Search</span>
+              <span className="group-data-[collapsible=icon]:hidden">Поиск</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -108,7 +108,7 @@ export function AppSidebar({
         <div className="group-data-[collapsible=icon]:hidden px-2 pb-2">
           <Input
             type="search"
-            placeholder="Search chats..."
+            placeholder="Поиск чатов..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="h-8"
@@ -120,7 +120,7 @@ export function AppSidebar({
         <NavMain 
           items={[
             {
-              title: "AI Models",
+              title: "Модели ИИ",
               url: "#",
               icon: Bot,
               isActive: false,

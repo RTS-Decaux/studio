@@ -250,16 +250,16 @@ export function Chat({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Enable AI provider billing</AlertDialogTitle>
+            <AlertDialogTitle>Включите биллинг AI-провайдера</AlertDialogTitle>
             <AlertDialogDescription>
-              This application requires{" "}
-              {process.env.NODE_ENV === "production" ? "the owner" : "you"} to
-              enable billing for the configured AI provider.
+              Это приложение требует, чтобы{" "}
+              {process.env.NODE_ENV === "production" ? "владелец" : "вы"} включили
+              биллинг для настроенного AI-провайдера.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Dismiss</AlertDialogCancel>
-            <AlertDialogAction>Close</AlertDialogAction>
+            <AlertDialogCancel>Отклонить</AlertDialogCancel>
+            <AlertDialogAction>Закрыть</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
