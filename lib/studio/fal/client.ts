@@ -1,4 +1,3 @@
-import "server-only";
 
 import type { QueueStatus } from "@fal-ai/client";
 import { fal } from "@fal-ai/client";
