@@ -12,7 +12,7 @@ This application uses Supabase Auth with Row Level Security (RLS) for secure aut
 
    - Email/Password authentication
    - Anonymous (Guest) authentication
-   - OAuth providers (GitHub, Google, GitLab)
+   - OAuth providers (GitHub, Google, GitLab) - ⚠️ **COMING SOON** (temporarily disabled)
    - Session management with secure cookies
 
 2. **Security Features**
@@ -46,21 +46,27 @@ Creates a temporary guest account without email/password.
 GET /api/auth/guest?redirectUrl=/
 ```
 
-#### `/api/auth/oauth` - OAuth Login
+#### `/api/auth/oauth` - OAuth Login ⚠️ **COMING SOON**
+
+> **Status**: Temporarily disabled while OAuth providers are being configured.
 
 Initiates OAuth flow with supported providers.
 
 ```bash
 GET /api/auth/oauth?provider=github&redirectTo=/
 # Supported providers: github, google, gitlab
+# Currently returns 503 Service Unavailable
 ```
 
-#### `/api/auth/callback` - OAuth Callback
+#### `/api/auth/callback` - OAuth Callback ⚠️ **COMING SOON**
+
+> **Status**: Temporarily disabled while OAuth providers are being configured.
 
 Handles OAuth callback and creates session.
 
 ```bash
 GET /api/auth/callback?code=xxx&next=/
+# Currently redirects to login with error message
 ```
 
 #### `/api/auth/convert` - Convert Anonymous to Permanent

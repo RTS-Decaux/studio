@@ -19,7 +19,6 @@ import { fetchModels } from "tokenlens/fetch";
 import { getUsage } from "tokenlens/helpers";
 import type { VisibilityType } from "@/components/visibility-selector";
 import { entitlementsByUserType } from "@/lib/ai/entitlements";
-import { debugToolMessages, filterToolMessages } from "@/lib/ai/message-utils";
 import type { ChatModelId } from "@/lib/ai/models";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { myProvider } from "@/lib/ai/providers";
@@ -139,15 +138,7 @@ export async function POST(request: Request) {
       if (chat.userId !== user.id) {
         return new ChatSDKError("forbidden:chat").toResponse();
       }
-      // Load messages and filter out tool messages
-      // Tool messages are AI SDK artifacts with results already in assistant parts
-      const allMessages = await getMessagesByChatId({ id });
-      messagesFromDb = filterToolMessages(allMessages);
-
-      // Debug: show how many tool messages were filtered
-      if (process.env.NODE_ENV === "development") {
-        debugToolMessages(allMessages);
-      }
+      messagesFromDb = await getMessagesByChatId({ id });
     } else {
       const title = await generateTitleFromUserMessage({
         message,
@@ -192,20 +183,41 @@ export async function POST(request: Request) {
     let finalMergedUsage: AppUsage | undefined;
 
     const stream = createUIMessageStream({
+      originalMessages: uiMessages,
       execute: ({ writer: dataStream }) => {
         const model = myProvider.languageModel(
           selectedChatModel,
           selectedProvider
         ) as LanguageModel;
 
+        // Sanitize messages: remove tool messages with invalid structure
+        // Tool results are preserved in assistant message parts as tool-* types
+        const sanitizedMessages = uiMessages.filter((msg) => {
+          // Keep all non-tool messages
+          if ((msg as any).role !== "tool") return true;
+
+          // For tool messages, validate they have required fields
+          // If invalid, skip them (they're legacy data from old format)
+          const toolMsg = msg as any;
+          return (
+            toolMsg.parts &&
+            Array.isArray(toolMsg.parts) &&
+            toolMsg.parts.every(
+              (part: any) =>
+                part.type === "tool-result" &&
+                part.toolCallId &&
+                part.toolName &&
+                part.output !== undefined
+            )
+          );
+        });
+
         const result = streamText({
           model,
           system: systemPrompt({ selectedChatModel, requestHints }),
-          // Filter tool messages - they break convertToModelMessages validation
-          // Tool results are already included in assistant message parts
-          messages: convertToModelMessages(filterToolMessages(uiMessages)),
+          messages: convertToModelMessages(sanitizedMessages),
           stopWhen: stepCountIs(5),
-          experimental_activeTools:
+          activeTools:
             selectedChatModel === "chat-model-reasoning"
               ? []
               : [
@@ -276,12 +288,18 @@ export async function POST(request: Request) {
       },
       generateId: generateUUID,
       onFinish: async ({ messages }) => {
-        // Filter out tool messages before saving
-        // Tool results are already in assistant message parts
-        const messagesToSave = filterToolMessages(messages);
+        // Validate messages before saving to prevent corrupt data
+        const validMessages = messages.filter((msg) => {
+          // Ensure message has required fields
+          if (!msg.id || !msg.role || !msg.parts) {
+            console.warn("Skipping invalid message:", msg);
+            return false;
+          }
+          return true;
+        });
 
         await saveMessages({
-          messages: messagesToSave.map((currentMessage) => ({
+          messages: validMessages.map((currentMessage) => ({
             id: currentMessage.id,
             role: currentMessage.role,
             parts: currentMessage.parts,

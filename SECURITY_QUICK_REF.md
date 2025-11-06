@@ -22,7 +22,7 @@ npm run dev
 
 ### New Features
 
-- 🎭 **OAuth Support** - GitHub, Google, GitLab
+- 🎭 **OAuth Support** - GitHub, Google, GitLab ⚠️ **COMING SOON**
 - 👤 **Guest Users** - Anonymous authentication
 - 📊 **Audit Log** - Track all security events
 - 🛡️ **Rate Limiting** - Prevent abuse
@@ -34,7 +34,7 @@ npm run dev
 # Guest login
 GET /api/auth/guest?redirectUrl=/
 
-# OAuth login
+# OAuth login ⚠️ COMING SOON (temporarily disabled)
 GET /api/auth/oauth?provider=github&redirectTo=/
 
 # Convert guest to permanent
@@ -44,7 +44,7 @@ POST /api/auth/convert
   "password": "password123"
 }
 
-# OAuth callback
+# OAuth callback ⚠️ COMING SOON (temporarily disabled)
 GET /api/auth/callback?code=xxx&next=/
 ```
 
