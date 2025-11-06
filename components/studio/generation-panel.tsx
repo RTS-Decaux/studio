@@ -350,45 +350,45 @@ export function GenerationPanel({
         </button>
       </div>
 
-      {/* Reference Image Upload (if needed) */}
-      {needsReferenceImage && (
+      {/* Reference Inputs (images/videos) */}
+      {modelRequirements.required.length > 0 && (
         <div className="space-y-3">
-          <Label className="font-medium text-sm">Reference Image</Label>
-          {referenceImagePreview ? (
-            <div className="relative aspect-video overflow-hidden rounded-xl border-border border-thin bg-background shadow-xs">
-              <img
-                alt="Reference"
-                className="h-full w-full object-cover"
-                src={referenceImagePreview}
+          <Label className="font-medium text-sm">Required Inputs</Label>
+          <div className="space-y-3">
+            {modelRequirements.required.map((inputType) => (
+              <ReferenceInputManager
+                key={inputType}
+                label={inputType
+                  .split("-")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")}
+                onChange={(file) => handleReferenceInputChange(inputType, file)}
+                required
+                type={inputType}
+                value={referenceInputs[inputType]}
               />
-              <Button
-                className="absolute top-2 right-2 shadow-md"
-                onClick={() => {
-                  setReferenceImage(null);
-                  setReferenceImagePreview(null);
-                }}
-                size="sm"
-                variant="secondary"
-              >
-                Remove
-              </Button>
-            </div>
-          ) : (
-            <label className="flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-border border-thin border-dashed bg-background transition-bg-background hover:border-foreground/50">
-              <div className="flex flex-col items-center justify-center gap-2">
-                <Upload className="h-7 w-7 text-muted-foreground/60" />
-                <p className="text-muted-foreground/80 text-sm">
-                  Click to upload or drag and drop
-                </p>
-              </div>
-              <input
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageUpload}
-                type="file"
+            ))}
+          </div>
+        </div>
+      )}
+
+      {modelRequirements.optional.length > 0 && (
+        <div className="space-y-3">
+          <Label className="font-medium text-sm">Optional Inputs</Label>
+          <div className="space-y-3">
+            {modelRequirements.optional.map((inputType) => (
+              <ReferenceInputManager
+                key={inputType}
+                label={inputType
+                  .split("-")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")}
+                onChange={(file) => handleReferenceInputChange(inputType, file)}
+                type={inputType}
+                value={referenceInputs[inputType]}
               />
-            </label>
-          )}
+            ))}
+          </div>
         </div>
       )}
 
@@ -540,6 +540,7 @@ export function GenerationPanel({
         onSelectModel={setSelectedModel}
         open={modelDialogOpen}
       />
-    </div>
+      </div>
+    </ScrollArea>
   );
 }
