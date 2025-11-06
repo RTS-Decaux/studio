@@ -79,7 +79,7 @@ export class ChatSDKError extends Error {
 
       return Response.json(
         { code: "", message: "Something went wrong. Please try again later." },
-        { status: statusCode }
+        { status: statusCode },
       );
     }
 

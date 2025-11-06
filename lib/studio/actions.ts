@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { ChatSDKError } from "@/lib/errors";
 import { getFalClient } from "@/lib/studio/fal-client";
 import { getModelById } from "@/lib/studio/model-mapping";
@@ -9,6 +8,7 @@ import type {
   GenerationRequest,
   GenerationResponse,
 } from "@/lib/studio/types";
+import { redirect } from "next/navigation";
 import {
   createAsset,
   createGeneration,
@@ -52,11 +52,11 @@ export async function getProjectAction(id: string) {
   if (!user) redirect("/login");
 
   const project = await getProjectById(id);
-  
+
   if (!project) {
     throw new ChatSDKError("not_found:studio_project");
   }
-  
+
   if (project.userId !== user.id) {
     throw new ChatSDKError("forbidden:studio_project");
   }
@@ -69,11 +69,17 @@ export async function createProjectAction(title: string, description?: string) {
   if (!user) redirect("/login");
 
   if (!title || title.trim().length === 0) {
-    throw new ChatSDKError("bad_request:studio_project", "Project title is required");
+    throw new ChatSDKError(
+      "bad_request:studio_project",
+      "Project title is required",
+    );
   }
 
   if (title.trim().length > 200) {
-    throw new ChatSDKError("bad_request:studio_project", "Project title is too long (max 200 characters)");
+    throw new ChatSDKError(
+      "bad_request:studio_project",
+      "Project title is too long (max 200 characters)",
+    );
   }
 
   try {
@@ -88,7 +94,9 @@ export async function createProjectAction(title: string, description?: string) {
       },
     });
   } catch (error: any) {
-    if (error.message?.includes("rate limit") || error.message?.includes("quota")) {
+    if (
+      error.message?.includes("rate limit") || error.message?.includes("quota")
+    ) {
       throw new ChatSDKError("rate_limit:studio_project");
     }
     throw new ChatSDKError("bad_request:studio_project", error.message);
@@ -97,27 +105,33 @@ export async function createProjectAction(title: string, description?: string) {
 
 export async function updateProjectAction(
   id: string,
-  updates: { title?: string; description?: string; thumbnail?: string }
+  updates: { title?: string; description?: string; thumbnail?: string },
 ) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const project = await getProjectById(id);
-  
+
   if (!project) {
     throw new ChatSDKError("not_found:studio_project");
   }
-  
+
   if (project.userId !== user.id) {
     throw new ChatSDKError("forbidden:studio_project");
   }
 
   if (updates.title !== undefined) {
     if (!updates.title || updates.title.trim().length === 0) {
-      throw new ChatSDKError("bad_request:studio_project", "Project title cannot be empty");
+      throw new ChatSDKError(
+        "bad_request:studio_project",
+        "Project title cannot be empty",
+      );
     }
     if (updates.title.trim().length > 200) {
-      throw new ChatSDKError("bad_request:studio_project", "Project title is too long (max 200 characters)");
+      throw new ChatSDKError(
+        "bad_request:studio_project",
+        "Project title is too long (max 200 characters)",
+      );
     }
   }
 
@@ -133,11 +147,11 @@ export async function deleteProjectAction(id: string) {
   if (!user) redirect("/login");
 
   const project = await getProjectById(id);
-  
+
   if (!project) {
     throw new ChatSDKError("not_found:studio_project");
   }
-  
+
   if (project.userId !== user.id) {
     throw new ChatSDKError("forbidden:studio_project");
   }
@@ -158,11 +172,11 @@ export async function getProjectAssetsAction(projectId: string) {
   if (!user) redirect("/login");
 
   const project = await getProjectById(projectId);
-  
+
   if (!project) {
     throw new ChatSDKError("not_found:studio_project");
   }
-  
+
   if (project.userId !== user.id) {
     throw new ChatSDKError("forbidden:studio_project");
   }
@@ -212,11 +226,11 @@ export async function getProjectGenerationsAction(projectId: string) {
   if (!user) redirect("/login");
 
   const project = await getProjectById(projectId);
-  
+
   if (!project) {
     throw new ChatSDKError("not_found:studio_project");
   }
-  
+
   if (project.userId !== user.id) {
     throw new ChatSDKError("forbidden:studio_project");
   }
@@ -232,7 +246,7 @@ export async function getProjectGenerationsAction(projectId: string) {
  * Запускает генерацию контента через fal.ai
  */
 export async function generateAction(
-  request: GenerationRequest
+  request: GenerationRequest,
 ): Promise<GenerationResponse> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -240,16 +254,25 @@ export async function generateAction(
   // Валидация модели
   const model = getModelById(request.modelId);
   if (!model) {
-    throw new ChatSDKError("not_found:fal_api", `Model not found: ${request.modelId}`);
+    throw new ChatSDKError(
+      "not_found:fal_api",
+      `Model not found: ${request.modelId}`,
+    );
   }
 
   // Валидация prompt для text-to-* моделей
   if (request.generationType.startsWith("text-to")) {
     if (!request.prompt || request.prompt.trim().length === 0) {
-      throw new ChatSDKError("bad_request:studio_generation", "Prompt is required for text-to-* generations");
+      throw new ChatSDKError(
+        "bad_request:studio_generation",
+        "Prompt is required for text-to-* generations",
+      );
     }
     if (request.prompt.trim().length > 10000) {
-      throw new ChatSDKError("bad_request:studio_generation", "Prompt is too long (max 10000 characters)");
+      throw new ChatSDKError(
+        "bad_request:studio_generation",
+        "Prompt is too long (max 10000 characters)",
+      );
     }
   }
 
@@ -301,7 +324,9 @@ export async function generateAction(
     if (error instanceof ChatSDKError) {
       throw error;
     }
-    if (error.message?.includes("rate limit") || error.message?.includes("quota")) {
+    if (
+      error.message?.includes("rate limit") || error.message?.includes("quota")
+    ) {
       throw new ChatSDKError("rate_limit:studio_generation");
     }
     throw new ChatSDKError("bad_request:studio_generation", error.message);
@@ -313,7 +338,7 @@ export async function generateAction(
  */
 async function processGeneration(
   generationId: string,
-  request: GenerationRequest
+  request: GenerationRequest,
 ): Promise<void> {
   try {
     // Обновляем статус
@@ -335,7 +360,7 @@ async function processGeneration(
     // Запускаем генерацию
     const startTime = Date.now();
     let result: any;
-    
+
     try {
       result = await falClient.run(request.modelId, input, {
         onProgress: (status) => {
@@ -345,24 +370,37 @@ async function processGeneration(
     } catch (falError: any) {
       // Обрабатываем специфичные ошибки fal.ai
       let errorMessage = falError.message || "Unknown fal.ai error";
-      
+
       if (falError.message?.includes("timeout")) {
-        errorMessage = "Generation timeout - the AI service took too long to respond";
+        errorMessage =
+          "Generation timeout - the AI service took too long to respond";
       } else if (falError.message?.includes("rate limit")) {
-        errorMessage = "AI service rate limit exceeded - please try again later";
-      } else if (falError.message?.includes("authentication") || falError.message?.includes("unauthorized")) {
-        errorMessage = "AI service authentication failed - please contact support";
-      } else if (falError.message?.includes("invalid") || falError.message?.includes("bad request")) {
-        errorMessage = "Invalid generation parameters - please check your inputs";
+        errorMessage =
+          "AI service rate limit exceeded - please try again later";
+      } else if (
+        falError.message?.includes("authentication") ||
+        falError.message?.includes("unauthorized")
+      ) {
+        errorMessage =
+          "AI service authentication failed - please contact support";
+      } else if (
+        falError.message?.includes("invalid") ||
+        falError.message?.includes("bad request")
+      ) {
+        errorMessage =
+          "Invalid generation parameters - please check your inputs";
       } else if (falError.message?.includes("not found")) {
         errorMessage = "AI model not found or deprecated";
-      } else if (falError.message?.includes("unavailable") || falError.message?.includes("offline")) {
+      } else if (
+        falError.message?.includes("unavailable") ||
+        falError.message?.includes("offline")
+      ) {
         errorMessage = "AI service temporarily unavailable";
       }
-      
+
       throw new Error(errorMessage);
     }
-    
+
     const processingTime = Math.floor((Date.now() - startTime) / 1000);
 
     // Получаем URL результата
@@ -404,7 +442,10 @@ async function processGeneration(
         });
         outputAssetId = asset.id;
       } catch (assetError: any) {
-        console.error(`Failed to create asset for generation ${generationId}:`, assetError);
+        console.error(
+          `Failed to create asset for generation ${generationId}:`,
+          assetError,
+        );
         // Продолжаем даже если не удалось создать asset
       }
     }
@@ -419,10 +460,11 @@ async function processGeneration(
     });
   } catch (error: any) {
     console.error(`Generation ${generationId} failed:`, error);
-    
+
     // Формируем понятное сообщение об ошибке
-    let errorMessage = error.message || "Unknown error occurred during generation";
-    
+    let errorMessage = error.message ||
+      "Unknown error occurred during generation";
+
     await updateGeneration(generationId, {
       status: "failed",
       error: errorMessage,
