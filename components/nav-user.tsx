@@ -1,7 +1,9 @@
 "use client";
 
 import { ChevronsUpDown, LogIn, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
+import { toast } from "@/components/toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -17,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useSupabaseSession } from "@/lib/supabase/provider";
 
 export function NavUser({
   user,
@@ -29,7 +32,9 @@ export function NavUser({
   };
   isGuest?: boolean;
 }) {
+  const router = useRouter();
   const { isMobile } = useSidebar();
+  const { supabase } = useSupabaseSession();
 
   const initials = user.name
     .split(" ")
@@ -37,6 +42,30 @@ export function NavUser({
     .join("")
     .toUpperCase()
     .slice(0, 2);
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error("Sign out error:", error);
+        toast({
+          type: "error",
+          description: "Failed to sign out. Please try again.",
+        });
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Unexpected sign out error:", error);
+      toast({
+        type: "error",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -90,11 +119,12 @@ export function NavUser({
                 </a>
               </DropdownMenuItem>
             ) : (
-              <DropdownMenuItem asChild>
-                <a href="/api/auth/signout">
-                  <LogOut />
-                  Log out
-                </a>
+              <DropdownMenuItem
+                className="cursor-pointer text-red-500 focus:text-red-600"
+                onClick={handleSignOut}
+              >
+                <LogOut />
+                Log out
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
