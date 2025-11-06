@@ -1,8 +1,8 @@
 "use server";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const authFormSchema = z.object({
   email: z.string().email(),
@@ -15,7 +15,7 @@ export type LoginActionState = {
 
 export const login = async (
   _: LoginActionState,
-  formData: FormData,
+  formData: FormData
 ): Promise<LoginActionState> => {
   try {
     const validatedData = authFormSchema.parse({
@@ -57,7 +57,7 @@ export type RegisterActionState = {
 
 export const register = async (
   _: RegisterActionState,
-  formData: FormData,
+  formData: FormData
 ): Promise<RegisterActionState> => {
   try {
     const validatedData = authFormSchema.parse({

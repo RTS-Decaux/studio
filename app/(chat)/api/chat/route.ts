@@ -1,34 +1,3 @@
-import type { VisibilityType } from "@/components/visibility-selector";
-import { entitlementsByUserType } from "@/lib/ai/entitlements";
-import {
-  debugToolMessages,
-  filterToolMessages,
-} from "@/lib/ai/message-utils";
-import type { ChatModelId } from "@/lib/ai/models";
-import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
-import { myProvider } from "@/lib/ai/providers";
-import { createDocument } from "@/lib/ai/tools/create-document";
-import { getWeather } from "@/lib/ai/tools/get-weather";
-import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
-import { updateDocument } from "@/lib/ai/tools/update-document";
-import { webSearch } from "@/lib/ai/tools/web-search";
-import { isProductionEnvironment } from "@/lib/constants";
-import {
-  createStreamId,
-  deleteChatById,
-  getChatById,
-  getMessageCountByUserId,
-  getMessagesByChatId,
-  saveChat,
-  saveMessages,
-  updateChatLastContextById,
-} from "@/lib/db/queries";
-import { ChatSDKError } from "@/lib/errors";
-import type { DBMessage } from "@/lib/supabase/models";
-import { getUser } from "@/lib/supabase/server";
-import type { ChatMessage } from "@/lib/types";
-import type { AppUsage } from "@/lib/usage";
-import { convertToUIMessages, generateUUID } from "@/lib/utils";
 import { geolocation } from "@vercel/functions";
 import {
   convertToModelMessages,
@@ -48,6 +17,42 @@ import {
 import type { ModelCatalog } from "tokenlens/core";
 import { fetchModels } from "tokenlens/fetch";
 import { getUsage } from "tokenlens/helpers";
+import type { VisibilityType } from "@/components/visibility-selector";
+import { entitlementsByUserType } from "@/lib/ai/entitlements";
+import { debugToolMessages, filterToolMessages } from "@/lib/ai/message-utils";
+import type { ChatModelId } from "@/lib/ai/models";
+import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
+import { myProvider } from "@/lib/ai/providers";
+import { createDocument } from "@/lib/ai/tools/create-document";
+import { getStockPrice } from "@/lib/ai/tools/get-stock-price";
+import { getStockPriceUI } from "@/lib/ai/tools/get-stock-price-ui";
+import { getWeather } from "@/lib/ai/tools/get-weather";
+import { getWeatherUI } from "@/lib/ai/tools/get-weather-ui";
+import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
+import { searchFlights } from "@/lib/ai/tools/search-flights";
+import { searchFlightsUI } from "@/lib/ai/tools/search-flights-ui";
+import { searchProducts } from "@/lib/ai/tools/search-products";
+import { searchProductsUI } from "@/lib/ai/tools/search-products-ui";
+import { updateDocument } from "@/lib/ai/tools/update-document";
+import { webSearch } from "@/lib/ai/tools/web-search";
+import { webSearchUI } from "@/lib/ai/tools/web-search-ui";
+import { isProductionEnvironment } from "@/lib/constants";
+import {
+  createStreamId,
+  deleteChatById,
+  getChatById,
+  getMessageCountByUserId,
+  getMessagesByChatId,
+  saveChat,
+  saveMessages,
+  updateChatLastContextById,
+} from "@/lib/db/queries";
+import { ChatSDKError } from "@/lib/errors";
+import type { DBMessage } from "@/lib/supabase/models";
+import { getUser } from "@/lib/supabase/server";
+import type { ChatMessage } from "@/lib/types";
+import type { AppUsage } from "@/lib/usage";
+import { convertToUIMessages, generateUUID } from "@/lib/utils";
 import { generateTitleFromUserMessage } from "../../actions";
 import { type PostRequestBody, postRequestBodySchema } from "./schema";
 
@@ -64,13 +69,13 @@ const getTokenlensCatalog = cache(
     } catch (err) {
       console.warn(
         "TokenLens: catalog fetch failed, using default catalog",
-        err,
+        err
       );
       return; // tokenlens helpers will fall back to defaultCatalog
     }
   },
   ["tokenlens-catalog"],
-  { revalidate: 24 * 60 * 60 }, // 24 hours
+  { revalidate: 24 * 60 * 60 } // 24 hours
 );
 
 export function getStreamContext() {
@@ -82,7 +87,7 @@ export function getStreamContext() {
     } catch (error: any) {
       if (error.message.includes("REDIS_URL")) {
         console.log(
-          " > Resumable streams are disabled due to missing REDIS_URL",
+          " > Resumable streams are disabled due to missing REDIS_URL"
         );
       } else {
         console.error(error);
@@ -146,9 +151,9 @@ export async function POST(request: Request) {
       // Tool messages are AI SDK artifacts with results already in assistant parts
       const allMessages = await getMessagesByChatId({ id });
       messagesFromDb = filterToolMessages(allMessages);
-      
+
       // Debug: show how many tool messages were filtered
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         debugToolMessages(allMessages);
       }
     } else {
@@ -198,7 +203,7 @@ export async function POST(request: Request) {
       execute: ({ writer: dataStream }) => {
         const model = myProvider.languageModel(
           selectedChatModel,
-          selectedProvider,
+          selectedProvider
         ) as LanguageModel;
 
         const result = streamText({
@@ -206,29 +211,34 @@ export async function POST(request: Request) {
           system: systemPrompt({ selectedChatModel, requestHints }),
           // Filter tool messages - they break convertToModelMessages validation
           // Tool results are already included in assistant message parts
-          messages: convertToModelMessages(
-            filterToolMessages(uiMessages)
-          ),
+          messages: convertToModelMessages(filterToolMessages(uiMessages)),
           stopWhen: stepCountIs(5),
-          experimental_activeTools: selectedChatModel === "chat-model-reasoning"
-            ? []
-            : [
-              "getWeather",
-              "webSearch",
-              "createDocument",
-              "updateDocument",
-              "requestSuggestions",
-            ],
+          experimental_activeTools:
+            selectedChatModel === "chat-model-reasoning"
+              ? []
+              : [
+                  "getWeatherUI",
+                  "webSearchUI",
+                  "createDocument",
+                  "updateDocument",
+                  "requestSuggestions",
+                  "getStockPriceUI",
+                  "searchFlightsUI",
+                  "searchProductsUI",
+                ],
           experimental_transform: smoothStream({ chunking: "word" }),
           tools: {
-            getWeather,
-            webSearch,
+            getWeatherUI,
+            webSearchUI,
             createDocument: createDocument({ user, dataStream }),
             updateDocument: updateDocument({ user, dataStream }),
             requestSuggestions: requestSuggestions({
               user,
               dataStream,
             }),
+            getStockPriceUI,
+            searchFlightsUI,
+            searchProductsUI,
           },
           experimental_telemetry: {
             isEnabled: isProductionEnvironment,
@@ -237,8 +247,10 @@ export async function POST(request: Request) {
           onFinish: async ({ usage }) => {
             try {
               const providers = await getTokenlensCatalog();
-              const modelId =
-                myProvider.languageModel(selectedChatModel, selectedProvider).modelId;
+              const modelId = myProvider.languageModel(
+                selectedChatModel,
+                selectedProvider
+              ).modelId;
               if (!modelId) {
                 finalMergedUsage = usage;
                 dataStream.write({
@@ -273,7 +285,7 @@ export async function POST(request: Request) {
         dataStream.merge(
           result.toUIMessageStream({
             sendReasoning: true,
-          }),
+          })
         );
       },
       generateId: generateUUID,
@@ -281,7 +293,7 @@ export async function POST(request: Request) {
         // Filter out tool messages before saving
         // Tool results are already in assistant message parts
         const messagesToSave = filterToolMessages(messages);
-        
+
         await saveMessages({
           messages: messagesToSave.map((currentMessage) => ({
             id: currentMessage.id,
@@ -331,7 +343,7 @@ export async function POST(request: Request) {
     if (
       error instanceof Error &&
       error.message?.includes(
-        "AI Gateway requires a valid credit card on file to service requests",
+        "AI Gateway requires a valid credit card on file to service requests"
       )
     ) {
       return new ChatSDKError("bad_request:activate_gateway").toResponse();

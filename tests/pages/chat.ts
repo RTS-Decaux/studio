@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { expect, type Locator, type Page } from "@playwright/test";
-import { chatModels, type ChatModelId } from "@/lib/ai/models";
+import { type ChatModelId, chatModels } from "@/lib/ai/models";
 
 type AssistantMessage = {
   element: Locator;
@@ -165,9 +165,8 @@ export class ChatPage {
       .getByTestId("message-content")
       .innerText();
 
-    const reasoningLocator = lastMessageElement.getByTestId(
-      "message-reasoning"
-    );
+    const reasoningLocator =
+      lastMessageElement.getByTestId("message-reasoning");
     const reasoningElement = (await reasoningLocator
       .isVisible()
       .catch(() => false))

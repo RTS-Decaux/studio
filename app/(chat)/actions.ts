@@ -1,17 +1,17 @@
 "use server";
 
+import { generateText, type LanguageModel, type UIMessage } from "ai";
+import { cookies } from "next/headers";
 import type { VisibilityType } from "@/components/visibility-selector";
 import type { ChatModelId } from "@/lib/ai/models";
 import { titlePrompt } from "@/lib/ai/prompts";
-import { myProvider, type ModelProviderId } from "@/lib/ai/providers";
+import { type ModelProviderId, myProvider } from "@/lib/ai/providers";
 import {
   deleteMessagesByChatIdAfterTimestamp,
   getMessageById,
   updateChatVisibilityById,
 } from "@/lib/db/queries";
 import { getTextFromMessage } from "@/lib/utils";
-import { generateText, type LanguageModel, type UIMessage } from "ai";
-import { cookies } from "next/headers";
 
 export async function saveChatModelAsCookie(model: ChatModelId) {
   const cookieStore = await cookies();

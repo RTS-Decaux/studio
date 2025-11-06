@@ -1,11 +1,11 @@
 "use client";
 
-import { AuthForm } from "@/components/auth-form";
-import { SubmitButton } from "@/components/submit-button";
-import { toast } from "@/components/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
+import { AuthForm } from "@/components/auth-form";
+import { SubmitButton } from "@/components/submit-button";
+import { toast } from "@/components/toast";
 import { type RegisterActionState, register } from "../actions";
 
 export default function Page() {
@@ -38,7 +38,7 @@ export default function Page() {
       router.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.status]);
+  }, [state.status, router.refresh]);
 
   const handleSubmit = (formData: FormData) => {
     setEmail(formData.get("email") as string);

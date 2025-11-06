@@ -1,5 +1,5 @@
-import type { Document } from "@/lib/supabase/models";
 import { getMessageByErrorCode } from "@/lib/errors";
+import type { Document } from "@/lib/supabase/models";
 import { generateUUID } from "@/lib/utils";
 import { expect, test } from "../fixtures";
 

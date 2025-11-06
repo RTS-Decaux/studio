@@ -1,5 +1,5 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,8 +15,8 @@ export async function GET(request: Request) {
       return NextResponse.redirect(
         new URL(
           `/login?error=${encodeURIComponent("Authentication failed")}`,
-          request.url,
-        ),
+          request.url
+        )
       );
     }
   }

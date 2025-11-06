@@ -1,5 +1,5 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   if (!provider || !["github", "google", "gitlab"].includes(provider)) {
     return NextResponse.json(
       { error: "Invalid OAuth provider" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     console.error("OAuth sign in error:", error);
     return NextResponse.json(
       { error: "Failed to initialize OAuth" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 

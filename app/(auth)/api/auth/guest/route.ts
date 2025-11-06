@@ -1,5 +1,5 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -10,7 +10,10 @@ export async function GET(request: Request) {
   const supabase = await createSupabaseServerClient();
 
   // Check if user is already signed in (use getUser() for security)
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
   if (user && !userError) {
     return NextResponse.redirect(new URL(redirectUrl, requestUrl.origin));
@@ -23,15 +26,12 @@ export async function GET(request: Request) {
     console.error("Failed to sign in anonymously:", error);
     return NextResponse.json(
       { error: "Failed to sign in as guest" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 
   if (!data.session) {
-    return NextResponse.json(
-      { error: "No session created" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "No session created" }, { status: 500 });
   }
 
   // Redirect to the desired page

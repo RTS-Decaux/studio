@@ -1,6 +1,6 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const convertSchema = z.object({
   email: z.string().email(),
@@ -17,16 +17,13 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (userError || !user) {
-    return NextResponse.json(
-      { error: "Not authenticated" },
-      { status: 401 },
-    );
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
   if (!user.is_anonymous) {
     return NextResponse.json(
       { error: "User is not anonymous" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -42,10 +39,7 @@ export async function POST(request: Request) {
 
     if (updateError) {
       console.error("Failed to convert anonymous user:", updateError);
-      return NextResponse.json(
-        { error: updateError.message },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: updateError.message }, { status: 400 });
     }
 
     return NextResponse.json({ success: true });
@@ -53,14 +47,14 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid email or password" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     console.error("Failed to convert anonymous user:", error);
     return NextResponse.json(
       { error: "Failed to convert account" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

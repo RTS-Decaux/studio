@@ -1,8 +1,8 @@
 import "server-only";
 
-import { NextResponse } from "next/server";
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
       console.error("Failed to create signed URL", signedError);
       return NextResponse.json(
         { error: "Failed to generate access URL" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
     console.error("Failed to process upload", error);
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
