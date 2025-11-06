@@ -1,6 +1,5 @@
 import "server-only";
 
-import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ArtifactKind } from "@/components/artifact";
 import type { VisibilityType } from "@/components/visibility-selector";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -18,7 +17,7 @@ import type { AppUsage } from "../usage";
 import { generateUUID } from "../utils";
 import { generateHashedPassword } from "./utils";
 
-type Supabase = SupabaseClient<Database>;
+type Supabase = ReturnType<typeof createSupabaseServerClient>;
 
 async function getSupabase(): Promise<Supabase> {
   return await createSupabaseServerClient();

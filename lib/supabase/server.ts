@@ -1,7 +1,6 @@
 import "server-only";
 
 import { type CookieOptions, createServerClient } from "@supabase/ssr";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -31,7 +30,7 @@ type MutableCookies = {
 };
 
 export async function createSupabaseServerClient(): Promise<
-  SupabaseClient<Database>
+  ReturnType<typeof createServerClient<Database>>
 > {
   const cookieStore = await cookies();
   const mutableCookies = cookieStore as unknown as MutableCookies;
@@ -65,7 +64,7 @@ export function createSupabaseMiddlewareResponse(request: NextRequest) {
         });
       },
     },
-  });
+  }) as ReturnType<typeof createServerClient<Database>>;
 
   return { supabase, response };
 }
