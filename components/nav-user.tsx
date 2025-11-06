@@ -1,12 +1,11 @@
 "use client";
 
-import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogIn, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -21,12 +20,14 @@ import {
 
 export function NavUser({
   user,
+  isGuest = false,
 }: {
   user: {
     name: string;
     email: string;
     avatar: string;
   };
+  isGuest?: boolean;
 }) {
   const { isMobile } = useSidebar();
 
@@ -81,23 +82,21 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+            {isGuest ? (
+              <DropdownMenuItem asChild>
+                <a href="/register?fromGuest=true">
+                  <LogIn />
+                  Войти в аккаунт
+                </a>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
+            ) : (
+              <DropdownMenuItem asChild>
+                <a href="/api/auth/signout">
+                  <LogOut />
+                  Log out
+                </a>
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <a href="/api/auth/signout">
-                <LogOut />
-                Log out
-              </a>
-            </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

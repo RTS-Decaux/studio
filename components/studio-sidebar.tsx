@@ -177,6 +177,7 @@ export function StudioSidebar({
             email: userEmail,
             avatar: user?.user_metadata?.avatar_url || "/avatars/default.jpg",
           }}
+          isGuest={user?.is_anonymous === true}
         />
       </SidebarFooter>
       <SidebarRail />

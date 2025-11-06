@@ -142,6 +142,7 @@ export function AppSidebar({
             email: userEmail,
             avatar: user?.user_metadata?.avatar_url || "/avatars/default.jpg",
           }}
+          isGuest={isGuest}
         />
       </SidebarFooter>
       <SidebarRail />
