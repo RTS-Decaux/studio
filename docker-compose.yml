@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-chatbot
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Node
+      - NODE_ENV=production
+
+      # Supabase (use your hosted Supabase)
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+
+      # AI Provider (OpenAI or Gemini)
+      - AI_DEFAULT_PROVIDER=${AI_DEFAULT_PROVIDER:-openai}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+      # fal.ai (for Studio)
+      - FAL_API_KEY=${FAL_API_KEY}
+
+      # Optional: Redis for resumable streams
+      - REDIS_URL=${REDIS_URL}
+
+      # Optional: App URL for OAuth
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    volumes:
+      # Logs (optional)
+      - ./logs:/app/logs
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
