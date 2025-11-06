@@ -1,13 +1,13 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { memo } from "react";
-import { useWindowSize } from "usehooks-ts";
 import { PlusIcon } from "@/components/icons";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { memo } from "react";
+import { useWindowSize } from "usehooks-ts";
 
 interface StudioHeaderProps {
   title?: string;

@@ -1,19 +1,6 @@
 "use client";
 
 import {
-  AlertCircle,
-  ChevronRight,
-  Film,
-  Image as ImageIcon,
-  Info,
-  Loader2,
-  Sparkles,
-  Video,
-  Wand2,
-} from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
-import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -43,6 +30,19 @@ import { getRecommendedModels } from "@/lib/studio/model-mapping";
 import type { ProjectTemplate, PromptTemplate } from "@/lib/studio/templates";
 import type { StudioGenerationType } from "@/lib/studio/types";
 import { cn } from "@/lib/utils";
+import {
+  AlertCircle,
+  ChevronRight,
+  Film,
+  Image as ImageIcon,
+  Info,
+  Loader2,
+  Sparkles,
+  Video,
+  Wand2,
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { Slider } from "../ui/slider";
 import { Switch } from "../ui/switch";
 import { ModelCapabilityBadge } from "./model-capability-badge";

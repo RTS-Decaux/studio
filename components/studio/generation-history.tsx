@@ -1,5 +1,11 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { StudioGeneration } from "@/lib/studio/types";
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import {
   CheckCircle2,
@@ -13,12 +19,6 @@ import {
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import type { StudioGeneration } from "@/lib/studio/types";
-import { cn } from "@/lib/utils";
 
 interface GenerationHistoryProps {
   generations: StudioGeneration[];

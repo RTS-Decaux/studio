@@ -1,13 +1,13 @@
 "use client";
 
-import { FolderOpen, Sparkles } from "lucide-react";
-import { useCallback, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
-  StudioAsset,
-  StudioGeneration,
-  StudioProject,
+    StudioAsset,
+    StudioGeneration,
+    StudioProject,
 } from "@/lib/studio/types";
+import { FolderOpen, Sparkles } from "lucide-react";
+import { useCallback, useState } from "react";
 import { AssetGallery } from "./asset-gallery";
 import { GenerationHistory } from "./generation-history";
 import { GenerationPanelV2 as GenerationPanel } from "./generation-panel-v2";
