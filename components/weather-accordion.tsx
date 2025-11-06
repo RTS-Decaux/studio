@@ -1,13 +1,13 @@
 "use client";
 
+import { CloudSun } from "lucide-react";
 import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { CloudSun } from "lucide-react";
 import { Weather } from "./weather";
 
 type WeatherAtLocation = {
@@ -54,19 +54,16 @@ export function WeatherAccordion({
 }: {
   weatherAtLocation?: WeatherAtLocation;
 }) {
-  const location = weatherAtLocation?.cityName || 
+  const location =
+    weatherAtLocation?.cityName ||
     `${weatherAtLocation?.latitude?.toFixed(1)}°, ${weatherAtLocation?.longitude?.toFixed(1)}°`;
-  
-  const temp = weatherAtLocation?.current?.temperature_2m 
+
+  const temp = weatherAtLocation?.current?.temperature_2m
     ? `${Math.ceil(weatherAtLocation.current.temperature_2m)}°`
     : "N/A";
 
   return (
-    <Accordion
-      className="not-prose mb-4"
-      collapsible
-      type="single"
-    >
+    <Accordion className="not-prose mb-4" collapsible type="single">
       <AccordionItem className="rounded-lg border bg-card" value="weather">
         <AccordionTrigger className="px-4 py-3 hover:no-underline">
           <div className="flex items-center gap-2">

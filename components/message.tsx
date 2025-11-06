@@ -1,16 +1,19 @@
 "use client";
-import type { Vote } from "@/lib/supabase/models";
-import type { ChatMessage } from "@/lib/types";
-import { cn, sanitizeText } from "@/lib/utils";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import equal from "fast-deep-equal";
 import { motion } from "framer-motion";
 import { memo, useMemo, useState } from "react";
+import type { Vote } from "@/lib/supabase/models";
+import type { ChatMessage } from "@/lib/types";
+import { cn, sanitizeText } from "@/lib/utils";
 import { useDataStream } from "./data-stream-provider";
 import { DocumentToolResult } from "./document";
 import { DocumentPreview } from "./document-preview";
 import { MessageContent } from "./elements/message";
 import { Response } from "./elements/response";
+import { FlightCard, FlightCardLoading } from "./generative-ui/flight-card";
+import { ProductCard, ProductCardLoading } from "./generative-ui/product-card";
+import { StockPrice, StockPriceLoading } from "./generative-ui/stock-price";
 import { SparklesIcon } from "./icons";
 import { MessageActions } from "./message-actions";
 import { MessageEditor } from "./message-editor";
@@ -49,7 +52,7 @@ const PurePreviewMessage = ({
   // Collect reasoning and tool calls into a trace
   const reasoningSteps = useMemo(() => {
     if (message.role !== "assistant") return [];
-    
+
     const steps: Array<{
       type: "reasoning" | "tool";
       title: string;
@@ -74,10 +77,18 @@ const PurePreviewMessage = ({
           "tool-createDocument": "Creating document",
           "tool-updateDocument": "Updating document",
           "tool-requestSuggestions": "Getting suggestions",
+          "tool-getStockPrice": "Fetching stock price",
+          "tool-searchFlights": "Searching flights",
+          "tool-searchProducts": "Searching products",
+          "tool-getStockPriceUI": "Fetching stock price",
+          "tool-searchFlightsUI": "Searching flights",
+          "tool-searchProductsUI": "Searching products",
+          "tool-getWeatherUI": "Getting weather data",
+          "tool-webSearchUI": "Searching the web",
         };
-        
+
         const state = "state" in part ? part.state : undefined;
-        
+
         steps.push({
           type: "tool",
           title: toolLabels[part.type] || part.type,
@@ -129,10 +140,7 @@ const PurePreviewMessage = ({
         >
           {/* Show reasoning trace for assistant messages */}
           {message.role === "assistant" && reasoningSteps.length > 0 && (
-            <ReasoningTrace
-              isStreaming={isLoading}
-              steps={reasoningSteps}
-            />
+            <ReasoningTrace isStreaming={isLoading} steps={reasoningSteps} />
           )}
 
           {attachmentsFromMessage.length > 0 && (
@@ -224,17 +232,17 @@ const PurePreviewMessage = ({
 
             if (type === "tool-webSearch") {
               const { toolCallId, state } = part;
-              
+
               // Extract the actual data from wrapped format if needed
-              const outputData = (part.output as any)?.type === "json" && (part.output as any)?.value 
-                ? (part.output as any).value 
-                : part.output;
+              const outputData =
+                (part.output as any)?.type === "json" &&
+                (part.output as any)?.value
+                  ? (part.output as any).value
+                  : part.output;
 
               // Only show output in accordion, process is shown in ReasoningTrace
               if (state === "output-available") {
-                return (
-                  <WebSearchResult key={toolCallId} output={outputData} />
-                );
+                return <WebSearchResult key={toolCallId} output={outputData} />;
               }
               return null;
             }
@@ -303,7 +311,11 @@ const PurePreviewMessage = ({
                         isReadonly={isReadonly}
                         result={{
                           ...part.output,
-                          kind: part.output.kind as "text" | "code" | "image" | "sheet"
+                          kind: part.output.kind as
+                            | "text"
+                            | "code"
+                            | "image"
+                            | "sheet",
                         }}
                         type="request-suggestions"
                       />
@@ -311,6 +323,35 @@ const PurePreviewMessage = ({
                   </div>
                 );
               }
+              return null;
+            }
+
+            // Handle generative UI tools - these return React components directly
+            if (
+              type === "tool-getStockPriceUI" ||
+              type === "tool-searchFlightsUI" ||
+              type === "tool-searchProductsUI" ||
+              type === "tool-getWeatherUI" ||
+              type === "tool-webSearchUI"
+            ) {
+              const { toolCallId, state } = part;
+
+              // The component is in part.output for UI tools
+              if (state === "output-available" && part.output) {
+                return <div key={toolCallId}>{part.output}</div>;
+              }
+
+              if (state === "output-error") {
+                return (
+                  <div
+                    className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-500 dark:bg-red-950/50"
+                    key={toolCallId}
+                  >
+                    Error: {part.errorText || "Something went wrong"}
+                  </div>
+                );
+              }
+
               return null;
             }
 
@@ -375,9 +416,7 @@ export const ThinkingMessage = () => {
         </div>
 
         <div className="flex w-full flex-col gap-2 md:gap-4">
-          <div className="p-0 text-muted-foreground text-sm">
-            Thinking...
-          </div>
+          <div className="p-0 text-muted-foreground text-sm">Thinking...</div>
         </div>
       </div>
     </motion.div>
