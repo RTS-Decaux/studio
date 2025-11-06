@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { getUser } = await import("@/lib/supabase/server");
@@ -20,7 +20,8 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const asset = await getAssetById(params.id);
+    const { id } = await params;
+    const asset = await getAssetById(id);
 
     if (!asset) {
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
@@ -44,7 +45,7 @@ export async function GET(
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { getUser } = await import("@/lib/supabase/server");
@@ -54,7 +55,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const asset = await getAssetById(params.id);
+    const { id } = await params;
+    const asset = await getAssetById(id);
 
     if (!asset) {
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
@@ -95,7 +97,7 @@ export async function PATCH(
       );
     }
 
-    const updatedAsset = await updateAsset(params.id, updates);
+    const updatedAsset = await updateAsset(id, updates);
 
     return NextResponse.json(updatedAsset);
   } catch (error) {
@@ -113,7 +115,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { getUser } = await import("@/lib/supabase/server");
@@ -123,7 +125,8 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const asset = await getAssetById(params.id);
+    const { id } = await params;
+    const asset = await getAssetById(id);
 
     if (!asset) {
       return NextResponse.json({ error: "Asset not found" }, { status: 404 });
@@ -139,7 +142,7 @@ export async function DELETE(
 
     // Delete from database
     const { deleteAsset } = await import("@/lib/studio/queries");
-    await deleteAsset(params.id);
+    await deleteAsset(id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
