@@ -114,6 +114,12 @@ export function GenerationPanelV2({
   const [duration, setDuration] = useState([5]);
   const [fps, setFps] = useState([24]);
 
+  // Veo-specific parameters
+  const [aspectRatio, setAspectRatio] = useState("16:9");
+  const [resolution, setResolution] = useState("720p");
+  const [enhancePrompt, setEnhancePrompt] = useState(false);
+  const [autoFix, setAutoFix] = useState(false);
+
   // Reference inputs (images/videos) - unified state
   const [referenceInputs, setReferenceInputs] = useState<
     Record<ReferenceInputKind, File | null>
@@ -152,6 +158,41 @@ export function GenerationPanelV2({
     if (!generationType) return false;
     return generationType.startsWith("text-to");
   }, [generationType]);
+
+  // Apply model defaults when model changes
+  useEffect(() => {
+    if (selectedModel?.modelParameters?.defaults) {
+      const defaults = selectedModel.modelParameters.defaults;
+      
+      // Apply aspect_ratio if present
+      if (defaults.aspect_ratio && typeof defaults.aspect_ratio === 'string') {
+        setAspectRatio(defaults.aspect_ratio);
+      }
+      
+      // Apply resolution if present
+      if (defaults.resolution && typeof defaults.resolution === 'string') {
+        setResolution(defaults.resolution);
+      }
+      
+      // Apply duration if present
+      if (defaults.duration && typeof defaults.duration === 'string') {
+        const durationNum = parseInt(defaults.duration);
+        if (!isNaN(durationNum)) {
+          setDuration([durationNum]);
+        }
+      }
+      
+      // Apply enhance_prompt if present
+      if (typeof defaults.enhance_prompt === 'boolean') {
+        setEnhancePrompt(defaults.enhance_prompt);
+      }
+      
+      // Apply auto_fix if present
+      if (typeof defaults.auto_fix === 'boolean') {
+        setAutoFix(defaults.auto_fix);
+      }
+    }
+  }, [selectedModel]);
 
   // Update model when generation type changes
   const handleGenerationTypeChange = useCallback(
@@ -284,12 +325,23 @@ export function GenerationPanelV2({
         lastFrameUrl: uploadedUrls["last-frame"],
         referenceVideoUrl: uploadedUrls["reference-video"],
         parameters: {
+          // Image-specific
           imageSize: selectedModel.type === "image" ? imageSize : undefined,
+          
+          // Video-specific
+          duration: selectedModel.type === "video" ? duration[0] : undefined,
+          fps: selectedModel.type === "video" ? fps[0] : undefined,
+          
+          // Veo-specific parameters (if model supports them)
+          aspect_ratio: selectedModel.modelParameters?.defaults?.aspect_ratio !== undefined ? aspectRatio : undefined,
+          resolution: selectedModel.modelParameters?.defaults?.resolution !== undefined ? resolution : undefined,
+          enhance_prompt: selectedModel.modelParameters?.defaults?.enhance_prompt !== undefined ? enhancePrompt : undefined,
+          auto_fix: selectedModel.modelParameters?.defaults?.auto_fix !== undefined ? autoFix : undefined,
+          
+          // Common parameters
           numInferenceSteps: steps[0],
           guidanceScale: guidanceScale[0],
           seed: randomSeed ? undefined : seed,
-          duration: selectedModel.type === "video" ? duration[0] : undefined,
-          fps: selectedModel.type === "video" ? fps[0] : undefined,
         },
       });
 
@@ -583,11 +635,8 @@ export function GenerationPanelV2({
         <Separator />
         <Accordion collapsible defaultValue="advanced" type="single">
           <AccordionItem className="border-none" value="advanced">
-            <AccordionTrigger className="py-2 hover:no-underline" disabled>
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-xs text-muted-foreground">Advanced Settings</span>
-                <Badge variant="secondary" className="text-[9px] px-1.5 py-0">Coming Soon</Badge>
-              </div>
+            <AccordionTrigger className="py-2 hover:no-underline">
+              <span className="font-medium text-xs">Advanced Settings</span>
             </AccordionTrigger>
             <AccordionContent className="space-y-3 pt-1">
               {/* Negative Prompt */}
@@ -640,6 +689,68 @@ export function GenerationPanelV2({
                 </div>
               )}
 
+              {/* Aspect Ratio - For video models that support it */}
+              {selectedModel?.type === "video" && 
+               selectedModel.modelParameters?.defaults?.aspect_ratio !== undefined && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[10px]" htmlFor="aspect-ratio">
+                      Aspect Ratio
+                    </Label>
+                    {selectedModel.modelParameters.defaults.aspect_ratio && (
+                      <Badge className="px-1.5 py-0 text-[9px]" variant="secondary">
+                        Default: {String(selectedModel.modelParameters.defaults.aspect_ratio)}
+                      </Badge>
+                    )}
+                  </div>
+                  <Select
+                    disabled={isGenerating}
+                    onValueChange={setAspectRatio}
+                    value={aspectRatio}
+                  >
+                    <SelectTrigger className="h-8 text-xs" id="aspect-ratio">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">Auto</SelectItem>
+                      <SelectItem value="16:9">16:9 (Landscape)</SelectItem>
+                      <SelectItem value="9:16">9:16 (Portrait)</SelectItem>
+                      <SelectItem value="1:1">1:1 (Square)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Resolution - For video models that support it */}
+              {selectedModel?.type === "video" && 
+               selectedModel.modelParameters?.defaults?.resolution !== undefined && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[10px]" htmlFor="resolution">
+                      Resolution
+                    </Label>
+                    {selectedModel.modelParameters.defaults.resolution && (
+                      <Badge className="px-1.5 py-0 text-[9px]" variant="secondary">
+                        Default: {String(selectedModel.modelParameters.defaults.resolution)}
+                      </Badge>
+                    )}
+                  </div>
+                  <Select
+                    disabled={isGenerating}
+                    onValueChange={setResolution}
+                    value={resolution}
+                  >
+                    <SelectTrigger className="h-8 text-xs" id="resolution">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="720p">720p (HD)</SelectItem>
+                      <SelectItem value="1080p">1080p (Full HD)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               {/* Duration - Only for video models */}
               {selectedModel?.type === "video" && (
                 <div className="space-y-1.5">
@@ -657,6 +768,11 @@ export function GenerationPanelV2({
                     step={1}
                     value={duration}
                   />
+                  {selectedModel.modelParameters?.defaults?.duration !== undefined && (
+                    <p className="text-muted-foreground text-[9px]">
+                      Recommended: {String(selectedModel.modelParameters.defaults.duration)}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -678,6 +794,73 @@ export function GenerationPanelV2({
                     value={fps}
                   />
                 </div>
+              )}
+
+              {/* Enhance Prompt - Only for models that support it */}
+              {selectedModel?.modelParameters?.defaults?.enhance_prompt !== undefined && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-[10px]" htmlFor="enhance-prompt">
+                        Enhance Prompt
+                      </Label>
+                      <p className="text-muted-foreground text-[9px]">
+                        Automatically improve prompt quality
+                      </p>
+                    </div>
+                    <Switch
+                      checked={enhancePrompt}
+                      disabled={isGenerating}
+                      id="enhance-prompt"
+                      onCheckedChange={setEnhancePrompt}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Auto Fix - Only for models that support it */}
+              {selectedModel?.modelParameters?.defaults?.auto_fix !== undefined && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="text-[10px]" htmlFor="auto-fix">
+                        Auto Fix
+                      </Label>
+                      <p className="text-muted-foreground text-[9px]">
+                        Automatically fix prompt policy violations
+                      </p>
+                    </div>
+                    <Switch
+                      checked={autoFix}
+                      disabled={isGenerating}
+                      id="auto-fix"
+                      onCheckedChange={setAutoFix}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Fixed Parameters Info */}
+              {selectedModel?.modelParameters?.fixed && Object.keys(selectedModel.modelParameters.fixed).length > 0 && (
+                <Card className="border-border bg-muted/30">
+                  <CardContent className="px-2.5 pt-2.5 pb-2">
+                    <div className="flex items-start gap-1.5">
+                      <Info className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
+                      <div className="space-y-0.5">
+                        <p className="font-medium text-foreground text-[10px]">
+                          Fixed Parameters
+                        </p>
+                        <p className="text-muted-foreground text-[10px] leading-tight">
+                          {Object.entries(selectedModel.modelParameters.fixed).map(([key, value]) => (
+                            <span key={key} className="block">
+                              {key}: {String(value)}
+                            </span>
+                          ))}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Inference Steps */}

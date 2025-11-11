@@ -124,8 +124,11 @@ export class StudioService {
      * Build fal.ai input from GenerationRequest
      *
      * Transforms Studio domain request to fal.ai SDK input format.
+     * Applies model-specific parameters (defaults and fixed).
      */
     private buildInput(request: GenerationRequest): FalGenerationInput {
+        const model = this.resolveModel(request.modelId);
+        
         const input: FalGenerationInput = {
             prompt: request.prompt || "",
         };
@@ -152,7 +155,17 @@ export class StudioService {
             input.video_url = request.referenceVideoUrl;
         }
 
-        // Parameters from request
+        // Sora 2 video_id for remix
+        if (request.videoId) {
+            input.video_id = request.videoId;
+        }
+
+        // Apply model-specific default parameters first
+        if (model.modelParameters?.defaults) {
+            Object.assign(input, model.modelParameters.defaults);
+        }
+
+        // Parameters from request (override defaults)
         if (request.parameters) {
             const params = request.parameters;
 
@@ -176,6 +189,20 @@ export class StudioService {
                 input.seed = params.seed as number;
             }
 
+            // Veo-specific parameters (already in correct format)
+            if (params.aspect_ratio !== undefined) {
+                input.aspect_ratio = params.aspect_ratio as string;
+            }
+            if (params.resolution !== undefined) {
+                input.resolution = params.resolution as string;
+            }
+            if (params.enhance_prompt !== undefined) {
+                input.enhance_prompt = params.enhance_prompt as boolean;
+            }
+            if (params.auto_fix !== undefined) {
+                input.auto_fix = params.auto_fix as boolean;
+            }
+
             // Pass through any other parameters
             for (const [key, value] of Object.entries(params)) {
                 if (
@@ -186,11 +213,20 @@ export class StudioService {
                         "duration",
                         "fps",
                         "seed",
+                        "aspect_ratio",
+                        "resolution",
+                        "enhance_prompt",
+                        "auto_fix",
                     ].includes(key)
                 ) {
                     input[key] = value;
                 }
             }
+        }
+
+        // Apply model-specific fixed parameters last (cannot be overridden)
+        if (model.modelParameters?.fixed) {
+            Object.assign(input, model.modelParameters.fixed);
         }
 
         return input;

@@ -4,6 +4,17 @@ export type ReferenceInputKind =
   | "last-frame"
   | "reference-video";
 
+/**
+ * Model-specific default parameters
+ * These override or extend user-provided parameters
+ */
+export type ModelDefaultParameters = {
+  /** Fixed parameters that cannot be changed by user */
+  fixed?: Record<string, unknown>;
+  /** Default parameters that can be overridden by user */
+  defaults?: Record<string, unknown>;
+};
+
 export type FalStudioModel = {
   id: string;
   name: string;
@@ -17,6 +28,8 @@ export type FalStudioModel = {
   requiresReferenceImage?: boolean;
   requiredInputs: ReferenceInputKind[];
   optionalInputs: ReferenceInputKind[];
+  /** Model-specific parameter configuration */
+  modelParameters?: ModelDefaultParameters;
 };
 
 export const FAL_MODEL_GROUPS: Array<{
@@ -55,6 +68,18 @@ export const FAL_MODEL_GROUPS: Array<{
         requiresReferenceImage: false,
         requiredInputs: [],
         optionalInputs: [],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука
+          },
+          defaults: {
+            aspect_ratio: "16:9",
+            duration: "8s",
+            enhance_prompt: false,
+            auto_fix: false,
+            resolution: "720p",
+          },
+        },
       },
       {
         id: "fal-ai/veo3.1/image-to-video",
@@ -70,6 +95,18 @@ export const FAL_MODEL_GROUPS: Array<{
         requiresReferenceImage: true,
         requiredInputs: ["reference-image"],
         optionalInputs: ["first-frame", "last-frame"],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука
+          },
+          defaults: {
+            aspect_ratio: "16:9",
+            duration: "8s",
+            enhance_prompt: false,
+            auto_fix: false,
+            resolution: "720p",
+          },
+        },
       },
       {
         id: "fal-ai/veo3.1/fast/image-to-video",
@@ -85,6 +122,18 @@ export const FAL_MODEL_GROUPS: Array<{
         requiresReferenceImage: true,
         requiredInputs: ["reference-image"],
         optionalInputs: [],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука
+          },
+          defaults: {
+            aspect_ratio: "16:9",
+            duration: "8s",
+            enhance_prompt: false,
+            auto_fix: false,
+            resolution: "720p",
+          },
+        },
       },
       {
         id: "fal-ai/veo3.1/reference-to-video",
@@ -100,6 +149,18 @@ export const FAL_MODEL_GROUPS: Array<{
         requiresReferenceImage: false,
         requiredInputs: ["reference-video"],
         optionalInputs: ["first-frame", "last-frame"],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука
+          },
+          defaults: {
+            aspect_ratio: "16:9",
+            duration: "8s",
+            enhance_prompt: false,
+            auto_fix: false,
+            resolution: "720p",
+          },
+        },
       },
       {
         id: "fal-ai/veo2/image-to-video",
@@ -115,6 +176,145 @@ export const FAL_MODEL_GROUPS: Array<{
         requiresReferenceImage: true,
         requiredInputs: ["reference-image"],
         optionalInputs: [],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука для Veo 2
+          },
+          defaults: {
+            aspect_ratio: "16:9",
+            duration: "8s",
+            resolution: "720p",
+          },
+        },
+      },
+      {
+        id: "fal-ai/veo3",
+        name: "Veo 3 Text-to-Video",
+        description:
+          "Veo 3 by Google, the most advanced AI video generation model in the world. With sound generation capabilities for ultra-realistic videos.",
+        type: "video",
+        provider: "fal",
+        creator: "Google",
+        quality: "SOTA",
+        supportsImageInput: false,
+        supportsVideoInput: false,
+        requiresReferenceImage: false,
+        requiredInputs: [],
+        optionalInputs: [],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука
+          },
+          defaults: {
+            aspect_ratio: "16:9",
+            duration: "8s",
+            enhance_prompt: true,
+            auto_fix: true,
+            resolution: "720p",
+          },
+        },
+      },
+      {
+        id: "fal-ai/veo3/fast",
+        name: "Veo 3 Fast Text-to-Video",
+        description:
+          "Faster and more cost effective version of Google's Veo 3! Optimized for quick iterations while maintaining high quality.",
+        type: "video",
+        provider: "fal",
+        creator: "Google",
+        quality: "SOTA",
+        supportsImageInput: false,
+        supportsVideoInput: false,
+        requiresReferenceImage: false,
+        requiredInputs: [],
+        optionalInputs: [],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука (экономия 33% кредитов)
+          },
+          defaults: {
+            aspect_ratio: "16:9",
+            duration: "8s",
+            enhance_prompt: true,
+            auto_fix: true,
+            resolution: "720p",
+          },
+        },
+      },
+      {
+        id: "fal-ai/veo3/image-to-video",
+        name: "Veo 3 Image-to-Video",
+        description:
+          "Veo 3 is the latest state-of-the art video generation model from Google DeepMind for animating images with realistic motion.",
+        type: "video",
+        provider: "fal",
+        creator: "Google",
+        quality: "SOTA",
+        supportsImageInput: true,
+        supportsVideoInput: false,
+        requiresReferenceImage: true,
+        requiredInputs: ["reference-image"],
+        optionalInputs: [],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука (экономия 50% кредитов)
+          },
+          defaults: {
+            aspect_ratio: "auto",
+            duration: "8s",
+            resolution: "720p",
+          },
+        },
+      },
+      {
+        id: "fal-ai/veo3/fast/image-to-video",
+        name: "Veo 3 Fast Image-to-Video",
+        description:
+          "Generate videos from your image prompts using Veo 3 fast. 50% price drop with optimized speed.",
+        type: "video",
+        provider: "fal",
+        creator: "Google",
+        quality: "SOTA",
+        supportsImageInput: true,
+        supportsVideoInput: false,
+        requiresReferenceImage: true,
+        requiredInputs: ["reference-image"],
+        optionalInputs: [],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука (экономия 33% кредитов)
+          },
+          defaults: {
+            aspect_ratio: "auto",
+            duration: "8s",
+            resolution: "720p",
+          },
+        },
+      },
+      {
+        id: "fal-ai/veo3.1/fast/first-last-frame-to-video",
+        name: "Veo 3.1 Fast First-Last-Frame-to-Video",
+        description:
+          "Generate videos from a first/last frame using Google's Veo 3.1 Fast. Create smooth transitions between two frames.",
+        type: "video",
+        provider: "fal",
+        creator: "Google",
+        quality: "SOTA",
+        supportsImageInput: true,
+        supportsVideoInput: false,
+        requiresReferenceImage: true,
+        requiredInputs: ["first-frame", "last-frame"],
+        optionalInputs: [],
+        modelParameters: {
+          fixed: {
+            generate_audio: false, // Отключаем генерацию звука (экономия 33% кредитов)
+          },
+          defaults: {
+            aspect_ratio: "auto",
+            duration: "8s",
+            resolution: "720p",
+          },
+        },
       },
     ],
   },
@@ -362,10 +562,98 @@ export const FAL_MODEL_GROUPS: Array<{
     creator: "OpenAI",
     models: [
       {
-        id: "fal-ai/sora/2",
-        name: "Sora 2",
+        id: "fal-ai/sora-2/text-to-video",
+        name: "Sora 2 Text-to-Video",
         description:
-          "Advanced video-to-video remix model from OpenAI for editing and generating videos using reference clips.",
+          "OpenAI's state-of-the-art text-to-video model capable of creating richly detailed, dynamic clips with audio from natural language prompts.",
+        type: "video",
+        provider: "fal",
+        creator: "OpenAI",
+        quality: "SOTA",
+        supportsImageInput: false,
+        supportsVideoInput: false,
+        requiresReferenceImage: false,
+        requiredInputs: [],
+        optionalInputs: [],
+        modelParameters: {
+          defaults: {
+            resolution: "720p",
+            aspect_ratio: "16:9",
+            duration: 4,
+          },
+        },
+      },
+      {
+        id: "fal-ai/sora-2/text-to-video/pro",
+        name: "Sora 2 Pro Text-to-Video",
+        description:
+          "Pro version of Sora 2 text-to-video with enhanced quality and 1080p support. Creates richly detailed, dynamic clips with audio.",
+        type: "video",
+        provider: "fal",
+        creator: "OpenAI",
+        quality: "SOTA",
+        supportsImageInput: false,
+        supportsVideoInput: false,
+        requiresReferenceImage: false,
+        requiredInputs: [],
+        optionalInputs: [],
+        modelParameters: {
+          defaults: {
+            resolution: "1080p",
+            aspect_ratio: "16:9",
+            duration: 4,
+          },
+        },
+      },
+      {
+        id: "fal-ai/sora-2/image-to-video",
+        name: "Sora 2 Image-to-Video",
+        description:
+          "Generate videos from images using Sora 2. Creates dynamic clips with audio from a reference image and text prompt.",
+        type: "video",
+        provider: "fal",
+        creator: "OpenAI",
+        quality: "SOTA",
+        supportsImageInput: true,
+        supportsVideoInput: false,
+        requiresReferenceImage: true,
+        requiredInputs: ["reference-image"],
+        optionalInputs: [],
+        modelParameters: {
+          defaults: {
+            resolution: "auto",
+            aspect_ratio: "auto",
+            duration: 4,
+          },
+        },
+      },
+      {
+        id: "fal-ai/sora-2/image-to-video/pro",
+        name: "Sora 2 Pro Image-to-Video",
+        description:
+          "Pro version of Sora 2 image-to-video with enhanced quality and 1080p support. Animates still images into dynamic clips with audio.",
+        type: "video",
+        provider: "fal",
+        creator: "OpenAI",
+        quality: "SOTA",
+        supportsImageInput: true,
+        supportsVideoInput: false,
+        requiresReferenceImage: true,
+        requiredInputs: ["reference-image"],
+        optionalInputs: [],
+        modelParameters: {
+          defaults: {
+            resolution: "auto",
+            aspect_ratio: "auto",
+            duration: 4,
+          },
+        },
+      },
+      {
+        id: "fal-ai/sora-2/video-to-video/remix",
+        name: "Sora 2 Video Remix",
+        description:
+          "Transform existing Sora-generated videos with new prompts. Allows rich edits, style changes, and creative reinterpretations while preserving motion.",
         type: "video",
         provider: "fal",
         creator: "OpenAI",

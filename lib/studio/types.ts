@@ -190,6 +190,7 @@ export type GenerationRequest = {
   lastFrameUrl?: string;
   referenceVideoUrl?: string;
   inputAssetId?: string;
+  videoId?: string; // For Sora 2 video-to-video remix
   parameters?: {
     imageSize?: string;
     numInferenceSteps?: number;
