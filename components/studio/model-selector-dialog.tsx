@@ -166,12 +166,14 @@ export function ModelSelectorDialog({
               <DialogTitle className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text font-bold text-transparent text-xl">
                 Выберите модель
               </DialogTitle>
-              <DialogDescription className="mt-1 text-muted-foreground text-sm">
-                Выберите модель для{" "}
-                <Badge className="ml-1" variant="outline">
+              <div className="mt-1 flex items-center gap-1">
+                <DialogDescription className="text-muted-foreground text-sm">
+                  Выберите модель для
+                </DialogDescription>
+                <Badge variant="outline">
                   {GENERATION_TYPE_LABELS[generationType]}
                 </Badge>
-              </DialogDescription>
+              </div>
             </div>
             <Badge className="text-xs" variant="secondary">
               {filteredModels.length} моделей
