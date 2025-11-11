@@ -85,7 +85,38 @@ const VEO_ASPECT_OPTIONS: ModelSettingOption[] = [
   { label: "1:1 (Square)", value: "1:1" },
 ];
 
-const SORA_MODELS: FalStudioModel[] = [
+const SEEDREAM_ENHANCE_OPTIONS = [
+  { label: "Standard", value: "standard" },
+  { label: "Fast", value: "fast" },
+];
+
+const SEEDREAM_IMAGE_SIZE_DEFAULT = JSON.stringify({
+  width: 2048,
+  height: 2048,
+ });
+
+const SEEDREAM_NUM_IMAGES_OPTIONS: ModelSettingOption[] = Array.from(
+  { length: 6 },
+  (_, index) => ({
+    label: `${index + 1} image${index === 0 ? "" : "s"}`,
+    value: index + 1,
+  })
+);
+
+const REVE_OUTPUT_FORMAT_OPTIONS: ModelSettingOption[] = [
+  { label: "PNG", value: "png" },
+  { label: "JPEG", value: "jpeg" },
+  { label: "WEBP", value: "webp" },
+];
+
+const REVE_NUM_IMAGES_OPTIONS: ModelSettingOption[] = [
+  { label: "1 image", value: 1 },
+  { label: "2 images", value: 2 },
+  { label: "3 images", value: 3 },
+  { label: "4 images", value: 4 },
+];
+
+export const SORA_MODELS: FalStudioModel[] = [
   {
     id: "fal-ai/sora-2/text-to-video",
     name: "Sora 2 Text-to-Video",
@@ -269,7 +300,15 @@ const SORA_MODELS: FalStudioModel[] = [
   },
 ];
 
-const VEO_MODELS: FalStudioModel[] = [
+const KLING_DURATION_OPTIONS: ModelSettingOption[] = [
+  { label: "5 seconds", value: "5" },
+  { label: "10 seconds", value: "10" },
+];
+
+const KLING_NEGATIVE_PROMPT =
+  "blur, distort, and low quality";
+
+export const VEO_MODELS: FalStudioModel[] = [
   {
     id: "fal-ai/veo3.1",
     name: "Veo 3.1 Text-to-Video",
@@ -313,7 +352,7 @@ const VEO_MODELS: FalStudioModel[] = [
         type: "toggle",
         key: "generate_audio",
         label: "Generate Audio",
-        defaultValue: true,
+        defaultValue: false,
         helperText: "Disable to save credits when silent footage is enough.",
       },
       {
@@ -642,6 +681,203 @@ const VEO_MODELS: FalStudioModel[] = [
   },
 ];
 
+export const SEEDREAM_MODELS: FalStudioModel[] = [
+  {
+    id: "fal-ai/bytedance/seedream/v4/edit",
+    name: "Seedream v4 Edit",
+    description:
+      "Seedream 4 Edit from ByteDance combines image generation and editing into a single workflow.",
+    type: "image",
+    provider: "fal",
+    creator: "ByteDance",
+    quality: "SOTA",
+    supportsImageInput: true,
+    supportsVideoInput: false,
+    requiresReferenceImage: true,
+    requiredInputs: ["reference-image"],
+    optionalInputs: [],
+    settings: [
+      {
+        type: "text",
+        key: "image_size",
+        label: "Image Size",
+        helperText: "JSON object {height, width}. Minimum area 921600 px.",
+        defaultValue: SEEDREAM_IMAGE_SIZE_DEFAULT,
+        required: true,
+      },
+      {
+        type: "select",
+        key: "num_images",
+        label: "Generations",
+        defaultValue: 1,
+        options: SEEDREAM_NUM_IMAGES_OPTIONS,
+      },
+      {
+        type: "select",
+        key: "max_images",
+        label: "Max images per generation",
+        defaultValue: 1,
+        options: SEEDREAM_NUM_IMAGES_OPTIONS,
+      },
+      {
+        type: "text",
+        key: "seed",
+        label: "Seed",
+        helperText: "Optional integer for deterministic outputs.",
+        defaultValue: "",
+      },
+      {
+        type: "toggle",
+        key: "sync_mode",
+        label: "Sync Mode",
+        helperText: "Enable to receive data URI outputs.",
+        defaultValue: false,
+      },
+      {
+        type: "toggle",
+        key: "enable_safety_checker",
+        label: "Safety Checker",
+        defaultValue: true,
+      },
+      {
+        type: "select",
+        key: "enhance_prompt_mode",
+        label: "Prompt Enhancement",
+        defaultValue: "standard",
+        options: SEEDREAM_ENHANCE_OPTIONS,
+      },
+      {
+        type: "textarea",
+        key: "negative_prompt",
+        label: "Negative Prompt",
+        helperText: "Default: blur, distort, and low quality",
+        defaultValue: "blur, distort, and low quality",
+      },
+    ],
+  },
+];
+
+export const REVE_MODELS: FalStudioModel[] = [
+  {
+    id: "fal-ai/reve/edit",
+    name: "Reve Edit",
+    description:
+      "Reve edit model for stylized image transformations using a text prompt.",
+    type: "image",
+    provider: "fal",
+    creator: "Reve",
+    quality: "High",
+    supportsImageInput: true,
+    supportsVideoInput: false,
+    requiresReferenceImage: true,
+    requiredInputs: ["reference-image"],
+    optionalInputs: [],
+    settings: [
+      {
+        type: "select",
+        key: "num_images",
+        label: "Generations",
+        defaultValue: 1,
+        options: REVE_NUM_IMAGES_OPTIONS,
+      },
+      {
+        type: "select",
+        key: "output_format",
+        label: "Output Format",
+        defaultValue: "png",
+        options: REVE_OUTPUT_FORMAT_OPTIONS,
+      },
+      {
+        type: "toggle",
+        key: "sync_mode",
+        label: "Sync Mode",
+        helperText: "Returns data URI and skips history",
+        defaultValue: false,
+      },
+    ],
+  },
+  {
+    id: "fal-ai/reve/fast/edit",
+    name: "Reve Fast Edit",
+    description:
+      "Reve fast edit for quicker image refinements with the same controls.",
+    type: "image",
+    provider: "fal",
+    creator: "Reve",
+    quality: "Fast",
+    supportsImageInput: true,
+    supportsVideoInput: false,
+    requiresReferenceImage: true,
+    requiredInputs: ["reference-image"],
+    optionalInputs: [],
+    settings: [
+      {
+        type: "select",
+        key: "num_images",
+        label: "Generations",
+        defaultValue: 1,
+        options: REVE_NUM_IMAGES_OPTIONS,
+      },
+      {
+        type: "select",
+        key: "output_format",
+        label: "Output Format",
+        defaultValue: "png",
+        options: REVE_OUTPUT_FORMAT_OPTIONS,
+      },
+      {
+        type: "toggle",
+        key: "sync_mode",
+        label: "Sync Mode",
+        helperText: "Returns data URI and skips history",
+        defaultValue: false,
+      },
+    ],
+  },
+];
+
+const KLING_MODELS: FalStudioModel[] = [
+  {
+    id: "fal-ai/kling-video/v2.5-turbo/standard/image-to-video",
+    name: "Kling 2.5 Turbo Standard",
+    description:
+      "Stylized Kling 2.5 Turbo image-to-video that emphasizes cinematic motion and clean visuals.",
+    type: "video",
+    provider: "fal",
+    creator: "Kling",
+    quality: "SOTA",
+    supportsImageInput: true,
+    supportsVideoInput: false,
+    requiresReferenceImage: true,
+    requiredInputs: ["reference-image"],
+    optionalInputs: [],
+    settings: [
+      {
+        type: "select",
+        key: "duration",
+        label: "Duration",
+        defaultValue: "5",
+        options: KLING_DURATION_OPTIONS,
+      },
+      {
+        type: "text",
+        key: "negative_prompt",
+        label: "Negative Prompt",
+        helperText: "Examples: blur, distort, and low quality",
+        defaultValue: KLING_NEGATIVE_PROMPT,
+      },
+      {
+        type: "text",
+        key: "cfg_scale",
+        label: "CFG Scale",
+        helperText: "0 = creative, 1 = faithful",
+        placeholder: "0.5",
+        defaultValue: "0.5",
+      },
+    ],
+  },
+];
+
 export const FAL_MODEL_GROUPS: Array<{
   creator: string;
   models: FalStudioModel[];
@@ -653,6 +889,18 @@ export const FAL_MODEL_GROUPS: Array<{
   {
     creator: "Google DeepMind",
     models: VEO_MODELS,
+  },
+  {
+    creator: "ByteDance",
+    models: SEEDREAM_MODELS,
+  },
+  {
+    creator: "Reve",
+    models: REVE_MODELS,
+  },
+  {
+    creator: "Kling",
+    models: KLING_MODELS,
   },
 ];
 
