@@ -59,6 +59,12 @@ const GENERATION_TYPES: Array<{
   description: string;
 }> = [
   {
+    value: "text-to-image",
+    label: "Text to Image",
+    icon: ImageIcon,
+    description: "Generate standalone images from prompts",
+  },
+  {
     value: "text-to-video",
     label: "Text to Video",
     icon: Video,
@@ -75,6 +81,12 @@ const GENERATION_TYPES: Array<{
     label: "Video to Video",
     icon: Layers,
     description: "Remix or extend existing clips",
+  },
+  {
+    value: "image-to-image",
+    label: "Image to Image",
+    icon: ImageIcon,
+    description: "Edit or restyle existing pictures",
   },
 ];
 

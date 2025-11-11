@@ -23,7 +23,9 @@ import {
     Video,
     XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAssetSignedUrl, useSignedUrl } from "@/hooks/use-signed-url";
+import type { StudioAsset } from "@/lib/studio/types";
 import { toast } from "sonner";
 
 interface GenerationHistoryProps {
@@ -75,6 +77,8 @@ export function GenerationHistory({
 }: GenerationHistoryProps) {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [actioningIds, setActioningIds] = useState<Set<string>>(new Set());
+  const [assetMap, setAssetMap] = useState<Record<string, StudioAsset | null>>({});
+  const fetchingRef = useRef<Set<string>>(new Set());
 
   // Handle cancel generation
   const handleCancel = async (generationId: string) => {
@@ -133,6 +137,39 @@ export function GenerationHistory({
     return () => clearInterval(interval);
   }, [autoRefresh, generations, onRefresh]);
 
+  useEffect(() => {
+    const idsToFetch = new Set(
+      generations
+        .map((generation) => generation.outputAssetId)
+        .filter(Boolean) as string[]
+    );
+
+    idsToFetch.forEach((assetId) => {
+      if (assetMap[assetId] !== undefined || fetchingRef.current.has(assetId)) {
+        return;
+      }
+
+      fetchingRef.current.add(assetId);
+
+      fetch(`/api/studio/assets/${assetId}`, { cache: "no-store" })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Unable to load asset");
+          }
+          return response.json();
+        })
+        .then((asset: StudioAsset) => {
+          setAssetMap((prev) => ({ ...prev, [assetId]: asset }));
+        })
+        .catch(() => {
+          setAssetMap((prev) => ({ ...prev, [assetId]: null }));
+        })
+        .finally(() => {
+          fetchingRef.current.delete(assetId);
+        });
+    });
+  }, [assetMap, generations]);
+
   if (generations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -142,6 +179,65 @@ export function GenerationHistory({
           Start generating content and your history will appear here
         </p>
       </div>
+    );
+  }
+
+  function GenerationAssetButtons({
+    asset,
+  }: {
+    asset?: StudioAsset | null;
+  }) {
+    const {
+      signedUrl: viewUrl,
+      loading: viewLoading,
+    } = useAssetSignedUrl(asset ?? null, "large");
+    const {
+      signedUrl: downloadUrl,
+      loading: downloadLoading,
+    } = useSignedUrl(asset?.url ?? null, {
+      download: asset?.name || "generated",
+    });
+
+    if (!asset) {
+      return (
+        <span className="text-muted-foreground text-[10px]">
+          Preparing generated asset...
+        </span>
+      );
+    }
+
+    return (
+      <>
+        <Button
+          asChild
+          className="h-6 text-xs"
+          disabled={!viewUrl || viewLoading}
+          size="sm"
+          variant="outline"
+        >
+          <a href={viewUrl ?? "#"} rel="noreferrer" target="_blank">
+            <ExternalLink className="mr-1 h-2.5 w-2.5" />
+            View
+          </a>
+        </Button>
+        <Button
+          asChild
+          className="h-6 text-xs"
+          disabled={!downloadUrl || downloadLoading}
+          size="sm"
+          variant="outline"
+        >
+          <a
+            href={downloadUrl ?? "#"}
+            rel="noreferrer"
+            target="_blank"
+            download
+          >
+            <Download className="mr-1 h-2.5 w-2.5" />
+            Download
+          </a>
+        </Button>
+      </>
     );
   }
 
@@ -291,24 +387,9 @@ export function GenerationHistory({
                         {/* Completed - View & Download */}
                         {generation.status === "completed" &&
                           generation.outputAssetId && (
-                            <>
-                              <Button
-                                className="h-6 text-xs"
-                                size="sm"
-                                variant="outline"
-                              >
-                                <ExternalLink className="mr-1 h-2.5 w-2.5" />
-                                View
-                              </Button>
-                              <Button
-                                className="h-6 text-xs"
-                                size="sm"
-                                variant="outline"
-                              >
-                                <Download className="mr-1 h-2.5 w-2.5" />
-                                Download
-                              </Button>
-                            </>
+                            <GenerationAssetButtons
+                              asset={assetMap[generation.outputAssetId]}
+                            />
                           )}
 
                         {/* Processing/Pending - Cancel */}
