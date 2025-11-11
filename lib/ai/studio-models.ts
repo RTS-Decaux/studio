@@ -60,12 +60,10 @@ export type FalStudioModel = {
   settings?: ModelSetting[];
 };
 
-const SORA_DURATION_OPTIONS: ModelSettingOption[] = [4, 8, 12].map(
-  (value) => ({
-    label: `${value} seconds`,
-    value,
-  })
-);
+const SORA_DURATION_OPTIONS: ModelSettingOption[] = [4, 8, 12].map((value) => ({
+  label: `${value} seconds`,
+  value,
+}));
 
 const SORA_ASPECT_OPTIONS: ModelSettingOption[] = [
   { label: "Auto", value: "auto" },
@@ -93,7 +91,7 @@ const SEEDREAM_ENHANCE_OPTIONS = [
 const SEEDREAM_IMAGE_SIZE_DEFAULT = JSON.stringify({
   width: 2048,
   height: 2048,
- });
+});
 
 const SEEDREAM_NUM_IMAGES_OPTIONS: ModelSettingOption[] = Array.from(
   { length: 6 },
@@ -114,6 +112,43 @@ const REVE_NUM_IMAGES_OPTIONS: ModelSettingOption[] = [
   { label: "2 images", value: 2 },
   { label: "3 images", value: 3 },
   { label: "4 images", value: 4 },
+];
+
+const FLUX_IMAGE_SIZE_OPTIONS: ModelSettingOption[] = [
+  { label: "Square (1024x1024)", value: "square_hd" },
+  { label: "Landscape 16:9 (1024x576)", value: "landscape_4_3" },
+  { label: "Landscape 3:2 (1152x832)", value: "landscape_16_9" },
+  { label: "Portrait 4:3 (832x1152)", value: "portrait_4_3" },
+  { label: "Portrait 16:9 (576x1024)", value: "portrait_16_9" },
+];
+
+const FLUX_NUM_IMAGES_OPTIONS: ModelSettingOption[] = [
+  { label: "1 image", value: 1 },
+  { label: "2 images", value: 2 },
+  { label: "3 images", value: 3 },
+  { label: "4 images", value: 4 },
+];
+
+const FLUX_SAFETY_TOLERANCE_OPTIONS: ModelSettingOption[] = [
+  { label: "1 (Most Strict)", value: "1" },
+  { label: "2 (Strict)", value: "2" },
+  { label: "3 (Moderate)", value: "3" },
+  { label: "4 (Permissive)", value: "4" },
+  { label: "5 (More Permissive)", value: "5" },
+  { label: "6 (Most Permissive)", value: "6" },
+];
+
+const FLUX_OUTPUT_FORMAT_OPTIONS: ModelSettingOption[] = [
+  { label: "JPEG", value: "jpeg" },
+  { label: "PNG", value: "png" },
+];
+
+const FLUX_ASPECT_RATIO_OPTIONS: ModelSettingOption[] = [
+  { label: "1:1 (Square)", value: "1:1" },
+  { label: "16:9 (Landscape)", value: "16:9" },
+  { label: "9:16 (Portrait)", value: "9:16" },
+  { label: "4:3 (Landscape)", value: "4:3" },
+  { label: "3:4 (Portrait)", value: "3:4" },
 ];
 
 export const SORA_MODELS: FalStudioModel[] = [
@@ -137,7 +172,9 @@ export const SORA_MODELS: FalStudioModel[] = [
         key: "aspect_ratio",
         label: "Aspect Ratio",
         defaultValue: "16:9",
-        options: SORA_ASPECT_OPTIONS.filter((option) => option.value !== "auto"),
+        options: SORA_ASPECT_OPTIONS.filter(
+          (option) => option.value !== "auto"
+        ),
       },
       {
         type: "select",
@@ -178,7 +215,9 @@ export const SORA_MODELS: FalStudioModel[] = [
         key: "aspect_ratio",
         label: "Aspect Ratio",
         defaultValue: "16:9",
-        options: SORA_ASPECT_OPTIONS.filter((option) => option.value !== "auto"),
+        options: SORA_ASPECT_OPTIONS.filter(
+          (option) => option.value !== "auto"
+        ),
       },
       {
         type: "select",
@@ -305,8 +344,7 @@ const KLING_DURATION_OPTIONS: ModelSettingOption[] = [
   { label: "10 seconds", value: "10" },
 ];
 
-const KLING_NEGATIVE_PROMPT =
-  "blur, distort, and low quality";
+const KLING_NEGATIVE_PROMPT = "blur, distort, and low quality";
 
 export const VEO_MODELS: FalStudioModel[] = [
   {
@@ -509,10 +547,7 @@ export const VEO_MODELS: FalStudioModel[] = [
         key: "aspect_ratio",
         label: "Aspect Ratio",
         defaultValue: "auto",
-        options: [
-          { label: "Auto", value: "auto" },
-          ...VEO_ASPECT_OPTIONS,
-        ],
+        options: [{ label: "Auto", value: "auto" }, ...VEO_ASPECT_OPTIONS],
       },
       {
         type: "select",
@@ -559,10 +594,7 @@ export const VEO_MODELS: FalStudioModel[] = [
         key: "aspect_ratio",
         label: "Aspect Ratio",
         defaultValue: "auto",
-        options: [
-          { label: "Auto", value: "auto" },
-          ...VEO_ASPECT_OPTIONS,
-        ],
+        options: [{ label: "Auto", value: "auto" }, ...VEO_ASPECT_OPTIONS],
       },
       {
         type: "select",
@@ -609,10 +641,7 @@ export const VEO_MODELS: FalStudioModel[] = [
         key: "aspect_ratio",
         label: "Aspect Ratio",
         defaultValue: "auto",
-        options: [
-          { label: "Auto", value: "auto" },
-          ...VEO_ASPECT_OPTIONS,
-        ],
+        options: [{ label: "Auto", value: "auto" }, ...VEO_ASPECT_OPTIONS],
       },
       {
         type: "select",
@@ -836,7 +865,7 @@ export const REVE_MODELS: FalStudioModel[] = [
   },
 ];
 
-const KLING_MODELS: FalStudioModel[] = [
+export const KLING_MODELS: FalStudioModel[] = [
   {
     id: "fal-ai/kling-video/v2.5-turbo/standard/image-to-video",
     name: "Kling 2.5 Turbo Standard",
@@ -878,6 +907,163 @@ const KLING_MODELS: FalStudioModel[] = [
   },
 ];
 
+export const FLUX_MODELS: FalStudioModel[] = [
+  {
+    id: "fal-ai/flux-pro/new",
+    name: "FLUX.1 [pro] new",
+    description:
+      "Accelerated version of FLUX.1 [pro], maintaining professional-grade image quality while delivering significantly faster generation speeds.",
+    type: "image",
+    provider: "fal",
+    creator: "Black Forest Labs",
+    quality: "Pro",
+    supportsImageInput: false,
+    supportsVideoInput: false,
+    requiresReferenceImage: false,
+    requiredInputs: [],
+    optionalInputs: [],
+    settings: [
+      {
+        type: "select",
+        key: "image_size",
+        label: "Image Size",
+        defaultValue: "landscape_4_3",
+        options: FLUX_IMAGE_SIZE_OPTIONS,
+      },
+      {
+        type: "select",
+        key: "num_images",
+        label: "Number of Images",
+        defaultValue: 1,
+        options: FLUX_NUM_IMAGES_OPTIONS,
+      },
+      {
+        type: "select",
+        key: "output_format",
+        label: "Output Format",
+        defaultValue: "jpeg",
+        options: FLUX_OUTPUT_FORMAT_OPTIONS,
+      },
+      {
+        type: "select",
+        key: "num_inference_steps",
+        label: "Inference Steps",
+        defaultValue: 28,
+        options: [
+          { label: "Fast (10 steps)", value: 10 },
+          { label: "Balanced (28 steps)", value: 28 },
+          { label: "Quality (50 steps)", value: 50 },
+        ],
+        helperText: "More steps = better quality but slower",
+      },
+      {
+        type: "select",
+        key: "guidance_scale",
+        label: "Guidance Scale",
+        defaultValue: 3.5,
+        options: [
+          { label: "1.0 (Creative)", value: 1.0 },
+          { label: "2.0", value: 2.0 },
+          { label: "3.5 (Balanced)", value: 3.5 },
+          { label: "5.0", value: 5.0 },
+          { label: "10.0", value: 10.0 },
+          { label: "20.0 (Strict)", value: 20.0 },
+        ],
+        helperText: "How closely to follow the prompt",
+      },
+      {
+        type: "select",
+        key: "safety_tolerance",
+        label: "Safety Tolerance",
+        defaultValue: "2",
+        options: FLUX_SAFETY_TOLERANCE_OPTIONS,
+        helperText: "1 = Most strict, 6 = Most permissive",
+      },
+      {
+        type: "toggle",
+        key: "enhance_prompt",
+        label: "Enhance Prompt",
+        defaultValue: false,
+        helperText: "AI enhancement of your prompt for better results",
+      },
+      {
+        type: "toggle",
+        key: "sync_mode",
+        label: "Sync Mode",
+        defaultValue: false,
+        helperText: "Returns data URI and skips history",
+      },
+    ],
+  },
+  {
+    id: "fal-ai/flux-pro/v1.1-ultra",
+    name: "FLUX.1 [pro] v1.1 Ultra",
+    description:
+      "Premium FLUX.1 [pro] variant with enhanced detail, richness, and fidelity for professional-grade image generation.",
+    type: "image",
+    provider: "fal",
+    creator: "Black Forest Labs",
+    quality: "Ultra",
+    supportsImageInput: false,
+    supportsVideoInput: false,
+    requiresReferenceImage: false,
+    requiredInputs: [],
+    optionalInputs: [],
+    settings: [
+      {
+        type: "select",
+        key: "num_images",
+        label: "Number of Images",
+        defaultValue: 1,
+        options: FLUX_NUM_IMAGES_OPTIONS,
+      },
+      {
+        type: "select",
+        key: "output_format",
+        label: "Output Format",
+        defaultValue: "jpeg",
+        options: FLUX_OUTPUT_FORMAT_OPTIONS,
+      },
+      {
+        type: "select",
+        key: "safety_tolerance",
+        label: "Safety Tolerance",
+        defaultValue: "2",
+        options: FLUX_SAFETY_TOLERANCE_OPTIONS,
+        helperText: "1 = Most strict, 6 = Most permissive",
+      },
+      {
+        type: "select",
+        key: "aspect_ratio",
+        label: "Aspect Ratio",
+        defaultValue: "1:1",
+        options: FLUX_ASPECT_RATIO_OPTIONS,
+      },
+      {
+        type: "toggle",
+        key: "enable_safety_checker",
+        label: "Safety Checker",
+        defaultValue: true,
+        helperText: "Detect and filter unsafe content",
+      },
+      {
+        type: "toggle",
+        key: "raw",
+        label: "Raw Mode",
+        defaultValue: false,
+        helperText: "Generate less processed, more natural-looking images",
+      },
+      {
+        type: "toggle",
+        key: "sync_mode",
+        label: "Sync Mode",
+        defaultValue: false,
+        helperText: "Returns data URI and skips history",
+      },
+    ],
+  },
+];
+
 export const FAL_MODEL_GROUPS: Array<{
   creator: string;
   models: FalStudioModel[];
@@ -901,6 +1087,10 @@ export const FAL_MODEL_GROUPS: Array<{
   {
     creator: "Kling",
     models: KLING_MODELS,
+  },
+  {
+    creator: "Black Forest Labs",
+    models: FLUX_MODELS,
   },
 ];
 

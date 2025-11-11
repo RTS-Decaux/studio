@@ -1,108 +1,89 @@
 import { ALL_FAL_MODELS, type FalStudioModel } from "@/lib/ai/studio-models";
 import type { ModelModalityMapping, StudioGenerationType } from "./types";
 
-/**
- * Определяет тип генерации на основе характеристик модели
- */
-export function inferGenerationType(
-  model: FalStudioModel
-): StudioGenerationType[] {
-  const types: StudioGenerationType[] = [];
+const GENERATION_TYPES: StudioGenerationType[] = [
+  "text-to-image",
+  "text-to-video",
+  "image-to-image",
+  "image-to-video",
+  "video-to-video",
+  "inpaint",
+  "lipsync",
+];
 
-  // Проверяем поддержку различных модальностей
-  const modelId = model.id.toLowerCase();
-  const description = model.description.toLowerCase();
-  const hasImageInput =
-    model.supportsImageInput || model.requiresReferenceImage;
-  const hasVideoInput = model.supportsVideoInput;
-  const requiresFirstLastFrame = model.requiredInputs?.includes("first-frame");
-  const requiresReferenceVideo =
-    model.requiredInputs?.includes("reference-video");
+const MODEL_TYPE_RULES: Record<
+  StudioGenerationType,
+  (model: FalStudioModel) => boolean
+> = {
+  "text-to-image": (m) =>
+    m.type === "image" &&
+    !(m.supportsImageInput ?? false) &&
+    !(m.supportsVideoInput ?? false) &&
+    !(m.requiresReferenceImage ?? false),
 
-  // Text-to-Image
-  if (
-    model.type === "image" &&
-    !hasImageInput &&
-    !hasVideoInput &&
-    (modelId.includes("text-to-image") ||
-      modelId.includes("flux") ||
-      modelId.includes("sdxl"))
-  ) {
-    types.push("text-to-image");
+  "text-to-video": (m) =>
+    m.type === "video" &&
+    !(m.supportsImageInput ?? false) &&
+    !(m.supportsVideoInput ?? false) &&
+    !(m.requiresReferenceImage ?? false) &&
+    !(m.requiredInputs?.includes("first-frame") ?? false) &&
+    !(m.requiredInputs?.includes("reference-video") ?? false),
+
+  "image-to-image": (m) =>
+    m.type === "image" &&
+    ((m.supportsImageInput ?? false) || (m.requiresReferenceImage ?? false)),
+
+  inpaint: (m) =>
+    m.type === "image" &&
+    ((m.supportsImageInput ?? false) || (m.requiresReferenceImage ?? false)) &&
+    m.id.toLowerCase().includes("inpaint"),
+
+  "image-to-video": (m) =>
+    m.type === "video" &&
+    ((m.supportsImageInput ?? false) || (m.requiresReferenceImage ?? false)) &&
+    !(m.requiredInputs?.includes("reference-video") ?? false),
+
+  "video-to-video": (m) =>
+    m.type === "video" &&
+    ((m.supportsVideoInput ?? false) ||
+      (m.requiredInputs?.includes("reference-video") ?? false)),
+
+  lipsync: (m) =>
+    m.type === "video" &&
+    (m.supportsVideoInput ?? false) &&
+    m.id.toLowerCase().includes("lipsync"),
+};
+
+const PRIORITY_MODELS: Record<StudioGenerationType, string[]> = {
+  "text-to-image": [],
+  "text-to-video": [
+    "fal-ai/sora-2/text-to-video",
+    "fal-ai/sora-2/text-to-video/pro",
+    "fal-ai/veo3.1",
+    "fal-ai/veo3.1/fast",
+  ],
+  "image-to-image": [],
+  "image-to-video": [
+    "fal-ai/sora-2/image-to-video",
+    "fal-ai/sora-2/image-to-video/pro",
+    "fal-ai/veo3.1/image-to-video",
+    "fal-ai/veo3.1/fast/image-to-video",
+  ],
+  "video-to-video": [],
+  inpaint: [],
+  lipsync: [],
+};
+
+let cachedMapping: ModelModalityMapping | null = null;
+const modelCache = new Map<string, FalStudioModel>();
+
+function buildCache() {
+  for (const m of ALL_FAL_MODELS) {
+    modelCache.set(m.id, m);
   }
-
-  // Text-to-Video
-  if (
-    model.type === "video" &&
-    !hasImageInput &&
-    !hasVideoInput &&
-    !requiresFirstLastFrame &&
-    !requiresReferenceVideo &&
-    (modelId.includes("text-to-video") ||
-      description.includes("text-to-video") ||
-      !model.requiresReferenceImage)
-  ) {
-    types.push("text-to-video");
-  }
-
-  // Image-to-Image
-  if (
-    model.type === "image" &&
-    hasImageInput &&
-    (modelId.includes("image-to-image") || modelId.includes("inpaint"))
-  ) {
-    if (modelId.includes("inpaint")) {
-      types.push("inpaint");
-    }
-    types.push("image-to-image");
-  }
-
-  // Image-to-Video
-  if (
-    model.type === "video" &&
-    hasImageInput &&
-    !requiresReferenceVideo &&
-    (modelId.includes("image-to-video") || description.includes("animate"))
-  ) {
-    types.push("image-to-video");
-  }
-
-  // Video-to-Video
-  if (
-    model.type === "video" &&
-    (hasVideoInput ||
-      requiresReferenceVideo ||
-      modelId.includes("video-to-video") ||
-      description.includes("video-to-video"))
-  ) {
-    types.push("video-to-video");
-  }
-
-  // Lipsync
-  if (
-    model.type === "video" &&
-    hasVideoInput &&
-    (modelId.includes("lipsync") || description.includes("lipsync"))
-  ) {
-    types.push("lipsync");
-  }
-
-  // Если ничего не подошло, определяем дефолт
-  if (types.length === 0) {
-    if (model.type === "image") {
-      types.push("text-to-image");
-    } else if (model.type === "video") {
-      types.push("text-to-video");
-    }
-  }
-
-  return types;
 }
 
-/**
- * Создаёт mapping моделей по модальностям
- */
-export function createModelModalityMapping(): ModelModalityMapping {
+function buildMapping(): ModelModalityMapping {
   const mapping: ModelModalityMapping = {
     "text-to-image": [],
     "text-to-video": [],
@@ -114,9 +95,8 @@ export function createModelModalityMapping(): ModelModalityMapping {
   };
 
   for (const model of ALL_FAL_MODELS) {
-    const types = inferGenerationType(model);
-    for (const type of types) {
-      if (!mapping[type].find((m) => m.id === model.id)) {
+    for (const type of GENERATION_TYPES) {
+      if (MODEL_TYPE_RULES[type](model)) {
         mapping[type].push(model);
       }
     }
@@ -125,91 +105,59 @@ export function createModelModalityMapping(): ModelModalityMapping {
   return mapping;
 }
 
-/**
- * Получает модели для конкретного типа генерации
- */
+function getMapping(): ModelModalityMapping {
+  if (!cachedMapping) {
+    cachedMapping = buildMapping();
+  }
+  return cachedMapping;
+}
+
+export function getModelById(modelId: string): FalStudioModel | undefined {
+  if (modelCache.size === 0) {
+    buildCache();
+  }
+  return modelCache.get(modelId);
+}
+
 export function getModelsByGenerationType(
   type: StudioGenerationType
 ): FalStudioModel[] {
-  const mapping = createModelModalityMapping();
-  return mapping[type] || [];
+  return getMapping()[type] || [];
 }
 
-/**
- * Находит модель по ID
- */
-export function getModelById(modelId: string): FalStudioModel | undefined {
-  return ALL_FAL_MODELS.find((model) => model.id === modelId);
-}
-
-/**
- * Получает рекомендуемые модели для типа генерации
- */
 export function getRecommendedModels(
   type: StudioGenerationType,
   limit = 5
 ): FalStudioModel[] {
   const models = getModelsByGenerationType(type);
+  const priorities = PRIORITY_MODELS[type] || [];
 
-  // Приоритеты для рекомендаций
-  const priorities = {
-    "text-to-image": [],
-    "text-to-video": [
-      "fal-ai/veo3.1",
-      "fal-ai/veo3.1/fast",
-      "fal-ai/sora-2/text-to-video/pro",
-      "fal-ai/sora-2/text-to-video",
-    ],
-    "image-to-image": [],
-    "image-to-video": [
-      "fal-ai/sora-2/image-to-video/pro",
-      "fal-ai/sora-2/image-to-video",
-      "fal-ai/veo3.1/image-to-video",
-      "fal-ai/veo3.1/fast/image-to-video",
-    ],
-    "video-to-video": [
-      "fal-ai/sora-2/video-to-video/remix",
-      "fal-ai/veo3.1/reference-to-video",
-      "fal-ai/veo3.1/first-last-frame-to-video",
-      "fal-ai/veo3.1/fast/first-last-frame-to-video",
-    ],
-    inpaint: [],
-    lipsync: [],
-  } as Record<StudioGenerationType, string[]>;
-
-  const priorityIds = priorities[type] || [];
-
-  // Сортируем: сначала приоритетные, потом остальные
-  const priorityModels = priorityIds
+  const prioritized = priorities
     .map((id) => models.find((m) => m.id === id))
     .filter((m): m is FalStudioModel => m !== undefined);
 
-  const otherModels = models.filter((m) => !priorityIds.includes(m.id));
+  const others = models.filter((m) => !priorities.includes(m.id));
 
-  return [...priorityModels, ...otherModels].slice(0, limit);
+  return [...prioritized, ...others].slice(0, limit);
 }
 
-/**
- * Получает все типы генерации, которые поддерживает модель
- */
 export function getModelGenerationTypes(
   modelId: string
 ): StudioGenerationType[] {
   const model = getModelById(modelId);
-  if (!model) return [];
-  return inferGenerationType(model);
+  if (!model) {
+    return [];
+  }
+
+  return GENERATION_TYPES.filter((type) => MODEL_TYPE_RULES[type](model));
 }
 
-/**
- * Проверяет, поддерживает ли модель определённый тип генерации
- */
 export function modelSupportsGenerationType(
   modelId: string,
   type: StudioGenerationType
 ): boolean {
-  const types = getModelGenerationTypes(modelId);
-  return types.includes(type);
+  const model = getModelById(modelId);
+  return model ? MODEL_TYPE_RULES[type](model) : false;
 }
 
-// Экспортируем готовый mapping
-export const MODEL_MODALITY_MAPPING = createModelModalityMapping();
+export const MODEL_MODALITY_MAPPING = getMapping();
