@@ -194,7 +194,9 @@ export async function POST(request: Request) {
         // Tool results are preserved in assistant message parts as tool-* types
         const sanitizedMessages = uiMessages.filter((msg) => {
           // Keep all non-tool messages
-          if ((msg as any).role !== "tool") return true;
+          if ((msg as any).role !== "tool") {
+            return true;
+          }
 
           // For tool messages, validate they have required fields
           // If invalid, skip them (they're legacy data from old format)

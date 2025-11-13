@@ -2,7 +2,7 @@
 import type { UseChatHelpers } from "@ai-sdk/react";
 import equal from "fast-deep-equal";
 import { motion } from "framer-motion";
-import { memo, useMemo, useState } from "react";
+import { memo, useState } from "react";
 import type { Vote } from "@/lib/supabase/models";
 import type { ChatMessage } from "@/lib/types";
 import { cn, sanitizeText } from "@/lib/utils";
@@ -156,8 +156,6 @@ const PurePreviewMessage = ({
               }
             }
 
-
-
             if (type === "tool-webSearch") {
               const { toolCallId, state } = part;
 
@@ -257,7 +255,7 @@ const PurePreviewMessage = ({
             // Handle tool parts - check using startsWith to support dynamic tool types
             if (typeof type === "string" && type.startsWith("tool-")) {
               const toolName = type.replace("tool-", "");
-              
+
               // @ts-expect-error - TypeScript can't narrow union types properly here
               const { toolCallId, state } = part;
 
@@ -287,7 +285,7 @@ const PurePreviewMessage = ({
                 if (state === "output-available") {
                   // @ts-expect-error - TypeScript can't narrow union types properly here
                   const output = part.output;
-                  
+
                   if ("error" in output) {
                     return (
                       <div
@@ -342,7 +340,7 @@ const PurePreviewMessage = ({
                 if (state === "output-available") {
                   // @ts-expect-error - TypeScript can't narrow union types properly here
                   const output = part.output;
-                  
+
                   return (
                     <div className="relative" key={toolCallId}>
                       <WebSearchResult output={output} />

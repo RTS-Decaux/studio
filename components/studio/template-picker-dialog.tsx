@@ -22,12 +22,12 @@ import {
 } from "@/lib/studio/templates";
 import type { StudioGenerationType } from "@/lib/studio/types";
 
-interface TemplatePickerDialogProps {
+type TemplatePickerDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectTemplate: (template: PromptTemplate) => void;
   generationType: StudioGenerationType;
-}
+};
 
 export function TemplatePickerDialog({
   open,

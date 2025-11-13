@@ -33,13 +33,13 @@ const GENERATION_TYPE_LABELS: Record<StudioGenerationType, string> = {
   lipsync: "Синхронизация губ",
 };
 
-interface ModelSelectorDialogProps {
+type ModelSelectorDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectModel: (model: FalStudioModel) => void;
   currentModel: FalStudioModel | null;
   generationType: StudioGenerationType;
-}
+};
 
 export function ModelSelectorDialog({
   open,

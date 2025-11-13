@@ -11,11 +11,9 @@ import type {
   User,
 } from "@/lib/supabase/models";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { Database, Json } from "@/lib/supabase/types";
+import type { Json } from "@/lib/supabase/types";
 import { ChatSDKError } from "../errors";
 import type { AppUsage } from "../usage";
-import { generateUUID } from "../utils";
-import { generateHashedPassword } from "./utils";
 
 type Supabase = ReturnType<typeof createSupabaseServerClient>;
 
@@ -92,9 +90,10 @@ async function withSignedAttachmentUrls(
 
   const clonedMessages = messages.map((message) => {
     if (Array.isArray(message.parts)) {
-      const partsClone = JSON.parse(JSON.stringify(message.parts)) as Array<
-        Record<string, unknown>
-      >;
+      const partsClone = JSON.parse(JSON.stringify(message.parts)) as Record<
+        string,
+        unknown
+      >[];
 
       return {
         ...message,
@@ -116,7 +115,7 @@ async function withSignedAttachmentUrls(
       return;
     }
 
-    (message.parts as unknown as Array<Record<string, unknown>>).forEach(
+    (message.parts as unknown as Record<string, unknown>[]).forEach(
       (part, partIndex) => {
         if (
           part &&
@@ -163,9 +162,7 @@ async function withSignedAttachmentUrls(
     const parts = clonedMessages[messageIndex].parts;
 
     if (Array.isArray(parts)) {
-      const part = (parts as unknown as Array<Record<string, unknown>>)[
-        partIndex
-      ];
+      const part = (parts as unknown as Record<string, unknown>[])[partIndex];
       part.url = signedUrl;
     }
   });

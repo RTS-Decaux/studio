@@ -69,7 +69,6 @@ function PureChatHeader({
           selectedProviderId={selectedProviderId}
         />
       )}
-
     </header>
   );
 }

@@ -13,12 +13,12 @@ const convertSchema = z.object({
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const redirectTo = searchParams.get("redirectTo") || "/";
-  
+
   // Redirect to register page with message
   const registerUrl = new URL("/register", request.url);
   registerUrl.searchParams.set("redirectTo", redirectTo);
   registerUrl.searchParams.set("fromGuest", "true");
-  
+
   return NextResponse.redirect(registerUrl);
 }
 

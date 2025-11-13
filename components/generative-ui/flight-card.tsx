@@ -2,7 +2,7 @@
 
 import { format, parseISO } from "date-fns";
 import { motion } from "framer-motion";
-import { Calendar, Clock, MapPin, Plane } from "lucide-react";
+import { Calendar, Clock, Plane } from "lucide-react";
 
 export type FlightData = {
   flightNumber: string;

@@ -172,12 +172,12 @@ export function StudioSidebar({
       </SidebarContent>
       <SidebarFooter>
         <NavUser
+          isGuest={user?.is_anonymous === true}
           user={{
             name: userName,
             email: userEmail,
             avatar: user?.user_metadata?.avatar_url || "/avatars/default.jpg",
           }}
-          isGuest={user?.is_anonymous === true}
         />
       </SidebarFooter>
       <SidebarRail />

@@ -2,10 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -29,9 +26,11 @@ import type { StudioGenerationType } from "@/lib/studio/types";
 import { cn } from "@/lib/utils";
 import {
   ChevronRight,
-  Image as ImageIcon, Loader2,
+  Image as ImageIcon,
+  Loader2,
   Settings2,
-  Sparkles, Video
+  Sparkles,
+  Video,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -40,11 +39,11 @@ import { Switch } from "../ui/switch";
 import { ModelSelectorDialog } from "./model-selector-dialog";
 import { ReferenceInputManager } from "./reference-input-manager";
 
-interface GenerationPanelProps {
+type GenerationPanelProps = {
   projectId?: string;
   onGenerationStart?: (generationId: string) => void;
   onGenerationComplete?: () => void;
-}
+};
 
 const GENERATION_TYPES: Array<{
   value: StudioGenerationType;
@@ -133,24 +132,29 @@ export function GenerationPanel({
 
   // Check if prompt is needed
   const needsPrompt = useMemo(() => {
-    if (!generationType) return false;
+    if (!generationType) {
+      return false;
+    }
     return generationType.startsWith("text-to");
   }, [generationType]);
 
   // Update model when generation type changes
-  const handleGenerationTypeChange = useCallback((type: StudioGenerationType) => {
-    setGenerationType(type);
-    const recommended = getRecommendedModels(type);
-    setSelectedModel(recommended[0] || null);
+  const handleGenerationTypeChange = useCallback(
+    (type: StudioGenerationType) => {
+      setGenerationType(type);
+      const recommended = getRecommendedModels(type);
+      setSelectedModel(recommended[0] || null);
 
-    // Reset reference inputs when changing generation type
-    setReferenceInputs({
-      "reference-image": null,
-      "first-frame": null,
-      "last-frame": null,
-      "reference-video": null,
-    });
-  }, []);
+      // Reset reference inputs when changing generation type
+      setReferenceInputs({
+        "reference-image": null,
+        "first-frame": null,
+        "last-frame": null,
+        "reference-video": null,
+      });
+    },
+    []
+  );
 
   // Handle reference input change
   const handleReferenceInputChange = useCallback(
@@ -209,10 +213,14 @@ export function GenerationPanel({
         generationType,
         prompt: prompt || undefined,
         negativePrompt: negativePrompt || undefined,
-        referenceImageUrl: referenceInputs["reference-image"] ? undefined : undefined, // Will be handled by upload
+        referenceImageUrl: referenceInputs["reference-image"]
+          ? undefined
+          : undefined, // Will be handled by upload
         firstFrameUrl: referenceInputs["first-frame"] ? undefined : undefined,
         lastFrameUrl: referenceInputs["last-frame"] ? undefined : undefined,
-        referenceVideoUrl: referenceInputs["reference-video"] ? undefined : undefined,
+        referenceVideoUrl: referenceInputs["reference-video"]
+          ? undefined
+          : undefined,
         parameters: {
           imageSize: selectedModel.type === "image" ? imageSize : undefined,
           numInferenceSteps: steps[0],
@@ -246,9 +254,15 @@ export function GenerationPanel({
   };
 
   const canGenerate = useMemo(() => {
-    if (!selectedModel) return false;
-    if (needsPrompt && !prompt.trim()) return false;
-    if (!hasAllRequiredInputs) return false;
+    if (!selectedModel) {
+      return false;
+    }
+    if (needsPrompt && !prompt.trim()) {
+      return false;
+    }
+    if (!hasAllRequiredInputs) {
+      return false;
+    }
     return true;
   }, [selectedModel, needsPrompt, prompt, hasAllRequiredInputs]);
 
@@ -261,7 +275,8 @@ export function GenerationPanel({
             Generate Content
           </h2>
           <p className="text-muted-foreground text-sm">
-            Choose your generation type, select a model, and configure parameters
+            Choose your generation type, select a model, and configure
+            parameters
           </p>
         </div>
 
@@ -308,226 +323,238 @@ export function GenerationPanel({
           </div>
         </div>
 
-      {/* Model Selector */}
-      <div className="space-y-3">
-        <Label className="font-medium text-sm">Model</Label>
-        <button
-          className="flex w-full items-center justify-between rounded-xl border-border border-thin bg-background p-3 text-left shadow-xs transition-bg-background hover:border-foreground/50"
-          onClick={() => setModelDialogOpen(true)}
-        >
-          {selectedModel ? (
-            <div className="min-w-0 flex-1">
-              <div className="mb-0.5 flex items-center gap-2">
-                <span className="truncate font-medium text-sm">
-                  {selectedModel.name}
-                </span>
-                {selectedModel.quality && (
-                  <Badge className="px-1.5 py-0 text-xs" variant="secondary">
-                    {selectedModel.quality}
-                  </Badge>
-                )}
+        {/* Model Selector */}
+        <div className="space-y-3">
+          <Label className="font-medium text-sm">Model</Label>
+          <button
+            className="flex w-full items-center justify-between rounded-xl border-border border-thin bg-background p-3 text-left shadow-xs transition-bg-background hover:border-foreground/50"
+            onClick={() => setModelDialogOpen(true)}
+          >
+            {selectedModel ? (
+              <div className="min-w-0 flex-1">
+                <div className="mb-0.5 flex items-center gap-2">
+                  <span className="truncate font-medium text-sm">
+                    {selectedModel.name}
+                  </span>
+                  {selectedModel.quality && (
+                    <Badge className="px-1.5 py-0 text-xs" variant="secondary">
+                      {selectedModel.quality}
+                    </Badge>
+                  )}
+                </div>
+                <p className="line-clamp-1 text-muted-foreground/80 text-xs">
+                  {selectedModel.description}
+                </p>
               </div>
-              <p className="line-clamp-1 text-muted-foreground/80 text-xs">
-                {selectedModel.description}
-              </p>
-            </div>
-          ) : (
-            <span className="text-muted-foreground/70 text-sm">Select model...</span>
-          )}
-          <ChevronRight className="ml-2 h-4 w-4 shrink-0 text-muted-foreground/60" />
-        </button>
-      </div>
-
-      {/* Reference Inputs (images/videos) */}
-      {modelRequirements.required.length > 0 && (
-        <div className="space-y-3">
-          <Label className="font-medium text-sm">Required Inputs</Label>
-          <div className="space-y-3">
-            {modelRequirements.required.map((inputType) => (
-              <ReferenceInputManager
-                key={inputType}
-                label={inputType
-                  .split("-")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
-                onChange={(file) => handleReferenceInputChange(inputType, file)}
-                required
-                type={inputType}
-                value={referenceInputs[inputType]}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {modelRequirements.optional.length > 0 && (
-        <div className="space-y-3">
-          <Label className="font-medium text-sm">Optional Inputs</Label>
-          <div className="space-y-3">
-            {modelRequirements.optional.map((inputType) => (
-              <ReferenceInputManager
-                key={inputType}
-                label={inputType
-                  .split("-")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
-                onChange={(file) => handleReferenceInputChange(inputType, file)}
-                type={inputType}
-                value={referenceInputs[inputType]}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Prompt */}
-      <div className="space-y-3">
-        <Label className="font-medium text-sm" htmlFor="prompt">
-          Prompt
-        </Label>
-        <Textarea
-          className="resize-none"
-          id="prompt"
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Describe what you want to generate..."
-          rows={4}
-          value={prompt}
-        />
-      </div>
-
-      {/* Advanced Settings */}
-      <Card className="border-border border-thin bg-background shadow-xs">
-        <CardContent className="space-y-4 pt-5">
-          <div className="flex items-center justify-between">
-            <Label className="font-medium text-sm">Advanced Settings</Label>
-            <Settings2 className="h-4 w-4 text-muted-foreground/60" />
-          </div>
-
-          {/* Negative Prompt */}
-          <div className="space-y-2">
-            <Label className="text-xs" htmlFor="negative-prompt">
-              Negative Prompt
-            </Label>
-            <Textarea
-              className="resize-none text-sm"
-              id="negative-prompt"
-              onChange={(e) => setNegativePrompt(e.target.value)}
-              placeholder="What to avoid in the generation..."
-              rows={2}
-              value={negativePrompt}
-            />
-          </div>
-
-          {/* Image Size */}
-          {generationType.includes("image") && (
-            <div className="space-y-2">
-              <Label className="text-xs" htmlFor="image-size">
-                Image Size
-              </Label>
-              <Select onValueChange={setImageSize} value={imageSize}>
-                <SelectTrigger id="image-size">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="square">Square (1:1)</SelectItem>
-                  <SelectItem value="square_hd">Square HD (1:1)</SelectItem>
-                  <SelectItem value="portrait_4_3">Portrait (4:3)</SelectItem>
-                  <SelectItem value="portrait_16_9">Portrait (16:9)</SelectItem>
-                  <SelectItem value="landscape_4_3">Landscape (4:3)</SelectItem>
-                  <SelectItem value="landscape_16_9">
-                    Landscape (16:9)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {/* Inference Steps */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs">Inference Steps</Label>
-              <span className="text-muted-foreground text-xs">{steps[0]}</span>
-            </div>
-            <Slider
-              max={50}
-              min={1}
-              onValueChange={setSteps}
-              step={1}
-              value={steps}
-            />
-          </div>
-
-          {/* Guidance Scale */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs">Guidance Scale</Label>
-              <span className="text-muted-foreground text-xs">
-                {guidanceScale[0]}
+            ) : (
+              <span className="text-muted-foreground/70 text-sm">
+                Select model...
               </span>
-            </div>
-            <Slider
-              max={20}
-              min={1}
-              onValueChange={setGuidanceScale}
-              step={0.5}
-              value={guidanceScale}
-            />
-          </div>
-
-          {/* Seed */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs" htmlFor="random-seed">
-                Random Seed
-              </Label>
-              <Switch
-                checked={randomSeed}
-                id="random-seed"
-                onCheckedChange={setRandomSeed}
-              />
-            </div>
-            {!randomSeed && (
-              <Input
-                onChange={(e) =>
-                  setSeed(e.target.value ? Number(e.target.value) : undefined)
-                }
-                placeholder="Enter seed..."
-                type="number"
-                value={seed || ""}
-              />
             )}
+            <ChevronRight className="ml-2 h-4 w-4 shrink-0 text-muted-foreground/60" />
+          </button>
+        </div>
+
+        {/* Reference Inputs (images/videos) */}
+        {modelRequirements.required.length > 0 && (
+          <div className="space-y-3">
+            <Label className="font-medium text-sm">Required Inputs</Label>
+            <div className="space-y-3">
+              {modelRequirements.required.map((inputType) => (
+                <ReferenceInputManager
+                  key={inputType}
+                  label={inputType
+                    .split("-")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                  onChange={(file) =>
+                    handleReferenceInputChange(inputType, file)
+                  }
+                  required
+                  type={inputType}
+                  value={referenceInputs[inputType]}
+                />
+              ))}
+            </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Generate Button */}
-      <Button
-        className="h-11 w-full rounded-xl font-medium text-sm shadow-md transition-bg-background"
-        disabled={isGenerating || !selectedModel}
-        onClick={handleGenerate}
-        size="lg"
-      >
-        {isGenerating ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Generating...
-          </>
-        ) : (
-          <>
-            <Sparkles className="mr-2 h-4 w-4" />
-            Generate
-          </>
         )}
-      </Button>
 
-      {/* Model Selector Dialog */}
-      <ModelSelectorDialog
-        currentModel={selectedModel}
-        generationType={generationType}
-        onOpenChange={setModelDialogOpen}
-        onSelectModel={setSelectedModel}
-        open={modelDialogOpen}
-      />
+        {modelRequirements.optional.length > 0 && (
+          <div className="space-y-3">
+            <Label className="font-medium text-sm">Optional Inputs</Label>
+            <div className="space-y-3">
+              {modelRequirements.optional.map((inputType) => (
+                <ReferenceInputManager
+                  key={inputType}
+                  label={inputType
+                    .split("-")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                  onChange={(file) =>
+                    handleReferenceInputChange(inputType, file)
+                  }
+                  type={inputType}
+                  value={referenceInputs[inputType]}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Prompt */}
+        <div className="space-y-3">
+          <Label className="font-medium text-sm" htmlFor="prompt">
+            Prompt
+          </Label>
+          <Textarea
+            className="resize-none"
+            id="prompt"
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Describe what you want to generate..."
+            rows={4}
+            value={prompt}
+          />
+        </div>
+
+        {/* Advanced Settings */}
+        <Card className="border-border border-thin bg-background shadow-xs">
+          <CardContent className="space-y-4 pt-5">
+            <div className="flex items-center justify-between">
+              <Label className="font-medium text-sm">Advanced Settings</Label>
+              <Settings2 className="h-4 w-4 text-muted-foreground/60" />
+            </div>
+
+            {/* Negative Prompt */}
+            <div className="space-y-2">
+              <Label className="text-xs" htmlFor="negative-prompt">
+                Negative Prompt
+              </Label>
+              <Textarea
+                className="resize-none text-sm"
+                id="negative-prompt"
+                onChange={(e) => setNegativePrompt(e.target.value)}
+                placeholder="What to avoid in the generation..."
+                rows={2}
+                value={negativePrompt}
+              />
+            </div>
+
+            {/* Image Size */}
+            {generationType.includes("image") && (
+              <div className="space-y-2">
+                <Label className="text-xs" htmlFor="image-size">
+                  Image Size
+                </Label>
+                <Select onValueChange={setImageSize} value={imageSize}>
+                  <SelectTrigger id="image-size">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="square">Square (1:1)</SelectItem>
+                    <SelectItem value="square_hd">Square HD (1:1)</SelectItem>
+                    <SelectItem value="portrait_4_3">Portrait (4:3)</SelectItem>
+                    <SelectItem value="portrait_16_9">
+                      Portrait (16:9)
+                    </SelectItem>
+                    <SelectItem value="landscape_4_3">
+                      Landscape (4:3)
+                    </SelectItem>
+                    <SelectItem value="landscape_16_9">
+                      Landscape (16:9)
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Inference Steps */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs">Inference Steps</Label>
+                <span className="text-muted-foreground text-xs">
+                  {steps[0]}
+                </span>
+              </div>
+              <Slider
+                max={50}
+                min={1}
+                onValueChange={setSteps}
+                step={1}
+                value={steps}
+              />
+            </div>
+
+            {/* Guidance Scale */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs">Guidance Scale</Label>
+                <span className="text-muted-foreground text-xs">
+                  {guidanceScale[0]}
+                </span>
+              </div>
+              <Slider
+                max={20}
+                min={1}
+                onValueChange={setGuidanceScale}
+                step={0.5}
+                value={guidanceScale}
+              />
+            </div>
+
+            {/* Seed */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs" htmlFor="random-seed">
+                  Random Seed
+                </Label>
+                <Switch
+                  checked={randomSeed}
+                  id="random-seed"
+                  onCheckedChange={setRandomSeed}
+                />
+              </div>
+              {!randomSeed && (
+                <Input
+                  onChange={(e) =>
+                    setSeed(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                  placeholder="Enter seed..."
+                  type="number"
+                  value={seed || ""}
+                />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Generate Button */}
+        <Button
+          className="h-11 w-full rounded-xl font-medium text-sm shadow-md transition-bg-background"
+          disabled={isGenerating || !selectedModel}
+          onClick={handleGenerate}
+          size="lg"
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Generate
+            </>
+          )}
+        </Button>
+
+        {/* Model Selector Dialog */}
+        <ModelSelectorDialog
+          currentModel={selectedModel}
+          generationType={generationType}
+          onOpenChange={setModelDialogOpen}
+          onSelectModel={setSelectedModel}
+          open={modelDialogOpen}
+        />
       </div>
     </ScrollArea>
   );

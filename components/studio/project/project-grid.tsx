@@ -4,10 +4,10 @@ import { FolderOpen } from "lucide-react";
 import type { StudioProject } from "@/lib/studio/types";
 import { ProjectCard } from "./project-card";
 
-interface ProjectGridProps {
+type ProjectGridProps = {
   projects: StudioProject[];
   onProjectDelete?: () => void;
-}
+};
 
 export function ProjectGrid({ projects, onProjectDelete }: ProjectGridProps) {
   if (projects.length === 0) {

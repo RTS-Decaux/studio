@@ -42,12 +42,16 @@ export function AppSidebar({
       url: "/",
     },
     // Hide Studio for guest users
-    ...(!isGuest ? [{
-      name: "Студия",
-      logo: Video,
-      plan: "Рабочая область",
-      url: "/studio",
-    }] : []),
+    ...(isGuest
+      ? []
+      : [
+          {
+            name: "Студия",
+            logo: Video,
+            plan: "Рабочая область",
+            url: "/studio",
+          },
+        ]),
   ];
 
   const modelsNav = chatModels.map((model) => ({
@@ -137,12 +141,12 @@ export function AppSidebar({
       <SidebarFooter>
         {/* NavUser - скрыть детали в collapsed, показать только аватар */}
         <NavUser
+          isGuest={isGuest}
           user={{
             name: userName,
             email: userEmail,
             avatar: user?.user_metadata?.avatar_url || "/avatars/default.jpg",
           }}
-          isGuest={isGuest}
         />
       </SidebarFooter>
       <SidebarRail />

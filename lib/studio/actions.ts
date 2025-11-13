@@ -38,14 +38,18 @@ async function getCurrentUser() {
 
 export async function getProjectsAction() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   return await getProjectsByUserId(user.id);
 }
 
 export async function getProjectAction(id: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   const project = await getProjectById(id);
 
@@ -62,19 +66,21 @@ export async function getProjectAction(id: string) {
 
 export async function createProjectAction(title: string, description?: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   if (!title || title.trim().length === 0) {
     throw new ChatSDKError(
       "bad_request:studio_project",
-      "Project title is required",
+      "Project title is required"
     );
   }
 
   if (title.trim().length > 200) {
     throw new ChatSDKError(
       "bad_request:studio_project",
-      "Project title is too long (max 200 characters)",
+      "Project title is too long (max 200 characters)"
     );
   }
 
@@ -91,7 +97,8 @@ export async function createProjectAction(title: string, description?: string) {
     });
   } catch (error: any) {
     if (
-      error.message?.includes("rate limit") || error.message?.includes("quota")
+      error.message?.includes("rate limit") ||
+      error.message?.includes("quota")
     ) {
       throw new ChatSDKError("rate_limit:studio_project");
     }
@@ -101,10 +108,12 @@ export async function createProjectAction(title: string, description?: string) {
 
 export async function updateProjectAction(
   id: string,
-  updates: { title?: string; description?: string; thumbnail?: string },
+  updates: { title?: string; description?: string; thumbnail?: string }
 ) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   const project = await getProjectById(id);
 
@@ -120,13 +129,13 @@ export async function updateProjectAction(
     if (!updates.title || updates.title.trim().length === 0) {
       throw new ChatSDKError(
         "bad_request:studio_project",
-        "Project title cannot be empty",
+        "Project title cannot be empty"
       );
     }
     if (updates.title.trim().length > 200) {
       throw new ChatSDKError(
         "bad_request:studio_project",
-        "Project title is too long (max 200 characters)",
+        "Project title is too long (max 200 characters)"
       );
     }
   }
@@ -140,7 +149,9 @@ export async function updateProjectAction(
 
 export async function deleteProjectAction(id: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   const project = await getProjectById(id);
 
@@ -165,7 +176,9 @@ export async function deleteProjectAction(id: string) {
 
 export async function getProjectAssetsAction(projectId: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   const project = await getProjectById(projectId);
 
@@ -186,14 +199,18 @@ export async function getProjectAssetsAction(projectId: string) {
 
 export async function getUserAssetsAction() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   return await getAssetsByUserId(user.id);
 }
 
 export async function deleteAssetAction(id: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   // TODO: Verify asset ownership before deletion
   try {
@@ -212,14 +229,18 @@ export async function deleteAssetAction(id: string) {
 
 export async function getUserGenerationsAction() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   return await getGenerationsByUserId(user.id);
 }
 
 export async function getProjectGenerationsAction(projectId: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   const project = await getProjectById(projectId);
 
@@ -242,17 +263,19 @@ export async function getProjectGenerationsAction(projectId: string) {
  * Запускает генерацию контента через fal.ai
  */
 export async function generateAction(
-  request: GenerationRequest,
+  request: GenerationRequest
 ): Promise<GenerationResponse> {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   // Валидация модели
   const model = getModelById(request.modelId);
   if (!model) {
     throw new ChatSDKError(
       "not_found:fal_api",
-      `Model not found: ${request.modelId}`,
+      `Model not found: ${request.modelId}`
     );
   }
 
@@ -261,13 +284,13 @@ export async function generateAction(
     if (!request.prompt || request.prompt.trim().length === 0) {
       throw new ChatSDKError(
         "bad_request:studio_generation",
-        "Prompt is required for text-to-* generations",
+        "Prompt is required for text-to-* generations"
       );
     }
-    if (request.prompt.trim().length > 10000) {
+    if (request.prompt.trim().length > 10_000) {
       throw new ChatSDKError(
         "bad_request:studio_generation",
-        "Prompt is too long (max 10000 characters)",
+        "Prompt is too long (max 10000 characters)"
       );
     }
   }
@@ -321,7 +344,8 @@ export async function generateAction(
       throw error;
     }
     if (
-      error.message?.includes("rate limit") || error.message?.includes("quota")
+      error.message?.includes("rate limit") ||
+      error.message?.includes("quota")
     ) {
       throw new ChatSDKError("rate_limit:studio_generation");
     }
@@ -334,7 +358,9 @@ export async function generateAction(
  */
 export async function cancelGenerationAction(generationId: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   try {
     const generations = await getGenerationsByUserId(user.id);
@@ -352,7 +378,7 @@ export async function cancelGenerationAction(generationId: string) {
     if (generation.status !== "pending" && generation.status !== "processing") {
       throw new ChatSDKError(
         "bad_request:studio_generation",
-        "Generation cannot be cancelled in current state",
+        "Generation cannot be cancelled in current state"
       );
     }
 
@@ -362,7 +388,7 @@ export async function cancelGenerationAction(generationId: string) {
       try {
         await service.cancelGeneration(
           generation.modelId,
-          generation.falRequestId,
+          generation.falRequestId
         );
       } catch (error: any) {
         console.error("Failed to cancel in fal.ai:", error);
@@ -390,7 +416,9 @@ export async function cancelGenerationAction(generationId: string) {
  */
 export async function retryGenerationAction(generationId: string) {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login");
+  }
 
   try {
     const generations = await getGenerationsByUserId(user.id);
@@ -408,7 +436,7 @@ export async function retryGenerationAction(generationId: string) {
     if (generation.status !== "failed") {
       throw new ChatSDKError(
         "bad_request:studio_generation",
-        "Only failed generations can be retried",
+        "Only failed generations can be retried"
       );
     }
 
@@ -441,7 +469,7 @@ export async function retryGenerationAction(generationId: string) {
  */
 async function processGeneration(
   generationId: string,
-  request: GenerationRequest,
+  request: GenerationRequest
 ): Promise<void> {
   try {
     // Обновляем статус
@@ -539,7 +567,7 @@ async function processGeneration(
       } catch (assetError: any) {
         console.error(
           `Failed to create asset for generation ${generationId}:`,
-          assetError,
+          assetError
         );
         // Продолжаем даже если не удалось создать asset
       }
@@ -557,8 +585,8 @@ async function processGeneration(
     console.error(`Generation ${generationId} failed:`, error);
 
     // Формируем понятное сообщение об ошибке
-    let errorMessage = error.message ||
-      "Unknown error occurred during generation";
+    const errorMessage =
+      error.message || "Unknown error occurred during generation";
 
     await updateGeneration(generationId, {
       status: "failed",

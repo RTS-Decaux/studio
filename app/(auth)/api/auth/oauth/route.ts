@@ -11,6 +11,6 @@ export async function GET(request: Request) {
   // TODO: Remove this when OAuth is ready
   return NextResponse.json(
     { error: "OAuth authentication is coming soon" },
-    { status: 503 },
+    { status: 503 }
   );
 }

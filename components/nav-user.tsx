@@ -46,7 +46,7 @@ export function NavUser({
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      
+
       if (error) {
         console.error("Sign out error:", error);
         toast({

@@ -17,7 +17,7 @@ export default async function StudioPage() {
     return (
       <div className="flex h-full flex-col">
         <StudioHeader showNewButton={false} title="AI Studio" />
-        
+
         <main className="flex-1 overflow-auto">
           <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4">
             <div className="mx-auto max-w-3xl space-y-8 text-center">
@@ -97,22 +97,20 @@ export default async function StudioPage() {
                     Sign Up Free
                   </Link>
                 </Button>
-                
+
                 <Button
                   asChild
-                  variant="outline"
                   className="h-12 px-8 font-semibold text-base"
                   size="lg"
+                  variant="outline"
                 >
-                  <Link href="/register">
-                    Create New Account
-                  </Link>
+                  <Link href="/register">Create New Account</Link>
                 </Button>
               </div>
 
               <p className="mt-4 text-muted-foreground text-xs">
                 Already have an account?{" "}
-                <Link href="/login" className="text-purple-600 hover:underline">
+                <Link className="text-purple-600 hover:underline" href="/login">
                   Sign in
                 </Link>
               </p>

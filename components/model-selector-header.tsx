@@ -72,13 +72,13 @@ function getModelGroupName(providerId: ModelProviderId): string {
   return providerId === "openai" ? `GPT-${version}` : `Gemini ${version}`;
 }
 
-interface ModelSelectorHeaderProps {
+type ModelSelectorHeaderProps = {
   selectedModelId: ChatModelId;
   selectedProviderId?: ModelProviderId;
   onModelChange?: (modelId: ChatModelId) => void;
   onProviderChange?: (providerId: ModelProviderId) => void;
   className?: string;
-}
+};
 
 function PureModelSelectorHeader({
   selectedModelId,

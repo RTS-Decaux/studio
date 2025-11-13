@@ -5,33 +5,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-    cancelGenerationAction,
-    retryGenerationAction,
+  cancelGenerationAction,
+  retryGenerationAction,
 } from "@/lib/studio/actions";
 import type { StudioGeneration } from "@/lib/studio/types";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import {
-    CheckCircle2,
-    Clock,
-    Download,
-    ExternalLink,
-    Image as ImageIcon,
-    Loader2,
-    RefreshCw,
-    Sparkles,
-    Video,
-    XCircle,
+  CheckCircle2,
+  Clock,
+  Download,
+  ExternalLink,
+  Image as ImageIcon,
+  Loader2,
+  RefreshCw,
+  Sparkles,
+  Video,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAssetSignedUrl, useSignedUrl } from "@/hooks/use-signed-url";
 import type { StudioAsset } from "@/lib/studio/types";
 import { toast } from "sonner";
 
-interface GenerationHistoryProps {
+type GenerationHistoryProps = {
   generations: StudioGeneration[];
   onRefresh?: () => void;
-}
+};
 
 const STATUS_CONFIG = {
   pending: {
@@ -77,7 +77,9 @@ export function GenerationHistory({
 }: GenerationHistoryProps) {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [actioningIds, setActioningIds] = useState<Set<string>>(new Set());
-  const [assetMap, setAssetMap] = useState<Record<string, StudioAsset | null>>({});
+  const [assetMap, setAssetMap] = useState<Record<string, StudioAsset | null>>(
+    {}
+  );
   const fetchingRef = useRef<Set<string>>(new Set());
 
   // Handle cancel generation
@@ -122,13 +124,17 @@ export function GenerationHistory({
 
   // Auto-refresh when there are pending/processing generations
   useEffect(() => {
-    if (!autoRefresh || !onRefresh) return;
+    if (!autoRefresh || !onRefresh) {
+      return;
+    }
 
     const hasActiveGenerations = generations.some(
       (g) => g.status === "pending" || g.status === "processing"
     );
 
-    if (!hasActiveGenerations) return;
+    if (!hasActiveGenerations) {
+      return;
+    }
 
     const interval = setInterval(() => {
       onRefresh();
@@ -182,25 +188,21 @@ export function GenerationHistory({
     );
   }
 
-  function GenerationAssetButtons({
-    asset,
-  }: {
-    asset?: StudioAsset | null;
-  }) {
-    const {
-      signedUrl: viewUrl,
-      loading: viewLoading,
-    } = useAssetSignedUrl(asset ?? null, "large");
-    const {
-      signedUrl: downloadUrl,
-      loading: downloadLoading,
-    } = useSignedUrl(asset?.url ?? null, {
-      download: asset?.name || "generated",
-    });
+  function GenerationAssetButtons({ asset }: { asset?: StudioAsset | null }) {
+    const { signedUrl: viewUrl, loading: viewLoading } = useAssetSignedUrl(
+      asset ?? null,
+      "large"
+    );
+    const { signedUrl: downloadUrl, loading: downloadLoading } = useSignedUrl(
+      asset?.url ?? null,
+      {
+        download: asset?.name || "generated",
+      }
+    );
 
     if (!asset) {
       return (
-        <span className="text-muted-foreground text-[10px]">
+        <span className="text-[10px] text-muted-foreground">
           Preparing generated asset...
         </span>
       );
@@ -228,10 +230,10 @@ export function GenerationHistory({
           variant="outline"
         >
           <a
+            download
             href={downloadUrl ?? "#"}
             rel="noreferrer"
             target="_blank"
-            download
           >
             <Download className="mr-1 h-2.5 w-2.5" />
             Download
@@ -271,24 +273,24 @@ export function GenerationHistory({
             const MediaIcon = isVideo ? Video : ImageIcon;
 
             return (
-              <Card
-                className="border-border bg-background"
-                key={generation.id}
-              >
+              <Card className="border-border bg-background" key={generation.id}>
                 <CardContent className="p-2.5">
                   <div className="flex gap-2.5">
                     {/* Thumbnail/Preview */}
                     <div className="shrink-0">
                       {generation.status === "completed" &&
                       generation.falResponse ? (
-                        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-md border-border border bg-muted/30">
+                        <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/30">
                           {isVideo ? (
                             <video
                               className="h-full w-full object-cover"
                               src={
                                 (generation.falResponse as any)?.video?.url ||
-                                (Array.isArray((generation.falResponse as any)?.videos)
-                                  ? (generation.falResponse as any).videos[0]?.url
+                                (Array.isArray(
+                                  (generation.falResponse as any)?.videos
+                                )
+                                  ? (generation.falResponse as any).videos[0]
+                                      ?.url
                                   : undefined)
                               }
                             />
@@ -297,10 +299,14 @@ export function GenerationHistory({
                               alt="Generated image"
                               className="h-full w-full object-cover"
                               src={
-                                (generation.falResponse as any)?.images?.[0]?.url ||
+                                (generation.falResponse as any)?.images?.[0]
+                                  ?.url ||
                                 (generation.falResponse as any)?.image?.url ||
-                                (Array.isArray((generation.falResponse as any)?.images)
-                                  ? (generation.falResponse as any).images[0]?.url
+                                (Array.isArray(
+                                  (generation.falResponse as any)?.images
+                                )
+                                  ? (generation.falResponse as any).images[0]
+                                      ?.url
                                   : undefined)
                               }
                             />
@@ -309,7 +315,7 @@ export function GenerationHistory({
                       ) : (
                         <div
                           className={cn(
-                            "flex h-16 w-16 items-center justify-center rounded-md border-border border",
+                            "flex h-16 w-16 items-center justify-center rounded-md border border-border",
                             status.bgColor
                           )}
                         >
@@ -346,7 +352,7 @@ export function GenerationHistory({
                           />
                           {status.label}
                         </Badge>
-                        <span className="text-muted-foreground text-[10px]">
+                        <span className="text-[10px] text-muted-foreground">
                           {format(generation.createdAt, "MMM d, HH:mm")}
                         </span>
                       </div>
@@ -359,8 +365,11 @@ export function GenerationHistory({
                       )}
 
                       {/* Model Info */}
-                      <div className="flex items-center gap-1.5 text-muted-foreground text-[10px]">
-                        <Badge className="px-1 py-0 text-[9px]" variant="outline">
+                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                        <Badge
+                          className="px-1 py-0 text-[9px]"
+                          variant="outline"
+                        >
                           {generation.modelId.split("/").pop()}
                         </Badge>
                         <span>•</span>
@@ -377,7 +386,7 @@ export function GenerationHistory({
 
                       {/* Error Message */}
                       {generation.status === "failed" && generation.error && (
-                        <p className="text-destructive text-[10px]">
+                        <p className="text-[10px] text-destructive">
                           {generation.error}
                         </p>
                       )}

@@ -23,7 +23,9 @@ export function filterToolMessages<T extends { role: string }>(
  * Logs debug info about filtered tool messages (development only)
  */
 export function debugToolMessages(messages: Array<{ role: string }>): void {
-  if (process.env.NODE_ENV !== "development") return;
+  if (process.env.NODE_ENV !== "development") {
+    return;
+  }
 
   const toolCount = messages.filter((msg) => msg.role === "tool").length;
 

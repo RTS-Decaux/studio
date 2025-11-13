@@ -7,13 +7,13 @@
  * Documentation: https://supabase.com/docs/guides/storage/serving/image-transformations
  */
 
-interface ImageTransformOptions {
+type ImageTransformOptions = {
   width?: number;
   height?: number;
   quality?: number; // 20-100
   format?: "origin" | "webp" | "avif";
   resize?: "cover" | "contain" | "fill";
-}
+};
 
 /**
  * Extracts bucket name and file path from a Supabase Storage URL
@@ -203,7 +203,9 @@ export function getResponsiveSrcSet(url: string | null): string | undefined {
  * Helper to check if a URL is a video
  */
 export function isVideoUrl(url: string | null): boolean {
-  if (!url) return false;
+  if (!url) {
+    return false;
+  }
   const videoExtensions = [".mp4", ".webm", ".mov", ".avi", ".mkv"];
   return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
 }

@@ -27,10 +27,10 @@ let clientInstance: FalClient | null = null;
  * ```
  */
 export function getFalClient(): FalClient {
-    if (!clientInstance) {
-        clientInstance = new FalClient();
-    }
-    return clientInstance;
+  if (!clientInstance) {
+    clientInstance = new FalClient();
+  }
+  return clientInstance;
 }
 
 /**
@@ -44,30 +44,30 @@ export function getFalClient(): FalClient {
  * ```
  */
 export function createFalClient(apiKey: string): FalClient {
-    return new FalClient(apiKey);
+  return new FalClient(apiKey);
 }
 
 /**
  * Reset singleton instance (useful for testing)
  */
 export function resetFalClient(): void {
-    clientInstance = null;
+  clientInstance = null;
 }
 
 // Re-export types
 export type {
-    FalClientError,
-    FalGenerationInput,
-    FalGenerationOutput,
-    FalGenerationStatus,
-    FalImageInfo,
-    FalLogEntry,
-    FalMetrics,
-    FalResult,
-    FalRunOptions,
-    FalStatusResult,
-    FalSubmitResult,
-    FalVideoInfo,
+  FalClientError,
+  FalGenerationInput,
+  FalGenerationOutput,
+  FalGenerationStatus,
+  FalImageInfo,
+  FalLogEntry,
+  FalMetrics,
+  FalResult,
+  FalRunOptions,
+  FalStatusResult,
+  FalSubmitResult,
+  FalVideoInfo,
 } from "./types";
 
 // Re-export client class

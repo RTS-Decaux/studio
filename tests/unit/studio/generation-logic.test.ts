@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test";
+import type { FalStudioModel } from "@/lib/ai/studio-models";
 import {
   getModelById,
   getModelsByGenerationType,
 } from "@/lib/studio/model-mapping";
-import type { FalStudioModel } from "@/lib/ai/studio-models";
 import type { StudioGenerationType } from "@/lib/studio/types";
+import { expect, test } from "@playwright/test";
 
 /**
  * Unit tests for GenerationPanelV2 and fal.ai integration logic

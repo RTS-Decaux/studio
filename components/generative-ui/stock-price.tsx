@@ -135,7 +135,7 @@ export function StockPriceLoading({ symbol }: { symbol?: string }) {
         <div className="h-6 w-20 animate-pulse rounded bg-muted" />
       </div>
       <div className="grid grid-cols-2 gap-4 rounded-xl border border-border/50 bg-muted/30 p-4">
-        {[...Array(4)].map((_, i) => (
+        {[...new Array(4)].map((_, i) => (
           <div key={i}>
             <div className="h-3 w-16 animate-pulse rounded bg-muted/50" />
             <div className="mt-1 h-4 w-20 animate-pulse rounded bg-muted" />

@@ -63,7 +63,7 @@ export async function requirePermanentUser() {
 
   // TypeScript doesn't understand that redirect() never returns
   // so we need to check again or use type assertion
-  if (user && user.is_anonymous) {
+  if (user?.is_anonymous) {
     redirect("/register?fromGuest=true");
   }
 
@@ -83,7 +83,7 @@ export async function getUserId() {
  */
 export async function convertAnonymousToPermanent(
   email: string,
-  password: string,
+  password: string
 ) {
   const supabase = await createSupabaseServerClient();
   const user = await getCurrentUser();
@@ -122,7 +122,7 @@ export async function logAuditEvent(
   action: string,
   resource: string,
   resourceId?: string,
-  metadata?: Record<string, unknown>,
+  metadata?: Record<string, unknown>
 ) {
   const supabase = await createSupabaseServerClient();
   const user = await getCurrentUser();
@@ -152,7 +152,7 @@ export async function logAuditEvent(
 export async function checkRateLimit(
   key: string,
   maxRequests: number,
-  windowSeconds: number,
+  windowSeconds: number
 ): Promise<boolean> {
   const supabase = await createSupabaseServerClient();
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-interface UseSignedUrlOptions {
+type UseSignedUrlOptions = {
   enabled?: boolean;
   transform?: {
     width?: number;
@@ -12,7 +12,7 @@ interface UseSignedUrlOptions {
     resize?: "cover" | "contain" | "fill";
   };
   download?: boolean | string;
-}
+};
 
 /**
  * Hook to generate and cache signed URLs for storage assets
@@ -50,12 +50,12 @@ export function useSignedUrl(
         const response = await fetch("/api/studio/assets/signed-url", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url: storageUrl,
-          transform: options.transform,
-          expiresIn: 3600, // 1 hour
-          download: options.download,
-        }),
+          body: JSON.stringify({
+            url: storageUrl,
+            transform: options.transform,
+            expiresIn: 3600, // 1 hour
+            download: options.download,
+          }),
         });
 
         if (!response.ok) {
@@ -93,7 +93,7 @@ export function useSignedUrl(
       cancelled = true;
       clearInterval(refreshInterval);
     };
-  }, [storageUrl, enabled, options.transform]);
+  }, [storageUrl, enabled, options.transform, options.download]);
 
   return { signedUrl, loading, error };
 }
@@ -190,7 +190,7 @@ export function useSignedUrls(
       cancelled = true;
       clearInterval(refreshInterval);
     };
-  }, [JSON.stringify(storageUrls), enabled, options.transform]);
+  }, [enabled, options.transform, storageUrls.length, storageUrls.map]);
 
   return { signedUrls, loading, error };
 }

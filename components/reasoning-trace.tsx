@@ -40,19 +40,19 @@ const toolLabels: Record<string, string> = {
   "tool-requestSuggestions": "Suggestions",
 };
 
-interface ReasoningStep {
+type ReasoningStep = {
   type: "reasoning" | "tool";
   title: string;
   content?: string;
   toolType?: string;
   state?: string;
   isStreaming?: boolean;
-}
+};
 
-interface ReasoningTraceProps {
+type ReasoningTraceProps = {
   steps: ReasoningStep[];
   isStreaming?: boolean;
-}
+};
 
 function StepIcon({
   type,
@@ -184,7 +184,9 @@ function ReasoningStepItem({
 }
 
 export function ReasoningTrace({ steps, isStreaming }: ReasoningTraceProps) {
-  if (steps.length === 0) return null;
+  if (steps.length === 0) {
+    return null;
+  }
 
   // Get summary of steps for the trigger
   const completedSteps = steps.filter(

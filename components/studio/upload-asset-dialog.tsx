@@ -31,20 +31,20 @@ import {
 } from "@/components/ui/select";
 import type { StudioAssetType } from "@/lib/studio/types";
 
-interface UploadAssetDialogProps {
+type UploadAssetDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUploadComplete?: (assetId: string) => void;
   projectId?: string;
-}
+};
 
-interface UploadFile {
+type UploadFile = {
   file: File;
   preview?: string;
   progress: number;
   status: "pending" | "uploading" | "success" | "error";
   error?: string;
-}
+};
 
 export function UploadAssetDialog({
   open,
@@ -72,7 +72,9 @@ export function UploadAssetDialog({
 
   const handleFileSelect = useCallback(
     (selectedFiles: FileList | null) => {
-      if (!selectedFiles) return;
+      if (!selectedFiles) {
+        return;
+      }
 
       const newFiles: UploadFile[] = [];
 

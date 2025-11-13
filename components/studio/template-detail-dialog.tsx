@@ -50,7 +50,9 @@ export function TemplateDetailDialog({
   const [copied, setCopied] = useState(false);
   const router = useRouter();
 
-  if (!template) return null;
+  if (!template) {
+    return null;
+  }
 
   const isPromptTemplate = (
     t: PromptTemplate | ProjectTemplate

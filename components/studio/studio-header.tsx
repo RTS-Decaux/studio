@@ -9,10 +9,10 @@ import { useRouter } from "next/navigation";
 import { memo } from "react";
 import { useWindowSize } from "usehooks-ts";
 
-interface StudioHeaderProps {
+type StudioHeaderProps = {
   title?: string;
   showNewButton?: boolean;
-}
+};
 
 function PureStudioHeader({
   title = "Projects",
@@ -29,7 +29,10 @@ function PureStudioHeader({
       {/* Title with icon */}
       <div className="flex items-center gap-1.5">
         <div className="hidden items-center justify-center rounded-md bg-muted p-1 sm:flex">
-          <Sparkles className="h-3.5 w-3.5 text-foreground/60" strokeWidth={2} />
+          <Sparkles
+            className="h-3.5 w-3.5 text-foreground/60"
+            strokeWidth={2}
+          />
         </div>
         <h1 className="font-semibold text-foreground text-sm tracking-tight md:text-base">
           {title}

@@ -26,7 +26,7 @@ describe("Provider Integration Tests", () => {
   describe("Real-world Scenarios", () => {
     it("should work with single provider configured", () => {
       process.env.OPENAI_API_KEY = "test-key";
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
 
       const configured = getConfiguredProviders();
       expect(configured).toEqual(["openai"]);
@@ -56,7 +56,7 @@ describe("Provider Integration Tests", () => {
 
     it("should fallback gracefully when preferred unavailable", () => {
       process.env.OPENAI_API_KEY = "test-key";
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
 
       // User wants gemini but it's not configured
       // With validate: false, it returns the requested provider anyway
@@ -97,7 +97,7 @@ describe("Provider Integration Tests", () => {
 
     it("should show provider status badges", () => {
       process.env.OPENAI_API_KEY = "test-key";
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
 
       const statuses = AVAILABLE_PROVIDERS.map((p) => ({
         provider: p,
@@ -192,14 +192,14 @@ describe("Provider Integration Tests", () => {
     });
 
     it("should provide clear error when no providers configured", () => {
-      delete process.env.OPENAI_API_KEY;
-      delete process.env.GEMINI_API_KEY;
+      process.env.OPENAI_API_KEY = undefined;
+      process.env.GEMINI_API_KEY = undefined;
 
       expect(() => selectProvider()).toThrow("No AI providers configured");
     });
 
     it("should provide clear error when requested provider not configured", () => {
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
 
       expect(() =>
         selectProvider({ provider: "gemini", validate: true })

@@ -16,8 +16,8 @@ if (!FAL_API_KEY) {
  * Базовый клиент для работы с fal.ai API
  */
 class FalClient {
-  private apiKey: string;
-  private baseUrl: string;
+  private readonly apiKey: string;
+  private readonly baseUrl: string;
 
   constructor(apiKey?: string) {
     this.apiKey = apiKey || FAL_API_KEY || "";

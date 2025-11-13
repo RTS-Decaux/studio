@@ -7,7 +7,7 @@
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-interface SignedUrlOptions {
+type SignedUrlOptions = {
   expiresIn?: number; // Seconds until expiration (default: 1 hour)
   download?: boolean | string; // Force download with optional filename
   transform?: {
@@ -17,7 +17,7 @@ interface SignedUrlOptions {
     format?: "origin" | "webp" | "avif";
     resize?: "cover" | "contain" | "fill";
   };
-}
+};
 
 /**
  * Parse internal storage URL format: supabase://storage/{bucket}/{path}
@@ -79,16 +79,21 @@ export async function getSignedStorageUrl(
     // Build transform options for images
     const transformOptions: any = {};
     if (options.transform) {
-      if (options.transform.width)
+      if (options.transform.width) {
         transformOptions.width = options.transform.width;
-      if (options.transform.height)
+      }
+      if (options.transform.height) {
         transformOptions.height = options.transform.height;
-      if (options.transform.quality)
+      }
+      if (options.transform.quality) {
         transformOptions.quality = options.transform.quality;
-      if (options.transform.format)
+      }
+      if (options.transform.format) {
         transformOptions.format = options.transform.format;
-      if (options.transform.resize)
+      }
+      if (options.transform.resize) {
         transformOptions.resize = options.transform.resize;
+      }
     }
 
     // Generate signed URL
@@ -228,7 +233,9 @@ export async function getAssetSignedUrl(
  * Check if a URL needs a signed URL (is internal storage URL)
  */
 export function isStorageUrl(url: string | null): boolean {
-  if (!url) return false;
+  if (!url) {
+    return false;
+  }
   return url.startsWith("supabase://storage/");
 }
 

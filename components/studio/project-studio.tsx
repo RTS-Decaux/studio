@@ -2,9 +2,9 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
-    StudioAsset,
-    StudioGeneration,
-    StudioProject,
+  StudioAsset,
+  StudioGeneration,
+  StudioProject,
 } from "@/lib/studio/types";
 import {
   getProjectAssetsAction,
@@ -16,11 +16,11 @@ import { AssetGallery } from "./asset-gallery";
 import { GenerationHistory } from "./generation-history";
 import { GenerationPanelV2 as GenerationPanel } from "./generation-panel-v2";
 
-interface ProjectStudioProps {
+type ProjectStudioProps = {
   project: StudioProject;
   initialAssets: StudioAsset[];
   initialGenerations: StudioGeneration[];
-}
+};
 
 export function ProjectStudio({
   project,
@@ -35,10 +35,6 @@ export function ProjectStudio({
     console.log("Generation started:", generationId);
   }, []);
 
-  const handleGenerationComplete = useCallback(() => {
-    refreshGenerations();
-  }, []);
-
   const refreshGenerations = useCallback(async () => {
     try {
       const [newAssets, newGenerations] = await Promise.all([
@@ -51,6 +47,10 @@ export function ProjectStudio({
       console.error("Failed to refresh generations:", error);
     }
   }, [project.id]);
+
+  const handleGenerationComplete = useCallback(() => {
+    refreshGenerations();
+  }, [refreshGenerations]);
 
   return (
     <div className="flex h-full flex-col bg-background">

@@ -26,11 +26,11 @@ import {
 } from "@/lib/studio/templates";
 import { cn } from "@/lib/utils";
 
-interface ProjectTemplatePickerProps {
+type ProjectTemplatePickerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelectTemplate: (template: ProjectTemplate) => void;
-}
+};
 
 export function ProjectTemplatePicker({
   open,

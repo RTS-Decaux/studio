@@ -46,11 +46,11 @@ import { ProjectTemplatePicker } from "./project-template-picker";
 import { ReferenceInputManager } from "./reference-input-manager";
 import { TemplatePickerDialog } from "./template-picker-dialog";
 
-interface GenerationPanelProps {
+type GenerationPanelProps = {
   projectId?: string;
   onGenerationStart?: (generationId: string) => void;
   onGenerationComplete?: () => void;
-}
+};
 
 const GENERATION_TYPES: Array<{
   value: StudioGenerationType;
@@ -123,24 +123,23 @@ export function GenerationPanelV2({
     Record<string, string | number | boolean>
   >({});
 
-  const buildDefaultSettings = useCallback(
-    (model: FalStudioModel | null) => {
-      if (!model?.settings) return {};
+  const buildDefaultSettings = useCallback((model: FalStudioModel | null) => {
+    if (!model?.settings) {
+      return {};
+    }
 
-      return model.settings.reduce<Record<string, string | number | boolean>>(
-        (acc, setting) => {
-          if (setting.type === "toggle" || setting.type === "select") {
-            acc[setting.key] = setting.defaultValue;
-          } else {
-            acc[setting.key] = setting.defaultValue ?? "";
-          }
-          return acc;
-        },
-        {}
-      );
-    },
-    []
-  );
+    return model.settings.reduce<Record<string, string | number | boolean>>(
+      (acc, setting) => {
+        if (setting.type === "toggle" || setting.type === "select") {
+          acc[setting.key] = setting.defaultValue;
+        } else {
+          acc[setting.key] = setting.defaultValue ?? "";
+        }
+        return acc;
+      },
+      {}
+    );
+  }, []);
 
   useEffect(() => {
     setModelSettings(buildDefaultSettings(selectedModel));
@@ -157,7 +156,8 @@ export function GenerationPanelV2({
   );
 
   const findSettingByKey = useCallback(
-    (key: string) => selectedModelSettings.find((setting) => setting.key === key),
+    (key: string) =>
+      selectedModelSettings.find((setting) => setting.key === key),
     [selectedModelSettings]
   );
 
@@ -193,7 +193,9 @@ export function GenerationPanelV2({
 
   const requiredSettingMissing = useMemo(() => {
     return selectedModelSettings.some((setting) => {
-      if (!setting.required) return false;
+      if (!setting.required) {
+        return false;
+      }
       const value = modelSettings[setting.key];
 
       switch (setting.type) {
@@ -223,19 +225,25 @@ export function GenerationPanelV2({
   const setSettingIfAvailable = useCallback(
     (key: string, value: string | number | boolean) => {
       const setting = findSettingByKey(key);
-      if (!setting) return;
+      if (!setting) {
+        return;
+      }
 
       if (setting.type === "select") {
         const match = setting.options.find(
           (option) => String(option.value) === String(value)
         );
-        if (!match) return;
+        if (!match) {
+          return;
+        }
         setSettingValue(key, match.value);
         return;
       }
 
       if (setting.type === "toggle") {
-        if (typeof value !== "boolean") return;
+        if (typeof value !== "boolean") {
+          return;
+        }
         setSettingValue(key, value);
         return;
       }
@@ -312,23 +320,32 @@ export function GenerationPanelV2({
       // Apply settings from template
       const settings = template.defaultSettings;
 
-      if (settings.imageSize)
+      if (settings.imageSize) {
         setSettingIfAvailable("image_size", settings.imageSize);
-      if (settings.duration)
+      }
+      if (settings.duration) {
         setSettingIfAvailable("duration", settings.duration);
-      if (settings.fps) setSettingIfAvailable("fps", settings.fps);
-      if (settings.steps)
+      }
+      if (settings.fps) {
+        setSettingIfAvailable("fps", settings.fps);
+      }
+      if (settings.steps) {
         setSettingIfAvailable("num_inference_steps", settings.steps);
-      if (settings.guidance)
+      }
+      if (settings.guidance) {
         setSettingIfAvailable("guidance_scale", settings.guidance);
+      }
 
       // Apply prompt templates if available
-      if (template.promptTemplate) setPrompt(template.promptTemplate);
-      if (template.negativePromptTemplate)
+      if (template.promptTemplate) {
+        setPrompt(template.promptTemplate);
+      }
+      if (template.negativePromptTemplate) {
         setSettingIfAvailable(
           "negative_prompt",
           template.negativePromptTemplate
         );
+      }
 
       toast.success(`Project template "${template.name}" loaded!`);
     },
@@ -371,12 +388,18 @@ export function GenerationPanelV2({
         Record<string, unknown>
       >((acc, setting) => {
         const value = modelSettings[setting.key];
-        if (value === undefined) return acc;
+        if (value === undefined) {
+          return acc;
+        }
 
         if (setting.type === "text" || setting.type === "textarea") {
-          if (typeof value !== "string") return acc;
+          if (typeof value !== "string") {
+            return acc;
+          }
           const trimmed = value.trim();
-          if (!trimmed && !setting.required) return acc;
+          if (!trimmed && !setting.required) {
+            return acc;
+          }
           acc[setting.key] = trimmed;
           return acc;
         }
@@ -443,10 +466,18 @@ export function GenerationPanelV2({
   };
 
   const canGenerate = useMemo(() => {
-    if (!selectedModel) return false;
-    if (promptRequired && !prompt.trim()) return false;
-    if (!hasAllRequiredInputs) return false;
-    if (requiredSettingMissing) return false;
+    if (!selectedModel) {
+      return false;
+    }
+    if (promptRequired && !prompt.trim()) {
+      return false;
+    }
+    if (!hasAllRequiredInputs) {
+      return false;
+    }
+    if (requiredSettingMissing) {
+      return false;
+    }
     return true;
   }, [
     selectedModel,
@@ -461,7 +492,7 @@ export function GenerationPanelV2({
       <div className="space-y-4 p-4">
         {/* Header */}
         <div className="space-y-1">
-          <h2 className="font-semibold text-foreground text-base tracking-tight">
+          <h2 className="font-semibold text-base text-foreground tracking-tight">
             Generate Content
           </h2>
           <p className="text-muted-foreground text-xs">
@@ -503,7 +534,7 @@ export function GenerationPanelV2({
                   </div>
                   <div className="min-w-0 flex-1">
                     <h4 className="mb-0.5 font-medium text-xs">{type.label}</h4>
-                    <p className="line-clamp-2 text-muted-foreground text-[10px] leading-tight">
+                    <p className="line-clamp-2 text-[10px] text-muted-foreground leading-tight">
                       {type.description}
                     </p>
                   </div>
@@ -535,7 +566,7 @@ export function GenerationPanelV2({
                     </Badge>
                   )}
                 </div>
-                <p className="line-clamp-1 text-muted-foreground text-[10px]">
+                <p className="line-clamp-1 text-[10px] text-muted-foreground">
                   {selectedModel.description}
                 </p>
                 <ModelCapabilityBadge model={selectedModel} />
@@ -557,10 +588,10 @@ export function GenerationPanelV2({
                   <div className="flex items-start gap-1.5">
                     <Info className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
                     <div className="space-y-0.5">
-                      <p className="font-medium text-foreground text-[10px]">
+                      <p className="font-medium text-[10px] text-foreground">
                         Model Requirements
                       </p>
-                      <p className="text-muted-foreground text-[10px] leading-tight">
+                      <p className="text-[10px] text-muted-foreground leading-tight">
                         {modelRequirements.required.length > 0 && (
                           <>
                             <strong>Required:</strong>{" "}
@@ -647,7 +678,7 @@ export function GenerationPanelV2({
             >
               <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="font-medium text-[10px]">Prompt Templates</span>
-              <span className="text-muted-foreground text-[9px]">
+              <span className="text-[9px] text-muted-foreground">
                 Ready-made prompts
               </span>
             </Button>
@@ -660,7 +691,7 @@ export function GenerationPanelV2({
             >
               <Layers className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="font-medium text-[10px]">Project Templates</span>
-              <span className="text-muted-foreground text-[9px]">
+              <span className="text-[9px] text-muted-foreground">
                 Pre-configured setups
               </span>
             </Button>
@@ -702,7 +733,7 @@ export function GenerationPanelV2({
                 rows={4}
                 value={prompt}
               />
-              <p className="flex items-center gap-1 text-muted-foreground text-[10px]">
+              <p className="flex items-center gap-1 text-[10px] text-muted-foreground">
                 <Info className="h-2.5 w-2.5" />
                 Be specific and descriptive for best results
               </p>
@@ -780,7 +811,7 @@ export function GenerationPanelV2({
                           </SelectContent>
                         </Select>
                         {setting.helperText && (
-                          <p className="text-muted-foreground text-[9px]">
+                          <p className="text-[9px] text-muted-foreground">
                             {setting.helperText}
                           </p>
                         )}
@@ -807,7 +838,7 @@ export function GenerationPanelV2({
                               </Badge>
                             )}
                             {setting.helperText && (
-                              <p className="text-muted-foreground text-[9px]">
+                              <p className="text-[9px] text-muted-foreground">
                                 {setting.helperText}
                               </p>
                             )}
@@ -826,7 +857,9 @@ export function GenerationPanelV2({
 
                   const isTextarea = setting.type === "textarea";
                   const textValue =
-                    typeof value === "string" ? value : setting.defaultValue || "";
+                    typeof value === "string"
+                      ? value
+                      : setting.defaultValue || "";
 
                   return (
                     <div className="space-y-1.5" key={setting.key}>
@@ -866,7 +899,7 @@ export function GenerationPanelV2({
                         />
                       )}
                       {setting.helperText && (
-                        <p className="text-muted-foreground text-[9px]">
+                        <p className="text-[9px] text-muted-foreground">
                           {setting.helperText}
                         </p>
                       )}
@@ -885,10 +918,10 @@ export function GenerationPanelV2({
               <div className="flex items-start gap-1.5">
                 <AlertCircle className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
                 <div className="space-y-0.5">
-                  <p className="font-medium text-foreground text-[10px]">
+                  <p className="font-medium text-[10px] text-foreground">
                     Cannot Generate
                   </p>
-                  <p className="text-muted-foreground text-[10px] leading-tight">
+                  <p className="text-[10px] text-muted-foreground leading-tight">
                     {!selectedModel && "Please select a model"}
                     {selectedModel &&
                       promptRequired &&

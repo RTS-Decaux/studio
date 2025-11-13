@@ -80,10 +80,10 @@ const INPUT_REQUIREMENT_LABELS: Record<ReferenceInputKind, string> = {
   "reference-video": "Reference Video",
 };
 
-interface ModelCapabilityBadgeProps {
+type ModelCapabilityBadgeProps = {
   model: FalStudioModel;
   showAll?: boolean;
-}
+};
 
 export function ModelCapabilityBadge({
   model,
@@ -92,7 +92,9 @@ export function ModelCapabilityBadge({
   const generationTypes = getModelGenerationTypes(model.id);
   const primaryType = generationTypes[0];
 
-  if (!primaryType) return null;
+  if (!primaryType) {
+    return null;
+  }
 
   const config = GENERATION_TYPE_CONFIG[primaryType];
   const Icon = config.icon;
@@ -140,9 +142,9 @@ export function ModelCapabilityBadge({
   );
 }
 
-interface ModelRequirementsBadgesProps {
+type ModelRequirementsBadgesProps = {
   model: FalStudioModel;
-}
+};
 
 export function ModelRequirementsBadges({
   model,

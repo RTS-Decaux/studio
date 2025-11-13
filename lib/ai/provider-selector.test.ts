@@ -53,7 +53,7 @@ describe("Provider Selector", () => {
 
   describe("getDefaultProvider", () => {
     it("should return openai as default fallback", () => {
-      delete process.env.AI_DEFAULT_PROVIDER;
+      process.env.AI_DEFAULT_PROVIDER = undefined;
       expect(getDefaultProvider()).toBe("openai");
     });
 
@@ -89,7 +89,7 @@ describe("Provider Selector", () => {
     });
 
     it("should use default provider when no fallback specified", () => {
-      delete process.env.AI_DEFAULT_PROVIDER;
+      process.env.AI_DEFAULT_PROVIDER = undefined;
       expect(resolveProvider("invalid")).toBe("openai");
     });
 
@@ -123,7 +123,7 @@ describe("Provider Selector", () => {
     });
 
     it("should return false when not configured", () => {
-      delete process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = undefined;
       expect(isProviderConfigured("openai")).toBe(false);
     });
 
@@ -135,19 +135,19 @@ describe("Provider Selector", () => {
 
   describe("getConfiguredProviders", () => {
     it("should return empty array when none configured", () => {
-      delete process.env.OPENAI_API_KEY;
-      delete process.env.GEMINI_API_KEY;
+      process.env.OPENAI_API_KEY = undefined;
+      process.env.GEMINI_API_KEY = undefined;
       expect(getConfiguredProviders()).toEqual([]);
     });
 
     it("should return only openai when configured", () => {
       process.env.OPENAI_API_KEY = "test-key";
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
       expect(getConfiguredProviders()).toEqual(["openai"]);
     });
 
     it("should return only gemini when configured", () => {
-      delete process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = undefined;
       process.env.GEMINI_API_KEY = "test-key";
       expect(getConfiguredProviders()).toEqual(["gemini"]);
     });
@@ -166,14 +166,14 @@ describe("Provider Selector", () => {
     });
 
     it("should throw when openai not configured", () => {
-      delete process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = undefined;
       expect(() => validateProviderConfig("openai")).toThrow(
         'Provider "openai" is not configured. Missing API key: OPENAI_API_KEY'
       );
     });
 
     it("should throw when gemini not configured", () => {
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
       expect(() => validateProviderConfig("gemini")).toThrow(
         'Provider "gemini" is not configured. Missing API key: GEMINI_API_KEY'
       );
@@ -189,7 +189,7 @@ describe("Provider Selector", () => {
 
     it("should fallback when preferred not configured", () => {
       process.env.OPENAI_API_KEY = "test-key";
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
       expect(selectBestProvider("gemini")).toBe("openai");
     });
 
@@ -201,15 +201,15 @@ describe("Provider Selector", () => {
     });
 
     it("should use first configured when default not available", () => {
-      delete process.env.AI_DEFAULT_PROVIDER;
-      delete process.env.OPENAI_API_KEY;
+      process.env.AI_DEFAULT_PROVIDER = undefined;
+      process.env.OPENAI_API_KEY = undefined;
       process.env.GEMINI_API_KEY = "test-key";
       expect(selectBestProvider()).toBe("gemini");
     });
 
     it("should throw when no providers configured", () => {
-      delete process.env.OPENAI_API_KEY;
-      delete process.env.GEMINI_API_KEY;
+      process.env.OPENAI_API_KEY = undefined;
+      process.env.GEMINI_API_KEY = undefined;
       expect(() => selectBestProvider()).toThrow("No AI providers configured");
     });
   });
@@ -226,14 +226,14 @@ describe("Provider Selector", () => {
     });
 
     it("should validate provider by default", () => {
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
       expect(() => selectProvider({ provider: "gemini" })).toThrow(
         "not configured"
       );
     });
 
     it("should skip validation when disabled", () => {
-      delete process.env.GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY = undefined;
       expect(selectProvider({ provider: "gemini", validate: false })).toBe(
         "gemini"
       );
@@ -266,7 +266,7 @@ describe("Provider Selector", () => {
     });
 
     it("should respect validate:false with invalid config", () => {
-      delete process.env.OPENAI_API_KEY;
+      process.env.OPENAI_API_KEY = undefined;
       expect(selectProvider({ provider: "openai", validate: false })).toBe(
         "openai"
       );

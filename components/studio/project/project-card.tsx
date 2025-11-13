@@ -26,10 +26,10 @@ import {
 import { deleteProjectAction } from "@/lib/studio/actions";
 import type { StudioProject } from "@/lib/studio/types";
 
-interface ProjectCardProps {
+type ProjectCardProps = {
   project: StudioProject;
   onDelete?: () => void;
-}
+};
 
 export function ProjectCard({ project, onDelete }: ProjectCardProps) {
   const router = useRouter();

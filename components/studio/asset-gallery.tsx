@@ -31,10 +31,10 @@ import { toast } from "sonner";
 import { AssetDetailDialog } from "./asset-detail-dialog";
 import { UploadAssetDialog } from "./upload-asset-dialog";
 
-interface AssetGalleryProps {
+type AssetGalleryProps = {
   assets: StudioAsset[];
   projectId?: string;
-}
+};
 
 type ViewMode = "grid" | "list";
 
@@ -88,7 +88,9 @@ export function AssetGallery({ assets, projectId }: AssetGalleryProps) {
   };
 
   const handleBulkDelete = async () => {
-    if (selectedAssets.size === 0) return;
+    if (selectedAssets.size === 0) {
+      return;
+    }
 
     if (
       !confirm(
@@ -138,21 +140,17 @@ export function AssetGallery({ assets, projectId }: AssetGalleryProps) {
   };
 
   const handleUpdate = async (assetId: string, data: { name?: string }) => {
-    try {
-      const response = await fetch(`/api/studio/assets/${assetId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+    const response = await fetch(`/api/studio/assets/${assetId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
 
-      if (!response.ok) {
-        throw new Error("Failed to update");
-      }
-
-      router.refresh();
-    } catch (error) {
-      throw error;
+    if (!response.ok) {
+      throw new Error("Failed to update");
     }
+
+    router.refresh();
   };
 
   const handleUploadComplete = () => {
@@ -250,7 +248,11 @@ export function AssetGallery({ assets, projectId }: AssetGalleryProps) {
         )}
 
         {/* Upload Button */}
-        <Button className="h-8 text-xs" onClick={() => setUploadDialogOpen(true)} size="sm">
+        <Button
+          className="h-8 text-xs"
+          onClick={() => setUploadDialogOpen(true)}
+          size="sm"
+        >
           <Upload className="mr-1.5 h-3.5 w-3.5" />
           Upload
         </Button>
@@ -470,7 +472,7 @@ function AssetCard({
         {/* Info */}
         <div className="space-y-0.5 p-2">
           <h4 className="truncate font-medium text-xs">{asset.name}</h4>
-          <div className="flex items-center justify-between text-muted-foreground/70 text-[10px]">
+          <div className="flex items-center justify-between text-[10px] text-muted-foreground/70">
             <span>{format(asset.createdAt, "MMM d, yyyy")}</span>
             {asset.metadata.size && (
               <span>{formatBytes(asset.metadata.size)}</span>
@@ -555,8 +557,10 @@ function AssetListItem({
 
           {/* Info */}
           <div className="min-w-0 flex-1">
-            <h4 className="mb-0.5 truncate font-medium text-xs">{asset.name}</h4>
-            <div className="flex items-center gap-2 text-muted-foreground text-[10px]">
+            <h4 className="mb-0.5 truncate font-medium text-xs">
+              {asset.name}
+            </h4>
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
               <Badge className="px-1 py-0 text-[9px]" variant="secondary">
                 {asset.type}
               </Badge>
@@ -608,7 +612,9 @@ function AssetListItem({
 }
 
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
+  if (bytes === 0) {
+    return "0 B";
+  }
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));

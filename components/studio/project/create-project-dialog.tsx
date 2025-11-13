@@ -17,10 +17,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createProjectAction } from "@/lib/studio/actions";
 
-interface CreateProjectDialogProps {
+type CreateProjectDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
+};
 
 export function CreateProjectDialog({
   open,

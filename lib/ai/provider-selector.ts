@@ -121,11 +121,11 @@ export function selectBestProvider(preferredProvider?: ProviderId): ProviderId {
 /**
  * Provider selection options
  */
-export interface ProviderOptions {
+export type ProviderOptions = {
   provider?: ProviderId;
   fallback?: boolean;
   validate?: boolean;
-}
+};
 
 /**
  * Main provider selection function with options

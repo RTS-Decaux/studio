@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
  * OAuth Callback Endpoint
- * 
+ *
  * ⚠️ STATUS: TEMPORARILY DISABLED - COMING SOON
  * This endpoint handles OAuth provider callbacks and is currently deactivated.
  */
@@ -23,8 +23,10 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code as string);
-  /* eslint-enable no-unreachable */
+    const { error } = await supabase.auth.exchangeCodeForSession(
+      code as string
+    );
+    /* eslint-enable no-unreachable */
 
     if (error) {
       console.error("Failed to exchange code for session:", error);

@@ -34,13 +34,13 @@ import { Separator } from "@/components/ui/separator";
 import { useAssetSignedUrl, useSignedUrl } from "@/hooks/use-signed-url";
 import type { StudioAsset } from "@/lib/studio/types";
 
-interface AssetDetailDialogProps {
+type AssetDetailDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   asset: StudioAsset | null;
   onDelete?: (assetId: string) => void;
   onUpdate?: (assetId: string, data: Partial<StudioAsset>) => void;
-}
+};
 
 export function AssetDetailDialog({
   open,
@@ -69,7 +69,9 @@ export function AssetDetailDialog({
   );
   const { signedUrl: videoUrl } = useSignedUrl(asset?.url || null);
 
-  if (!asset) return null;
+  if (!asset) {
+    return null;
+  }
 
   const handleEdit = () => {
     setEditedName(asset.name);
@@ -116,7 +118,9 @@ export function AssetDetailDialog({
   };
 
   const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return "0 B";
+    if (bytes === 0) {
+      return "0 B";
+    }
     const k = 1024;
     const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -136,8 +140,12 @@ export function AssetDetailDialog({
                   className="font-semibold text-lg"
                   onChange={(e) => setEditedName(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSave();
-                    if (e.key === "Escape") setIsEditing(false);
+                    if (e.key === "Enter") {
+                      handleSave();
+                    }
+                    if (e.key === "Escape") {
+                      setIsEditing(false);
+                    }
                   }}
                   value={editedName}
                 />

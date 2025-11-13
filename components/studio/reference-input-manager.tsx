@@ -8,14 +8,14 @@ import { Label } from "@/components/ui/label";
 import type { ReferenceInputKind } from "@/lib/ai/studio-models";
 import { cn } from "@/lib/utils";
 
-interface ReferenceInputManagerProps {
+type ReferenceInputManagerProps = {
   type: ReferenceInputKind;
   label: string;
   required?: boolean;
   value: File | string | null;
   onChange: (value: File | null) => void;
   disabled?: boolean;
-}
+};
 
 const INPUT_CONFIG: Record<
   ReferenceInputKind,
@@ -96,7 +96,9 @@ export function ReferenceInputManager({
     e.preventDefault();
     setIsDragging(false);
 
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
 
     const file = e.dataTransfer.files[0];
     if (file) {
@@ -105,8 +107,12 @@ export function ReferenceInputManager({
       const fileType = file.type;
 
       const isAccepted = acceptedTypes.some((type) => {
-        if (type === "image/*") return fileType.startsWith("image/");
-        if (type === "video/*") return fileType.startsWith("video/");
+        if (type === "image/*") {
+          return fileType.startsWith("image/");
+        }
+        if (type === "video/*") {
+          return fileType.startsWith("video/");
+        }
         return fileType === type;
       });
 
